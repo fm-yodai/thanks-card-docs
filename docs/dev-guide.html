@@ -6,7 +6,7 @@
 <title>開発の進め方ガイド — ありがとうカード プロジェクト</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
+    :root {
     --bg: #F7F6F2;
     --card: #FFFFFF;
     --text: #1E1E2E;
@@ -37,20 +37,51 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
 
+  /* ── SIDEBAR (overlay) ── */
+  .sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--card);border-right:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .sidebar.open{transform:translateX(0)}
+  .sb-overlay{position:fixed;inset:0;background:transparent;z-index:299;opacity:0;pointer-events:none;transition:opacity .3s}
+  .sb-overlay.show{opacity:1;pointer-events:auto}
+  .sb-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+  .sb-title{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+  .sb-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--sub);transition:all .15s}
+  .sb-close:hover{background:var(--text);color:#fff;border-color:var(--text)}
+  .sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+  .sb-nav::-webkit-scrollbar{width:4px}
+  .sb-nav::-webkit-scrollbar-thumb{background:#E0DED8;border-radius:2px}
+  .sb-section{padding:6px 20px 4px;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .sb-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:12.5px;color:var(--sub);line-height:1.4}
+  .sb-item:hover{background:var(--bg);color:var(--text)}
+  .sb-item.active{background:var(--warm-light);color:var(--warm);border-left-color:var(--warm);font-weight:600}
+  .sb-item.active.sup-active{background:var(--purple-light);color:var(--purple);border-left-color:var(--purple)}
+  .sb-num{font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;color:var(--muted);min-width:18px;text-align:right}
+  .sb-item.active .sb-num{color:var(--warm)}
+  .sb-item.active.sup-active .sb-num{color:var(--purple)}
+  .sb-divider{height:1px;background:var(--border);margin:8px 20px}
+  .sb-toggle{position:fixed;top:8px;left:10px;z-index:201;width:30px;height:30px;border-radius:6px;background:var(--card);border:1px solid var(--border);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,.04);transition:all .15s}
+  .sb-toggle:hover{background:var(--text);color:#fff;border-color:var(--text)}
+
+  /* ── MAIN ── */
+  .main{margin-left:0;height:100vh;position:relative}
+
   .sw{display:flex;height:100vh;transition:transform .55s cubic-bezier(.22,1,.36,1)}
-  .sl{min-width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;padding:56px 64px 64px}
-  .sc{max-width:900px;width:100%;opacity:0;transform:translateX(24px);transition:all .45s cubic-bezier(.22,1,.36,1) .1s}
+  .sl{min-width:100vw;height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:100px 64px 64px;overflow-y:auto}
+  .sl::-webkit-scrollbar{width:8px}
+  .sl::-webkit-scrollbar-track{background:transparent}
+  .sl::-webkit-scrollbar-thumb{background:#D5D4D0;border-radius:4px}
+  .sl.center-v{align-items:center}
+  .sc{max-width:900px;width:100%;padding-right:20px;opacity:0;transform:translateX(24px);transition:all .45s cubic-bezier(.22,1,.36,1) .1s}
   .sl.active .sc{opacity:1;transform:translateX(0)}
 
-  /* TOP */
-  .top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:200;background:rgba(247,246,242,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  /* ── TOP ── */
+  .top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px 0 52px;z-index:200;background:rgba(247,246,242,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
   .top-t{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--sub)}
   .top-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;color:var(--muted)}
 
   .prog{position:fixed;top:46px;left:0;right:0;height:3px;background:var(--border);z-index:200}
   .prog-f{height:100%;background:linear-gradient(90deg,var(--warm),var(--purple));transition:width .55s cubic-bezier(.22,1,.36,1);border-radius:0 3px 3px 0}
 
-  /* BOTTOM */
+  /* ── BOTTOM ── */
   .bot{position:fixed;bottom:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:200;background:rgba(247,246,242,.92);backdrop-filter:blur(12px);border-top:1px solid var(--border)}
   .btn{padding:8px 20px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--sub);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans JP',sans-serif;user-select:none}
   .btn:hover{background:var(--text);color:#fff;border-color:var(--text)}
@@ -64,7 +95,7 @@
   .sec-label{position:fixed;top:46px;left:0;right:0;height:26px;display:flex;align-items:center;justify-content:center;z-index:199;background:var(--purple-light);border-bottom:1px solid var(--purple-border);font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--purple);transition:all .3s;opacity:0;pointer-events:none}
   .sec-label.show{opacity:1}
 
-  /* TYPO */
+  /* ── TYPO ── */
   .tag{display:inline-flex;align-items:center;gap:6px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;padding:4px 12px;border-radius:6px}
   .tag.t-warm{background:var(--warm-light);color:var(--warm)}
   .tag.t-blue{background:var(--blue-light);color:var(--blue)}
@@ -74,9 +105,10 @@
   .tag.t-pink{background:var(--pink-light);color:var(--pink)}
 
   h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:clamp(23px,3.2vw,32px);line-height:1.45;margin-bottom:10px}
-  .lead{font-size:14.5px;color:var(--sub);line-height:1.85;max-width:660px}
+  h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:16px;margin-bottom:8px}
+  .lead{font-size:14.5px;color:var(--sub);line-height:1.85}
 
-  /* HERO */
+  /* ── HERO ── */
   .hero{text-align:center;background:linear-gradient(170deg,#FFF8F4 0%,var(--bg) 40%,#F0EEFF 100%)}
   .hero .sc{display:flex;flex-direction:column;align-items:center}
   .hero-i{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#FFF1EB,#FDE4D6);display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:24px;box-shadow:0 4px 20px rgba(224,122,75,.12)}
@@ -87,7 +119,7 @@
   .hint{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
   .key{display:inline-flex;align-items:center;justify-content:center;width:24px;height:22px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--card);color:var(--sub);box-shadow:0 1px 2px rgba(0,0,0,.06)}
 
-  /* CARD */
+  /* ── CARD ── */
   .cd{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:0 1px 4px rgba(0,0,0,.02);transition:transform .2s}
   .cd:hover{transform:translateY(-2px)}
   .cd-top{height:4px;border-radius:var(--r) var(--r) 0 0;margin:-22px -22px 18px -22px}
@@ -96,7 +128,7 @@
   .cd-top.ct-purple{background:linear-gradient(90deg,var(--purple),#A68FD8)}
   .cd-top.ct-green{background:linear-gradient(90deg,var(--green),#6CC98B)}
   .cd-top.ct-pink{background:linear-gradient(90deg,var(--pink),#DE8199)}
-
+  .cd-top.ct-yellow{background:linear-gradient(90deg,var(--yellow),#D4B44A)}
   .cd-l{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;margin-bottom:5px}
   .cd h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:16px;margin-bottom:8px}
   .cd p,.cd-p{font-size:13px;color:var(--sub);line-height:1.8}
@@ -105,7 +137,7 @@
   .ex.ex-blue{background:var(--blue-light);border-color:var(--blue)}
   .ex.ex-purple{background:var(--purple-light);border-color:var(--purple)}
 
-  /* CALLOUT */
+  /* ── CALLOUT ── */
   .co{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);box-shadow:0 1px 4px rgba(0,0,0,.02)}
   .co.co-warm{background:var(--warm-light);border-color:var(--warm-border)}
   .co.co-blue{background:var(--blue-light);border-color:var(--blue-border)}
@@ -116,32 +148,26 @@
   .co p{font-size:13px;color:var(--sub);line-height:1.8}
   .co strong{color:var(--text)}
 
-  /* GRIDS */
+  /* ── GRIDS ── */
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   .mb8{margin-bottom:8px}.mb10{margin-bottom:10px}.mb12{margin-bottom:12px}.mb14{margin-bottom:14px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}
 
-  /* APPROACH */
+  /* ── APPROACH ── */
   .ap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
   .ap-l{font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
   .sts{display:flex;flex-direction:column;gap:4px}
   .st{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:500;text-align:center}
   .arr{text-align:center;font-size:10px;color:var(--muted);line-height:1}
-
-  .wf .ap-l{color:var(--muted)}
-  .wf .st{background:#F0F0EE;color:var(--sub)}
-
+  .wf .ap-l{color:var(--muted)}.wf .st{background:#F0F0EE;color:var(--sub)}
   .ag{border-color:var(--warm-border);background:var(--warm-light)}
-  .ag .ap-l{color:var(--warm)}
-  .ag .st{background:rgba(255,255,255,.7);color:var(--sub)}
-  .ag .st.hl{background:rgba(224,122,75,.12);color:var(--warm);font-weight:700}
-  .ag .arr{color:var(--warm)}
-
+  .ag .ap-l{color:var(--warm)}.ag .st{background:rgba(255,255,255,.7);color:var(--sub)}.ag .st.hl{background:rgba(224,122,75,.12);color:var(--warm);font-weight:700}.ag .arr{color:var(--warm)}
   .loop{border:2px dashed rgba(224,122,75,.35);border-radius:10px;padding:10px 10px 8px;position:relative;margin:3px 0;background:rgba(255,255,255,.3)}
   .loop-t{position:absolute;top:-9px;left:12px;background:var(--warm-light);padding:0 8px;font-size:9.5px;font-weight:700;color:var(--warm);letter-spacing:.06em}
   .ap-n{text-align:center;font-size:11px;color:var(--muted);margin-top:10px;font-style:italic}
 
-  /* SPRINT CARD */
+  /* ── SPRINT CARD ── */
   .spc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.02);transition:transform .2s}
   .spc:hover{transform:translateY(-2px)}
   .spc::after{content:'';position:absolute;top:0;left:0;right:0;height:4px}
@@ -154,17 +180,17 @@
   .spc h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px}
   .spc p{font-size:12.5px;color:var(--sub);line-height:1.75}
 
-  /* CYCLE */
+  /* ── CYCLE ── */
   .cy{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);flex-wrap:wrap;font-size:13px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.02)}
   .cy-a{color:var(--muted);font-size:12px}
 
-  /* PRINCIPLE */
+  /* ── PRINCIPLE ── */
   .pr{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--rs);background:var(--blue-light);border:1px solid var(--blue-border)}
   .pr p{font-size:13px;color:var(--sub);line-height:1.8}.pr strong{color:var(--text)}
 
-  /* TIMELINE */
+  /* ── TIMELINE ── */
   .tl{position:relative;padding-left:36px}
-  .tl::before{content:'';position:absolute;left:10px;top:8px;bottom:8px;width:3px;background:linear-gradient(180deg,var(--warm),var(--blue),var(--purple),var(--green),var(--pink));border-radius:3px}
+  .tl::before{content:'';position:absolute;left:10px;top:8px;bottom:8px;width:3px;background:linear-gradient(180deg,var(--warm),var(--blue),var(--purple),var(--green));border-radius:3px}
   .tli{position:relative;margin-bottom:12px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);box-shadow:0 1px 4px rgba(0,0,0,.02);transition:transform .2s}
   .tli:hover{transform:translateX(4px)}
   .tli:last-child{margin-bottom:0}
@@ -173,20 +199,12 @@
   .tli:nth-child(2)::before{background:var(--blue);box-shadow:0 0 0 2px var(--blue)}
   .tli:nth-child(3)::before{background:var(--purple);box-shadow:0 0 0 2px var(--purple)}
   .tli:nth-child(4)::before{background:var(--green);box-shadow:0 0 0 2px var(--green)}
-  .tli:nth-child(5)::before{background:var(--pink);box-shadow:0 0 0 2px var(--pink)}
   .tl-p{font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;letter-spacing:.06em;margin-bottom:2px}
-  .tli:nth-child(1) .tl-p{color:var(--warm)}.tli:nth-child(2) .tl-p{color:var(--blue)}.tli:nth-child(3) .tl-p{color:var(--purple)}.tli:nth-child(4) .tl-p{color:var(--green)}.tli:nth-child(5) .tl-p{color:var(--pink)}
+  .tli:nth-child(1) .tl-p{color:var(--warm)}.tli:nth-child(2) .tl-p{color:var(--blue)}.tli:nth-child(3) .tl-p{color:var(--purple)}.tli:nth-child(4) .tl-p{color:var(--green)}
   .tli h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14.5px;margin-bottom:2px}
   .tli p{font-size:12.5px;color:var(--sub);line-height:1.7}
 
-  /* REQ */
-  .rc{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.02);transition:transform .2s}
-  .rc:hover{transform:translateY(-2px)}
-  .rc-e{font-size:22px;margin-bottom:8px;display:block}
-  .rc h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px}
-  .rc p{font-size:12.5px;color:var(--sub);line-height:1.7}
-
-  /* RELATION */
+  /* ── RELATION ── */
   .rel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.02)}
   .rel-grid{display:grid;grid-template-columns:auto 44px auto;grid-template-rows:auto 28px auto;align-items:center;justify-items:center;gap:0;font-size:13px;font-weight:600}
   .rel-box{padding:12px 18px;border:1.5px solid var(--border);border-radius:var(--rs);background:#FAFAF8;text-align:center;white-space:nowrap;font-size:13px}
@@ -196,7 +214,7 @@
   .rel-box:nth-child(9){border-color:var(--warm-border);background:var(--warm-light)}
   .rel-arrow{color:var(--muted);font-size:12px}
 
-  /* SPRINT STACK */
+  /* ── SPRINT STACK ── */
   .stk{display:flex;flex-direction:column;gap:7px}
   .stk-i{display:flex;align-items:center;gap:14px;padding:11px 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);box-shadow:0 1px 4px rgba(0,0,0,.02);transition:transform .2s}
   .stk-i:hover{transform:translateX(4px)}
@@ -205,27 +223,26 @@
   .stk-i.goal{border-color:var(--warm-border);background:var(--warm-light)}
   .stk-i.goal .stk-n{color:var(--warm)}
 
-  /* SUMMARY */
+  /* ── SUMMARY ── */
   .sum{text-align:center;background:linear-gradient(170deg,#F0EEFF 0%,var(--bg) 40%,#FFF8F4 100%)}
   .sum .sc{display:flex;flex-direction:column;align-items:center}
   .sum .lead{margin-bottom:34px}
-  .sum-g{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;width:100%;max-width:680px;margin-bottom:40px}
-  .sum-c{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.02)}
-  .sum-i{font-size:26px;margin-bottom:8px;display:block}
+  .sum-g{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:750px;margin-bottom:40px}
+  .sum-c{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px 16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .sum-i{font-size:28px;margin-bottom:10px;display:block}
   .sum-l{font-family:'Montserrat',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
-  .sum-t{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;line-height:1.45}
+  .sum-t{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14px;line-height:1.45;margin-bottom:6px}
+  .sum-d{font-size:12px;color:var(--sub);line-height:1.6}
   .closing{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:18px}
 
-  /* SUPPLEMENT */
+  /* ── SUPPLEMENT ── */
   .sup-badge{display:inline-flex;align-items:center;gap:5px;font-family:'Montserrat',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:6px;background:var(--purple-light);color:var(--purple);border:1px solid var(--purple-border);margin-bottom:14px}
 
-  /* DESIGN */
+  /* ── DESIGN ── */
   .db{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
   .db h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14.5px;margin-bottom:6px}
-  .db.bad{border-color:var(--pink-border);background:var(--pink-light)}
-  .db.bad h3{color:var(--pink)}
-  .db.good{border-color:var(--green-border);background:var(--green-light)}
-  .db.good h3{color:var(--green)}
+  .db.bad{border-color:var(--pink-border);background:var(--pink-light)}.db.bad h3{color:var(--pink)}
+  .db.good{border-color:var(--green-border);background:var(--green-light)}.db.good h3{color:var(--green)}
   .db p{font-size:12.5px;color:var(--sub);line-height:1.75}
 
   .gb{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.02)}
@@ -238,28 +255,74 @@
   .gp p{font-size:11px;color:var(--sub);line-height:1.55}
   .gp-a{position:absolute;right:-7px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);z-index:1;background:var(--card);padding:2px 0}
 
-  /* BACKLOG */
-  .bl{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
-  .bl-e{font-size:22px;margin-bottom:8px;display:block}
-  .bl h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:4px}
-  .bl p{font-size:12.5px;color:var(--sub);line-height:1.7}
+  /* ── TABLE ── */
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .tbl th{background:#F2F1ED;font-weight:700;font-size:11.5px;color:var(--sub);text-align:left;padding:11px 16px;border-bottom:1px solid var(--border)}
+  .tbl td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--sub);line-height:1.7;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl .t-label{font-weight:700;color:var(--text)}
+  .tbl .t-sub{font-size:11px;color:var(--muted);margin-top:2px}
+  .tbl .t-done{color:var(--muted);font-style:italic}
+  .tbl .t-loop{background:var(--warm-light);font-size:11.5px;color:var(--warm);font-weight:600}
+  .t-badge{display:inline-block;font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:3px}
+  .t-badge.tb-green{background:var(--green-light);color:var(--green)}
+  .t-badge.tb-blue{background:var(--blue-light);color:var(--blue)}
 
+  /* ── ROLE TABLE ── */
+  .rtbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .rtbl th{background:#F2F1ED;font-weight:700;font-size:11.5px;color:var(--sub);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border)}
+  .rtbl td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--sub);line-height:1.65;vertical-align:top;font-size:12.5px}
+  .rtbl tr:last-child td{border-bottom:none}
+  .rtbl .r-name{font-weight:700;color:var(--text);white-space:nowrap}
+
+  /* ── CITE ── */
+  .cite{font-size:11px;color:var(--muted);line-height:1.6;margin-top:6px}
+
+  /* ── FLOW ── */
+  .fl{display:flex;align-items:stretch;gap:0}
+  .fl-step{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:14px 12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .fl-step h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;margin-bottom:3px}
+  .fl-step p{font-size:11px;color:var(--sub);line-height:1.5}
+  .fl-arr{display:flex;align-items:center;padding:0 6px;color:var(--muted);font-size:14px}
+  .fl-step.fl-warm{border-color:var(--warm-border);border-top:3px solid var(--warm)}
+  .fl-step.fl-blue{border-color:var(--blue-border);border-top:3px solid var(--blue)}
+  .fl-step.fl-green{border-color:var(--green-border);border-top:3px solid var(--green)}
+  .fl-step.fl-purple{border-color:var(--purple-border);border-top:3px solid var(--purple)}
+  .fl-step.fl-dashed{border-style:dashed;border-top:3px dashed var(--warm)}
+
+  /* ── RESPONSIVE ── */
   @media(max-width:800px){
-    .sl{padding:54px 22px 64px}
-    .g2,.g3{grid-template-columns:1fr}
-    .sum-g{grid-template-columns:repeat(2,1fr)}
+    .sl{padding:100px 22px 64px}
+    .top{padding:0 20px 0 48px}
+    .g2,.g3,.g4{grid-template-columns:1fr}
+    .sum-g{grid-template-columns:1fr}
     .gb{grid-template-columns:repeat(2,1fr)}
     .gp:nth-child(2){border-right:none}.gp-a{display:none}
     .rel-grid{grid-template-columns:auto 28px auto;font-size:12px}
     .rel-box{padding:10px 12px;font-size:12px}
     .stk-i{flex-direction:column;align-items:flex-start;gap:4px}
+    .fl{flex-direction:column}.fl-arr{justify-content:center;padding:4px 0;transform:rotate(90deg)}
   }
 </style>
 </head>
 <body>
 
+<!-- SIDEBAR (overlay menu) -->
+<div class="sb-overlay" id="sbOverlay"></div>
+<button class="sb-toggle" id="sbToggle" aria-label="目次を開く">☰</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-title">📘 目次</div>
+    <button class="sb-close" id="sbClose" aria-label="目次を閉じる">✕</button>
+  </div>
+  <div class="sb-nav" id="sbNav"></div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
 <div class="top">
-  <div class="top-t">📘 開発の進め方ガイド</div>
+  <div class="top-t">開発の進め方ガイド</div>
   <div class="top-p"><span id="pn">1</span> / <span id="tt"></span></div>
 </div>
 <div class="prog"><div class="prog-f" id="pf"></div></div>
@@ -268,65 +331,65 @@
 <div class="sw" id="sw">
 
 <!-- 1: HERO -->
-<div class="sl hero active" data-section="本編">
+<div class="sl hero center-v active" data-section="本編" data-title="タイトル">
 <div class="sc">
   <div class="hero-i">📘</div>
   <h1>開発の進め方ガイド</h1>
-  <p class="lead">これから「ありがとうカード」をどう作っていくか。<br>チーム全員で共通認識を持つための資料です。</p>
+  <p class="lead">これからプロジェクトをどう進めていくか。<br>チーム全員で共通認識を持つための資料です。</p>
   <div class="chips">
-    <div class="chip">📄 全10スライド＋補足</div>
-    <div class="chip">⏱ 約10分</div>
+    <div class="chip">📄 全12スライド＋補足</div>
+    <div class="chip">⏱ 約15分</div>
     <div class="chip">🎯 チーム全員向け</div>
   </div>
   <div class="hint"><span class="key">←</span><span class="key">→</span> or 下のボタンで操作</div>
 </div>
 </div>
 
-<!-- 2: 用語 -->
-<div class="sl" data-section="本編">
+<!-- 2: What/Why と How -->
+<div class="sl" data-section="本編" data-title="What & Why と How">
 <div class="sc">
   <div class="tag t-warm">FIRST THINGS FIRST</div>
-  <h2>「要求定義」と「要件定義」</h2>
-  <p class="lead mb20">このプロジェクトで何度も出てくる用語を、最初に整理しておきます。</p>
+  <h2>What & Why と How</h2>
+  <p class="lead mb20">ソフトウェア開発では、大きく2つの問いに答える必要があります。ウォーターフォール開発では「要求定義」「要件定義」と呼ばれるフェーズで、これらの問いの答えを明らかにしていきます。</p>
   <div class="g3 mb14">
     <div class="cd"><div class="cd-top ct-warm"></div>
-      <div class="cd-l" style="color:var(--warm)">WHAT &amp; WHY</div>
-      <h3>🎯 要求定義</h3>
-      <p>「何を・なぜ作るか」を決めること。ユーザーの目線で、プロダクトで何が起きてほしいかを描く。</p>
+      <div class="cd-l" style="color:var(--warm)">WHAT &amp; WHY ― 要求定義</div>
+      <h3>🎯 何を・なぜ作るか</h3>
+      <p>プロダクトの目的、ユーザーが誰か、どんな価値を届けるか。</p>
       <div class="ex ex-warm">💬「全社員が誰にでもありがとうカードを送れるようにしたい」</div>
     </div>
     <div class="cd"><div class="cd-top ct-blue"></div>
-      <div class="cd-l" style="color:var(--blue)">HOW — 骨格</div>
-      <h3>🦴 要件定義・骨格</h3>
-      <p>「どんな画面があって、大まかに何ができるか」を決める。MVP全体の構造を描く。</p>
-      <div class="ex ex-blue">💬「カード送信画面がある。宛先を選んでメッセージを書いてAIラベルが付いて送信できる」</div>
+      <div class="cd-l" style="color:var(--blue)">HOW ― 要件定義（骨格）</div>
+      <h3>🦴 どう作るか（大まかに）</h3>
+      <p>画面構成、技術基盤、MVP 全体の構造を描く。</p>
+      <div class="ex ex-blue">💬「カード送信画面がある。宛先を選んでメッセージを書いてAIラベルが付いて送信」</div>
     </div>
     <div class="cd"><div class="cd-top ct-purple"></div>
-      <div class="cd-l" style="color:var(--purple)">HOW — 詳細</div>
-      <h3>🔍 要件定義・詳細</h3>
-      <p>「画面の細かい振る舞い」を決めること。実装する直前に詰める粒度。</p>
+      <div class="cd-l" style="color:var(--purple)">HOW ― 要件定義（詳細）</div>
+      <h3>🔍 どう作るか（細かく）</h3>
+      <p>画面の細かい振る舞い。実装する直前に詰める粒度。</p>
       <div class="ex ex-purple">💬「宛先は部署フィルタ可」「最大500文字」「AIラベルは手動変更可」</div>
     </div>
   </div>
   <div class="co co-warm">
     <div class="co-i">💡</div>
-    <p>この3つは、プロジェクトの中で<strong>段階的に</strong>進めていきます。次のページで「どの順番で、いつやるか」を説明します。</p>
+    <p>ウォーターフォールでは What&Why を「<strong>要求定義</strong>」、How を「<strong>要件定義</strong>」と呼びます。これらはウォーターフォール固有のフェーズ名であり、アジャイルでは使いません。次のスライドで違いを見てみましょう。</p>
   </div>
 </div>
 </div>
 
-<!-- 3: アジャイル -->
-<div class="sl" data-section="本編">
+<!-- 3: アジャイルに要求定義・要件定義はない -->
+<div class="sl" data-section="本編" data-title="アジャイルと要求/要件定義">
 <div class="sc">
   <div class="tag t-yellow">CORE CONCEPT</div>
-  <h2>アジャイルってなに？</h2>
-  <p class="lead mb20">「最初に全部決めてから作る」のではなく「小さく作って、早くFBをもらって、育てていく」進め方です。</p>
+  <h2>アジャイルに「要求定義」「要件定義」はない</h2>
+  <p class="lead mb20">アジャイルには「要求定義」「要件定義」という工程はありません。Sprint 0で要求+骨格の初版を決め、スプリントを繰り返しながら詳細化していきます。</p>
   <div class="g2 mb14">
     <div class="ap wf">
       <div class="ap-l">📐 WATERFALL（従来型）</div>
       <div class="sts">
         <div class="st">要求定義</div><div class="arr">↓</div>
-        <div class="st">要件定義（骨格＋詳細を全部決める）</div><div class="arr">↓</div>
+        <div class="st">要件定義（骨格＋詳細）</div><div class="arr">↓</div>
         <div class="st">設計</div><div class="arr">↓</div>
         <div class="st">実装</div><div class="arr">↓</div>
         <div class="st">テスト → リリース 🎉</div>
@@ -336,13 +399,13 @@
     <div class="ap ag">
       <div class="ap-l">🔄 AGILE（今回の進め方）</div>
       <div class="sts">
-        <div class="st hl">要求定義</div><div class="arr">↓</div>
-        <div class="st hl">要件定義（骨格）</div><div class="arr">↓</div>
+        <div class="st hl">Sprint 0：　要求+骨格の初版を決める</div>
+        <div class="arr">↓</div>
         <div class="loop">
-          <div class="loop-t">🔁 くり返す</div>
-          <div class="st">要件定義（詳細）</div><div class="arr">↓</div>
+          <div class="loop-t">🔁 Sprint 1〜N くり返す</div>
+          <div class="st">プランニング（詳細を決める）</div><div class="arr">↓</div>
           <div class="st">設計 → 実装 → テスト</div><div class="arr">↓</div>
-          <div class="st hl">見せる → 声を聞く</div>
+          <div class="st hl">見せる → 声を聞く → 修正</div>
         </div>
         <div class="arr">↓</div>
         <div class="st hl">MVPリリース 🎉</div>
@@ -352,23 +415,283 @@
   </div>
   <div class="co co-yellow">
     <div class="co-i">💡</div>
-    <p><strong>違いのポイント：</strong>ウォーターフォールでは骨格も詳細もまとめて最初に全部やる。アジャイルでは骨格だけ先に決めて、詳細は各スプリントで都度決める。だから途中で方向修正がしやすい。</p>
+    <p><strong>ポイント：</strong>ウォーターフォールでは骨格も詳細もまとめて最初に全部やる。アジャイルでは骨格だけ先に決めて、詳細は各スプリントで都度決める。だから途中で方向修正がしやすい。</p>
   </div>
 </div>
 </div>
 
-<!-- 4: スプリント -->
-<div class="sl" data-section="本編">
+<!-- 4: WF → アジャイル 対応表 -->
+<div class="sl" data-section="本編" data-title="WF → アジャイル対応表">
 <div class="sc">
-  <div class="tag t-blue">HOW IT WORKS</div>
-  <h2>スプリントの回し方</h2>
-  <p class="lead mb20">2週間を1サイクル（＝スプリント）として、毎回「動くもの」を作ります。</p>
+  <div class="tag t-yellow">MAPPING</div>
+  <h2>WF の各フェーズ、アジャイルではいつやる？</h2>
+  <p class="lead mb20">ウォーターフォールのフェーズに相当する活動は、アジャイルでは以下のタイミングで行われます。</p>
+  <table class="tbl mb14">
+    <thead>
+      <tr><th style="width:28%">WF フェーズ</th><th style="width:38%">アジャイルでの対応</th><th style="width:34%">タイミング</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="t-label">要求定義</span><div class="t-sub">What / Why</div></td>
+        <td>プロダクトゴール策定、インセプションデッキ、UX設計・プロトタイプ作成</td>
+        <td>Sprint 0 で初版作成。以降も継続的に見直し</td>
+      </tr>
+      <tr>
+        <td><span class="t-label">要件定義（骨格）</span><div class="t-sub">How の大枠</div></td>
+        <td>技術選定・環境構築、プロダクトバックログ作成、完成の定義（DoD）</td>
+        <td>Sprint 0 で初版作成。以降も継続的に見直し</td>
+      </tr>
+      <tr>
+        <td><span class="t-label">要件定義（詳細）</span><div class="t-sub">How の詳細</div></td>
+        <td>スプリントプランニングでバックログ項目を詳細化（スプリントバックログ作成）</td>
+        <td>毎スプリント</td>
+      </tr>
+      <tr>
+        <td><span class="t-label">設計・実装・テスト</span></td>
+        <td>スプリント内で一貫して実施</td>
+        <td>毎スプリント</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="co co-green">
+    <div class="co-i">🔑</div>
+    <p><strong>ポイント：</strong>アジャイルでは「すべてを最初に決める」のではなく、Sprint 0 で骨格を固め、スプリントごとに学びながら詳細化していきます。</p>
+  </div>
+</div>
+</div>
+
+<!-- 5: スクラムガイドが定めていること -->
+<div class="sl" data-section="本編" data-title="スクラムガイドの定義">
+<div class="sc">
+  <div class="tag t-purple">OFFICIAL SOURCE</div>
+  <h2>スクラムガイドが定めていること</h2>
+  <p class="lead mb20">スクラムの公式ルール（スクラムガイド 2020）が定めているのは、以下の要素だけです。実は、「Sprint 0」をはじめとするスプリントの準備のやり方については、ガイド内では定められていません。</p>
+  <div class="g4 mb14">
+    <div class="cd" style="text-align:center"><div class="cd-top ct-blue"></div>
+      <div class="cd-l" style="color:var(--blue)">ROLES</div>
+      <h3>3つの役割</h3>
+      <p>プロダクトオーナー<br>スクラムマスター<br>開発者</p>
+    </div>
+    <div class="cd" style="text-align:center"><div class="cd-top ct-green"></div>
+      <div class="cd-l" style="color:var(--green)">EVENTS</div>
+      <h3>5つのイベント</h3>
+      <p>スプリント<br>プランニング<br>デイリースクラム<br>レビュー<br>レトロスペクティブ</p>
+    </div>
+    <div class="cd" style="text-align:center"><div class="cd-top ct-purple"></div>
+      <div class="cd-l" style="color:var(--purple)">ARTIFACTS</div>
+      <h3>3つの作成物</h3>
+      <p>プロダクトバックログ<br>スプリントバックログ<br>インクリメント</p>
+    </div>
+    <div class="cd" style="text-align:center"><div class="cd-top ct-warm"></div>
+      <div class="cd-l" style="color:var(--warm)">COMMITMENTS</div>
+      <h3>3つの確約</h3>
+      <p>プロダクトゴール<br>スプリントゴール<br>完成の定義（DoD）</p>
+    </div>
+  </div>
+  <div class="co co-purple">
+    <div class="co-i">📖</div>
+    <p>スクラムガイドはフレームワークの<strong>最小限のルール</strong>だけを定めています。具体的な準備の進め方はチームに委ねられています。</br>Sprint 0、インセプションデッキ、デザインスプリント、技術選定などは、すべてチームが選ぶプラクティスです。</p>
+  </div>
+</div>
+</div>
+
+<!-- 6: Sprint 0 という選択 -->
+<div class="sl" data-section="本編" data-title="Sprint 0 という選択">
+<div class="sc">
+  <div class="tag t-purple">PRACTICE</div>
+  <h2>Sprint 0 という選択</h2>
+  <p class="lead mb20">Sprint 0 はスクラムガイドには定義されていませんが、Sprint 1 を始めるための準備期間として多くのチームが採用しています。</p>
+  <h3 class="mb10">スクラムガイドから導かれる「必要な準備」</h3>
+  <p style="font-size:13px;color:var(--sub);margin-bottom:12px">最初のスプリント（Sprint 1）を開始するには、少なくとも以下の４つが必要です。</p>
+  <div class="g2 mb16">
+    <div class="cd">
+      <h3>① スクラムチームの構成</h3>
+      <p>SM 1名 ＋ PO 1名 ＋ 開発者（複数名）</p>
+      <p class="cite">スクラムチームは、スクラムマスター1人、プロダクトオーナー1人、複数人の開発者で構成される。— スクラムガイド 2020</p>
+    </div>
+    <div class="cd">
+      <h3>② プロダクトゴール</h3>
+      <p>プロダクトの将来の状態を示す目標</p>
+      <p class="cite">プロダクトゴールは、プロダクトの将来の状態を表しており、スクラムチームの計画のターゲットになる。— スクラムガイド 2020</p>
+    </div>
+    <div class="cd">
+      <h3>③ プロダクトバックログ</h3>
+      <p>優先順位付けされた作業リスト</p>
+      <p class="cite">プロダクトバックログは、プロダクトの改善に必要なものの、創発的かつ順番に並べられた一覧である。— スクラムガイド 2020</p>
+    </div>
+    <div class="cd">
+      <h3>④ 完成の定義（DoD）</h3>
+      <p>インクリメントの品質基準</p>
+      <p class="cite">完成の定義とは、プロダクトの品質基準を満たすインクリメントの状態を示した正式な記述である。— スクラムガイド 2020</p>
+    </div>
+  </div>
+  <h3 class="mb10">そのほかに決めておくとよいこと</h3>
+  <div class="g2 mb14">
+    <div class="cd">
+      <h3>🎨 UX 設計</h3>
+      <p>ユーザーフロー・ワイヤーフレーム・プロトタイプを事前に検討しておくと、バックログの精度が上がります。</p>
+    </div>
+    <div class="cd">
+      <h3>⚙️ 技術選定・環境構築</h3>
+      <p>言語・フレームワーク・CI/CD・リポジトリなどの技術基盤を整えると、Sprint 1 からすぐ開発に入れます。</p>
+    </div>
+  </div>
+  <div class="co co-purple">
+    <div class="co-i">🔧</div>
+    <p>どのプラクティスを Sprint 0 に含めるかは、チームの状況に応じて選択します。<strong>本プロジェクトでは、上記の６つを実施します。</strong></p>
+  </div>
+</div>
+</div>
+
+<!-- 7: 全体フロー -->
+<div class="sl" data-section="本編" data-title="全体フロー">
+<div class="sc">
+  <div class="tag t-green">BIG PICTURE</div>
+  <h2>プロジェクト全体の流れ</h2>
+  <p class="lead mb20">Sprint 0 で、スプリント開始に向けた準備を整えます。</br>Sprint 1 以降は同じリズムを繰り返しながら、段階的にプロダクトを作り上げていきます。</p>
+  <div class="tl">
+    <div class="tli">
+      <div class="tl-p">SPRINT 0 — 準備期間</div>
+      <h3>🛠️ 骨格の初版を作り、開発の土台を整える</h3>
+      <p>インセプションデッキ、UX設計、技術選定・環境構築、バックログ作成、DoD策定。</p>
+    </div>
+    <div class="tli">
+      <div class="tl-p">SPRINT 1〜2</div>
+      <h3>💻 コア機能を作る</h3>
+      <p>カード送受信、AIラベリング、タイムライン表示。詳細はプランニングで詰めてから実装。</p>
+    </div>
+    <div class="tli">
+      <div class="tl-p">SPRINT 3〜N</div>
+      <h3>🔄 フィードバックで育てる</h3>
+      <p>月次レポート、UI改善、AI精度チューニング。声を聞きながら繰り返す。骨格の見直しもOK。</p>
+    </div>
+    <div class="tli">
+      <div class="tl-p">GOAL</div>
+      <h3>🎉 ベータ → MVPリリース</h3>
+      <p>先行テスト後、全社60名へ展開。ここはゴールではなくスタート。</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 8: 今回のSprint 0で行うこと -->
+<div class="sl" data-section="本編" data-title="Sprint 0 で行うこと">
+<div class="sc">
+  <div class="tag t-warm">THIS PROJECT</div>
+  <h2>Sprint 0 でやること</h2>
+  <p class="lead mb20">今回のSprint 0 で行うことを、時系列に沿ってまとめました。</p>
+  <table class="tbl mb14">
+    <thead>
+      <tr><th style="width:6%">#</th><th style="width:28%">決めること</th><th style="width:36%">手段・プラクティス</th><th style="width:16%">主導</th><th style="width:14%">区分</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1</strong></td>
+        <td><span class="t-label">スクラムチームの構成</span></td>
+        <td class="t-done">キックオフで決定済み</td>
+        <td>—</td>
+        <td><span class="t-badge tb-green">ガイド準拠</span></td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td><span class="t-label">プロダクトゴール</span></td>
+        <td>インセプションデッキ（簡略版）</td>
+        <td>企画リード</td>
+        <td><span class="t-badge tb-green">ガイド準拠</span></td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td><span class="t-label">UX 設計</span></td>
+        <td>デザインスプリント（簡略版）</td>
+        <td>企画リード</td>
+        <td><span class="t-badge tb-blue">追加</span></td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td><span class="t-label">技術選定・環境構築</span></td>
+        <td>技術選定（言語・FW決定）、環境構築（CI/CD・リポジトリ）</td>
+        <td>テックリード</td>
+        <td><span class="t-badge tb-blue">追加</span></td>
+      </tr>
+      <tr class="t-loop">
+        <td>↺</td>
+        <td colspan="4">技術的制約を踏まえ、UX・プロトタイプを調整（企画リード＋テックリード協働）</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td><span class="t-label">完成の定義（DoD）</span></td>
+        <td>チーム全員で策定・合意</td>
+        <td>テックリード</td>
+        <td><span class="t-badge tb-green">ガイド準拠</span></td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td><span class="t-label">プロダクトバックログ</span></td>
+        <td>UX設計をもとにチームで洗い出し＋優先順位付け</td>
+        <td>PO＋テックリード</td>
+        <td><span class="t-badge tb-green">ガイド準拠</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="co co-warm">
+    <div class="co-i">👑</div>
+    <p>すべての工程で<strong>PO が最終意思決定</strong>を行います。</p>
+  </div>
+</div>
+</div>
+
+<!-- 9: Sprint 0 の進め方 -->
+<div class="sl" data-section="本編" data-title="Sprint 0 の進め方">
+<div class="sc">
+  <div class="tag t-blue">SPRINT 0</div>
+  <h2>Sprint 0 の進め方</h2>
+  <p class="lead mb20">今回のSprint 0 は企画リードが主導する前半と、テックリード（+PO）が主導する後半に分かれます。</p>
+  <h3 class="mb10">前半：企画リード主導</h3>
+  <div class="fl mb20">
+    <div class="fl-step fl-warm"><h4>プロダクトゴールの定義</h4><p>インセプションデッキ<br>簡略版</p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-warm"><h4>PO 合意</h4><p>ゴールの最終確認</p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-warm"><h4>UX 設計</h4><p>デザインスプリント<br>簡略版</p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-warm"><h4>チームレビュー</h4><p>フィードバック収集</p></div>
+  </div>
+  <div class="co co-yellow">
+    <div class="co-i">🧭</div>
+    <p>PO・開発チームと協働し、要求を言語化・可視化します。プロダクトゴール・プロトタイプが成果物となります。</p>
+  </div>
+  </br></br>
+  <h3 class="mb10">後半：テックリード（+PO）主導</h3>
+  <div class="fl mb14">
+    <div class="fl-step fl-blue"><h4>技術選定</h4><p>言語・FW 決定</p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-dashed"><h4>UX・プロト調整</h4><p>技術制約の反映<br><span style="font-size:10px;color:var(--muted)">企画リード協働</span></p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-blue"><h4>環境構築</h4><p>CI/CD<br>リポジトリ</p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-blue"><h4>DoD 策定</h4><p>完成の基準を合意</p></div>
+    <div class="fl-arr">→</div>
+    <div class="fl-step fl-blue"><h4>バックログ作成</h4><p>洗い出し<br>＋優先順位決定</p></div>
+  </div>
+  <div class="co co-blue">
+    <div class="co-i">🔄️</div>
+    <p>前半の成果物（プロダクトゴール・プロトタイプ）をインプットとして、要件の骨格・開発基盤を固めます。</p>
+  </div>
+</div>
+</div>
+
+<!-- 10: Sprint 1以降の進め方 -->
+<div class="sl" data-section="本編" data-title="Sprint 1 以降の進め方">
+<div class="sc">
+  <div class="tag t-purple">SPRINT 1〜N</div>
+  <h2>Sprint 1 以降の進め方</h2>
+  <p class="lead mb20">2週間を1サイクル（＝スプリント）として、毎回「動くもの」を作ります。Sprint 0 で固めた骨格をもとに、機能を積み上げていきます。</p>
   <div class="g3 mb14">
     <div class="spc">
       <span class="sp-e">📋</span>
       <div class="sp-d">DAY 1</div>
       <h3>プランニング</h3>
-      <p>今回何を作るか決める。バックログから選んで、骨格をもとに詳細な仕様を詰める。1〜2時間。</p>
+      <p>バックログから今回作る機能を選ぶ。骨格をもとに、具体的な仕様を詰める。1〜2時間。</p>
     </div>
     <div class="spc">
       <span class="sp-e">💻</span>
@@ -389,167 +712,6 @@
     <span>👀 見せる</span><span class="cy-a">→</span>
     <span>💬 振り返る</span><span class="cy-a">→ 🔁</span>
   </div>
-  <div class="pr">
-    <div style="font-size:17px;flex-shrink:0">✨</div>
-    <p><strong>大事なルール：スプリントの終わりには必ず「動くもの」がある。</strong>ドキュメントだけ、設計だけで終わらない。小さくても触れるものを作ろう。</p>
-  </div>
-</div>
-</div>
-
-<!-- 5: 全体の流れ -->
-<div class="sl" data-section="本編">
-<div class="sc">
-  <div class="tag t-green">BIG PICTURE</div>
-  <h2>プロジェクト全体の流れ</h2>
-  <p class="lead mb20">要求定義とSprint 0が準備。Sprint 1以降はずっと同じリズムの繰り返しです。</p>
-  <div class="tl">
-    <div class="tli">
-      <div class="tl-p">要求定義 — 1〜2週間</div>
-      <h3>🎯 方向性を揃え、MVPの骨格を描く</h3>
-      <p>プロジェクトチャーター作成、UX設計・プロトタイプの初版作成。</p>
-    </div>
-    <div class="tli">
-      <div class="tl-p">SPRINT 0 — 1〜2週間</div>
-      <h3>🛠️ 開発の土台をつくる</h3>
-      <p>技術選定・環境構築・バックログ作成。技術面を踏まえてUX・プロトタイプを調整。</p>
-    </div>
-    <div class="tli">
-      <div class="tl-p">SPRINT 1〜2</div>
-      <h3>💻 コア機能を作る</h3>
-      <p>カード送受信、AIラベリング、タイムライン表示。詳細な仕様はプランニングで詰めてから実装。</p>
-    </div>
-    <div class="tli">
-      <div class="tl-p">SPRINT 3〜N</div>
-      <h3>🔄 フィードバックで育てる</h3>
-      <p>月次レポート、UI改善、AI精度チューニング。声を聞きながら繰り返す。骨格の見直しもOK。</p>
-    </div>
-    <div class="tli">
-      <div class="tl-p">GOAL</div>
-      <h3>🎉 ベータ → MVPリリース</h3>
-      <p>先行テスト後、全社60名へ展開。ここはゴールではなくスタート。</p>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- 6: 要求定義 -->
-<div class="sl" data-section="本編">
-<div class="sc">
-  <div class="tag t-warm">FIRST STEP</div>
-  <h2>要求定義でやること</h2>
-  <p class="lead mb16">プロジェクトチャーターの作成と、UX設計・プロトタイプの初版作成までを行います。</p>
-  <div class="co co-warm mb16">
-    <div class="co-i">📝</div>
-    <p>まず以下の5項目を話し合い、<strong>「プロジェクトチャーター」</strong>として1枚にまとめます。開発中に迷ったときの判断基準になる、チームの羅針盤です。</p>
-  </div>
-  <div class="g3 mb12">
-    <div class="rc"><span class="rc-e">🎯</span><h3>プロダクトの目的</h3><p>なぜ作るのか。キックオフ資料をチームの言葉で再確認。</p></div>
-    <div class="rc"><span class="rc-e">👥</span><h3>対象ユーザーと課題</h3><p>誰がどんな場面で困っているか。チームで腹落ちさせる。</p></div>
-    <div class="rc"><span class="rc-e">📦</span><h3>MVPスコープ</h3><p>「MVP」「v2以降」「やらない」に機能を仕分け。</p></div>
-  </div>
-  <div class="g2 mb14">
-    <div class="rc"><span class="rc-e">🏁</span><h3>成功の定義</h3><p>具体的で測定可能な基準を1〜2個決める。</p></div>
-    <div class="rc"><span class="rc-e">🚧</span><h3>制約と前提</h3><p>開発期間・メンバー・技術・予算など動かせない条件を明示。</p></div>
-  </div>
-  <div class="co co-blue">
-    <div class="co-i">🖼️</div>
-    <p>プロジェクトチャーターができたら、その内容をもとに<strong>UX設計（ユーザーフロー・ワイヤーフレーム）とプロトタイプの初版</strong>を作成します。ここで作るのは叩き台。Sprint 0で技術面を踏まえて調整することを前提としています。</p>
-  </div>
-</div>
-</div>
-
-<!-- 7: Sprint 0 -->
-<!-- 7: Sprint 0 -->
-<div class="sl" data-section="本編">
-<div class="sc">
-  <div class="tag t-blue">SPRINT 0</div>
-  <h2>Sprint 0 でやること</h2>
-  <p class="lead mb20">要求定義フェーズの成果物を受け取り、開発の土台をつくります。</p>
-  <div class="g3 mb14">
-    <div class="cd"><div class="cd-top ct-blue"></div>
-      <div class="cd-l" style="color:var(--blue)">開発準備</div>
-      <h3>⚙️ 技術選定＆環境構築</h3>
-      <p>使う技術を選んで開発環境を整える。</br>その前提として、利用環境・認証方式・同時利用の規模感・データの取り扱いなど、技術判断に関わる非機能要件も整理する。</p>
-    </div>
-    <div class="cd"><div class="cd-top ct-purple"></div>
-      <div class="cd-l" style="color:var(--purple)">UX調整</div>
-      <h3>🖼️ UX・プロトタイプの調整</h3>
-      <p>技術選定の結果を受けて初版を調整。「こうしたい」と「こうできる」のすり合わせ。</p>
-    </div>
-    <div class="cd"><div class="cd-top ct-green"></div>
-      <div class="cd-l" style="color:var(--green)">バックログ</div>
-      <h3>📋 バックログ作成</h3>
-      <p>MVPに必要な機能をリストアップし優先順位をつける。Sprint 1以降のプランニングの土台。</p>
-    </div>
-  </div>
-  <div class="co co-blue">
-    <div class="co-i">💡</div>
-    <p><strong>Sprint 0が終わると：</strong>MVP全体の骨格が確定し、Sprint 1から「何をどの順番で作るか」がクリアになります。</p>
-  </div>
-</div>
-</div>
-
-<!-- 8: Sprint 0 進め方 -->
-<div class="sl" data-section="本編">
-<div class="sc">
-  <div class="tag t-blue">SPRINT 0</div>
-  <h2>Sprint 0 の進め方</h2>
-  <p class="lead mb20">Sprint 0の作業は順番にやるものではなく、お互いに影響し合いながら並行で進みます。</p>
-  <div class="rel mb20">
-    <div class="rel-grid">
-      <div class="rel-box">🖼️ UX・プロトタイプ</div>
-      <div class="rel-arrow">←→</div>
-      <div class="rel-box">⚙️ 技術選定</div>
-      <div class="rel-arrow" style="transform:rotate(90deg)">←→</div>
-      <div></div>
-      <div class="rel-arrow" style="transform:rotate(90deg)">←→</div>
-      <div class="rel-box">📋 バックログ</div>
-      <div class="rel-arrow">←→</div>
-      <div class="rel-box">🔧 環境構築</div>
-    </div>
-  </div>
-  <div class="g2 mb14">
-    <div class="cd"><div class="cd-top ct-purple"></div>
-      <div class="cd-l" style="color:var(--purple)">UX → 技術</div>
-      <h3>「こうしたい」が先にある場合</h3>
-      <p>UXで「AIラベルをリアルタイムでプレビューしたい」と決めたら、それを実現できるAPI構成を技術選定で検討する。</p>
-    </div>
-    <div class="cd"><div class="cd-top ct-blue"></div>
-      <div class="cd-l" style="color:var(--blue)">技術 → UX</div>
-      <h3>「こうできる」が制約になる場合</h3>
-      <p>技術調査で「リアルタイムは応答速度的に厳しい」とわかったら、UXを「送信後にラベルが付く」に修正する。</p>
-    </div>
-  </div>
-  <div class="co co-green">
-    <div class="co-i">🔄</div>
-    <p>きれいに一方通行で進むわけではありません。<strong>「こうしたい」と「こうできる」を行ったり来たりしながら</strong>、チームで落としどころを見つけていくのがSprint 0です。</p>
-  </div>
-</div>
-</div>
-
-<!-- 9: Sprint 1以降 -->
-<div class="sl" data-section="本編">
-<div class="sc">
-  <div class="tag t-purple">SPRINT 1〜N</div>
-  <h2>Sprint 1以降の進め方</h2>
-  <p class="lead mb20">骨格が固まったら、ここからはスプリントを回して機能を積み上げていきます。</p>
-  <div class="g3 mb16">
-    <div class="cd"><div class="cd-top ct-blue"></div>
-      <div class="cd-l" style="color:var(--blue)">プランニング</div>
-      <h3>📋 要件定義（詳細）</h3>
-      <p>バックログから今回作る機能を選ぶ。骨格を見ながら「この画面のこの部分、具体的にどうする？」を詰める。</p>
-    </div>
-    <div class="cd"><div class="cd-top ct-green"></div>
-      <div class="cd-l" style="color:var(--green)">開発</div>
-      <h3>💻 設計→実装→テスト</h3>
-      <p>詰めた仕様をもとに作る。途中で仕様の抜けに気づいたらチーム内で相談してその場で決める。</p>
-    </div>
-    <div class="cd"><div class="cd-top ct-purple"></div>
-      <div class="cd-l" style="color:var(--purple)">レビュー＆ふりかえり</div>
-      <h3>👀 見せる→声を聞く</h3>
-      <p>作ったものを見せてFBをもらう。フィードバックはバックログに追加。進め方も振り返る。</p>
-    </div>
-  </div>
   <div class="stk mb14">
     <div class="stk-i"><div class="stk-n">Sprint 1</div><p>カードの送信・受信ができる</p></div>
     <div class="stk-i"><div class="stk-n">Sprint 2</div><p>AIラベリングが付く、タイムラインで一覧表示</p></div>
@@ -558,33 +720,97 @@
     <div class="stk-i"><div class="stk-n">Sprint 5</div><p>ベータテスト、フィードバック反映</p></div>
     <div class="stk-i goal"><div class="stk-n">Sprint 6</div><p>🎉 MVPリリース</p></div>
   </div>
-  <div class="co co-purple">
-    <div class="co-i">💡</div>
-    <p><strong>スプリントの内容は固定ではありません。</strong>レビューで得たFBや開発中に見つかった課題に応じて、次に何を作るかは毎回見直します。</p>
+  <div class="pr">
+    <div style="font-size:17px;flex-shrink:0">✅</div>
+    <p>スプリントの内容は固定ではなく、FBや課題に応じて毎回見直します。</p>
   </div>
 </div>
 </div>
 
-<!-- 10: まとめ -->
-<div class="sl sum" data-section="本編">
+<!-- 11: 役割一覧 -->
+<div class="sl" data-section="本編" data-title="役割一覧">
+<div class="sc">
+  <div class="tag t-green">TEAM</div>
+  <h2>役割一覧</h2>
+  <p class="lead mb20">本プロジェクトの役割と、Sprint 0 ／ Sprint 1 以降のファシリテート担当です。</p>
+  <table class="rtbl mb14">
+    <thead>
+      <tr><th style="width:14%">役割</th><th style="width:40%">責任</th><th style="width:23%">Sprint 0</th><th style="width:23%">Sprint 1〜N</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="r-name">PO</td>
+        <td>プロダクト価値の最大化。全工程で方向性の意思決定・最終承認。</td>
+        <td>最終意思決定</td>
+        <td>最終意思決定</td>
+      </tr>
+      <tr>
+        <td class="r-name">企画リード</td>
+        <td>Sprint 0 前半を主導。インセプションデッキ、UX 設計・プロトタイプを作成しチームに引き継ぐ。</td>
+        <td>前半ファシリテート</td>
+        <td>離脱</td>
+      </tr>
+      <tr>
+        <td class="r-name">テックリード</td>
+        <td>Sprint 0 後半を主導。技術選定・環境構築をリード。Sprint 1 以降も技術面の判断・方針を継続してリード。</td>
+        <td>後半ファシリテート</td>
+        <td>技術リード継続</td>
+      </tr>
+      <tr>
+        <td class="r-name">SM</td>
+        <td>スクラムイベントのファシリテート、障害物の排除、チーム支援。</td>
+        <td>参加者として関与</td>
+        <td>イベントファシリテート</td>
+      </tr>
+      <tr>
+        <td class="r-name">開発メンバー</td>
+        <td>インクリメント（スプリントの成果物）の作成。</br>Sprint 0 ではフィードバック提供・DoD 策定・バックログ作成に参加。技術選定・環境構築では担当領域の推進を担う。</td>
+        <td>参加・フィードバック<br><span style="font-size:11px;color:var(--muted)">＋担当領域の技術推進</span></td>
+        <td>設計・実装・テスト</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="co co-green">
+    <div class="co-i">🧑‍🤝‍🧑</div>
+    <p><strong>開発メンバー：</strong>各自の担当領域を持ち、担当領域の計画・推進においてオーナーシップを発揮します。</br>ここでは詳細な役割については割愛します。</p>
+  </div>
+</div>
+</div>
+
+<!-- 12: まとめ -->
+<div class="sl sum center-v" data-section="本編" data-title="まとめ">
 <div class="sc">
   <h2>まとめ</h2>
-  <p class="lead">完璧な計画を立てることよりも、<br>動くものを作って学ぶスピードを大事にしよう。</p>
+  <p class="lead">このガイドのポイントを3つに絞ると。</p>
   <div class="sum-g">
-    <div class="sum-c"><span class="sum-i">🎯</span><div class="sum-l">要求定義</div><div class="sum-t">プロジェクトチャーター＋<br>UX設計の初版</div></div>
-    <div class="sum-c"><span class="sum-i">🛠️</span><div class="sum-l">SPRINT 0</div><div class="sum-t">技術面を踏まえ<br>骨格を確定</div></div>
-    <div class="sum-c"><span class="sum-i">🔄</span><div class="sum-l">SPRINT 1〜N</div><div class="sum-t">詳細は都度<br>作りながら決める</div></div>
-    <div class="sum-c"><span class="sum-i">🎨</span><div class="sum-l">デザイン</div><div class="sum-t">プロダクトと<br>一緒に育てる</div></div>
+    <div class="sum-c">
+      <span class="sum-i">📖</span>
+      <div class="sum-l">SCRUM GUIDE</div>
+      <div class="sum-t">ルールは最小限</div>
+      <div class="sum-d">スクラムガイドが定めるのは<br>役割・イベント・作成物だけ。<br>あとはチームが決める。</div>
+    </div>
+    <div class="sum-c">
+      <span class="sum-i">🛠️</span>
+      <div class="sum-l">SPRINT 0</div>
+      <div class="sum-t">骨格の初版を作る</div>
+      <div class="sum-d">プロダクトゴール、UX設計、<br>技術基盤、バックログ、DoD。<br>すべてここで初版を揃える。</div>
+    </div>
+    <div class="sum-c">
+      <span class="sum-i">🔄</span>
+      <div class="sum-l">SPRINT 1〜N</div>
+      <div class="sum-t">作りながら育てる</div>
+      <div class="sum-d">詳細は都度決める。<br>Sprint 0の骨格も見直してOK。<br>変化は学びの証。</div>
+    </div>
   </div>
-  <p class="closing">さあ、まずは方向性を揃えるところから 🚀</p>
+  <p class="closing">準備はOK。さっそく始めよう 🚀</p>
 </div>
 </div>
 
 <!-- ===== 補足資料 ===== -->
 
-<!-- A -->
-<div class="sl" data-section="補足資料">
-<div class="sc">
+<!-- A: なぜアジャイル -->
+<div class="sl" data-section="補足資料" data-title="なぜアジャイルか">
+<div class="sc" style="padding-top:16px">
   <div class="sup-badge">APPENDIX A</div>
   <div class="tag t-yellow">WHY AGILE</div>
   <h2>なぜアジャイルで進めるの？</h2>
@@ -601,10 +827,42 @@
 </div>
 </div>
 
-<!-- B -->
-<div class="sl" data-section="補足資料">
-<div class="sc">
+<!-- B: UX設計の位置づけ -->
+<div class="sl" data-section="補足資料" data-title="UX設計の位置づけ">
+<div class="sc" style="padding-top:16px">
   <div class="sup-badge">APPENDIX B</div>
+  <div class="tag t-blue">UX &amp; AGILE</div>
+  <h2>補足：UX 設計の位置づけ</h2>
+  <p class="lead mb20">アジャイル宣言（2001年）は UX デザインを直接カバーしていません。その後、2010年代にデザインスプリントなどの手法が登場し、アジャイルと UX を統合する動きが広がりました。</p>
+  <div class="g2 mb14">
+    <div class="cd"><div class="cd-top ct-blue"></div>
+      <div class="cd-l" style="color:var(--blue)">2001</div>
+      <h3>📜 アジャイル宣言</h3>
+      <p>ソフトウェア開発の原則を定義。UX や UI デザインのプロセスは対象外。</p>
+    </div>
+    <div class="cd"><div class="cd-top ct-green"></div>
+      <div class="cd-l" style="color:var(--green)">2010〜</div>
+      <h3>🎨 デザインスプリントの登場</h3>
+      <p>Google Ventures が提唱。5日間で課題定義→プロトタイプ→ユーザーテストを実施する手法。</p>
+    </div>
+  </div>
+  <div class="cd mb14">
+    <div class="cd-top ct-purple"></div>
+    <div class="cd-l" style="color:var(--purple)">CURRENT</div>
+    <h3>🔄 現在の主流：アジャイル × UX の融合</h3>
+    <p>Sprint 0 や開発スプリントの中で UX 設計を組み込むチームが増えています。「作る前に確かめる」というデザインスプリントの考え方は、スクラムの「検査と適応」の精神と相性が良いとされています。</p>
+  </div>
+  <div class="co co-green">
+    <div class="co-i">🎯</div>
+    <p>今回のプロジェクトでは、Sprint 0 内で<strong>デザインスプリントの簡略版</strong>（本来5日間→短縮）を実施し、UX 設計とプロトタイプを作成します。</p>
+  </div>
+</div>
+</div>
+
+<!-- C: デザインも育てていく -->
+<div class="sl" data-section="補足資料" data-title="デザインも育てていく">
+<div class="sc" style="padding-top:16px">
+  <div class="sup-badge">APPENDIX C</div>
   <div class="tag t-purple">DESIGN APPROACH</div>
   <h2>デザインも、育てていく</h2>
   <p class="lead mb20">「先にデザインを完璧にしてから開発」ではなく、プロダクトと一緒に育てます。</p>
@@ -621,33 +879,9 @@
 </div>
 </div>
 
-<!-- C -->
-<div class="sl" data-section="補足資料">
-<div class="sc">
-  <div class="sup-badge">APPENDIX C</div>
-  <div class="tag t-blue">FAQ</div>
-  <h2>Sprint 0は「動くもの」が<br>なくてもいいの？</h2>
-  <p class="lead mb24">本編で「スプリントの終わりには必ず動くものがある」と言いましたが、Sprint 0は例外です。</p>
-  <div class="g2 mb14">
-    <div class="cd"><div class="cd-top ct-blue"></div>
-      <h3>🛠️ Sprint 0の性質</h3>
-      <p>Sprint 0は開発の準備フェーズ。成果物はプロトタイプの調整版、技術選定の結論、環境構築、バックログ。動くソフトウェアではありません。</p>
-    </div>
-    <div class="cd"><div class="cd-top ct-purple"></div>
-      <h3>🖱️ ここでの「動くもの」</h3>
-      <p>クリッカブルプロトタイプが「触って確認できるもの」にあたります。ソフトウェアではないけれど、チームの認識合わせに十分機能します。</p>
-    </div>
-  </div>
-  <div class="co co-blue">
-    <div class="co-i">💡</div>
-    <p><strong>Sprint 0だけは特別。</strong>Sprint 1以降は、必ず実際に動くソフトウェアを成果物にします。</p>
-  </div>
-</div>
-</div>
-
-<!-- D -->
-<div class="sl" data-section="補足資料">
-<div class="sc">
+<!-- D: 骨格の柔軟性 -->
+<div class="sl" data-section="補足資料" data-title="骨格の柔軟性">
+<div class="sc" style="padding-top:16px">
   <div class="sup-badge">APPENDIX D</div>
   <div class="tag t-green">FAQ</div>
   <h2>骨格で決めたことは<br>変えていいの？</h2>
@@ -664,29 +898,22 @@
 </div>
 </div>
 
-<!-- E -->
-<div class="sl" data-section="補足資料">
-<div class="sc">
+<!-- E: 出典 -->
+<div class="sl" data-section="補足資料" data-title="出典・参考情報">
+<div class="sc" style="padding-top:16px">
   <div class="sup-badge">APPENDIX E</div>
-  <div class="tag t-warm">FAQ</div>
-  <h2>バックログって何？</h2>
-  <p class="lead mb24">「やりたいことリスト」です。ただし、優先順位がついています。</p>
-  <div class="cd mb16">
-    <p>バックログとは、このプロダクトで実現したい機能や改善をすべてリストアップしたもの。Sprint 0で初期版を作り、プロジェクトが進む中で常に更新されます。</p>
-  </div>
-  <div class="g3 mb14">
-    <div class="bl"><span class="bl-e">📝</span><h4>全部入り</h4><p>思いついた機能・改善案はとりあえず全部入れる。入れるだけならタダ。</p></div>
-    <div class="bl"><span class="bl-e">🔢</span><h4>優先順位つき</h4><p>上にあるものほど優先度が高い。「次のスプリントでやる」ものが一番上。</p></div>
-    <div class="bl"><span class="bl-e">🔄</span><h4>常に更新</h4><p>レビューで出たFB、開発中の課題、新しいアイデアを都度追加・並べ替え。</p></div>
-  </div>
-  <div class="co co-warm">
-    <div class="co-i">💡</div>
-    <p>スプリントプランニングでは、バックログの上から順に<strong>「今回はここまでやれそう」を選びます。</strong>全部やろうとしない。2週間でできる量だけ選ぶのがコツです。</p>
+  <div class="tag t-purple">REFERENCES</div>
+  <h2>出典・参考情報</h2>
+  <p class="lead mb20">本ガイドで参照した公式ソースおよび参考文献です。</p>
+  <div class="cd">
+    <p class="cite" style="font-size:12px">Ken Schwaber &amp; Jeff Sutherland.『スクラムガイド 2020年版』<br>https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-Japanese.pdf</p>
+    <p class="cite" style="font-size:12px;margin-top:10px">Jonathan Rasmusson.『アジャイルサムライ — 達人開発者への道』（インセプションデッキの出典）</p>
+    <p class="cite" style="font-size:12px;margin-top:10px">Jake Knapp.『Sprint — How to Solve Big Problems and Test New Ideas in Just Five Days』（デザインスプリントの出典）</p>
   </div>
 </div>
 </div>
 
-</div>
+</div><!-- /sw -->
 
 <div class="bot">
   <button class="btn" id="prev" disabled>← 前へ</button>
@@ -694,14 +921,19 @@
   <button class="btn" id="next">次へ →</button>
 </div>
 
+</div><!-- /main -->
+
 <script>
 const sw=document.getElementById('sw'),slides=[...document.querySelectorAll('.sl')],total=slides.length;
 const prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next');
 const pn=document.getElementById('pn'),tt=document.getElementById('tt'),pf=document.getElementById('pf');
 const dotsEl=document.getElementById('dots'),secLabel=document.getElementById('secLabel');
+const sbNav=document.getElementById('sbNav'),sidebar=document.getElementById('sidebar'),sbToggle=document.getElementById('sbToggle');
 let cur=0,anim=false;
 tt.textContent=total;
 const mainCount=slides.filter(s=>s.dataset.section==='本編').length;
+
+// Build dots
 slides.forEach((_,i)=>{
   const d=document.createElement('button');
   const isSup=slides[i].dataset.section==='補足資料';
@@ -711,29 +943,74 @@ slides.forEach((_,i)=>{
   if(i===mainCount-1){const sep=document.createElement('div');sep.style.cssText='width:1px;height:14px;background:var(--border);margin:0 4px;flex-shrink:0';dotsEl.appendChild(sep)}
 });
 const dots=[...document.querySelectorAll('.dot')];
+
+// Build sidebar
+let lastSection='';
+slides.forEach((sl,i)=>{
+  const sec=sl.dataset.section;
+  const title=sl.dataset.title||('スライド '+(i+1));
+  if(sec!==lastSection){
+    if(lastSection){const div=document.createElement('div');div.className='sb-divider';sbNav.appendChild(div)}
+    const lbl=document.createElement('div');
+    lbl.className='sb-section';
+    lbl.textContent=sec==='補足資料'?'📎 APPENDIX':'📘 '+sec;
+    sbNav.appendChild(lbl);
+    lastSection=sec;
+  }
+  const item=document.createElement('div');
+  item.className='sb-item'+(i===0?' active':'');
+  if(sec==='補足資料')item.classList.add('sup-item');
+  const num=document.createElement('span');
+  num.className='sb-num';
+  num.textContent=sec==='補足資料'?String.fromCharCode(65+(i-mainCount)):(i+1);
+  const txt=document.createElement('span');
+  txt.textContent=title;
+  item.appendChild(num);
+  item.appendChild(txt);
+  item.addEventListener('click',()=>{go(i);if(window.innerWidth<=900)sidebar.classList.remove('open')});
+  sbNav.appendChild(item);
+});
+const sbItems=[...document.querySelectorAll('.sb-item')];
+
 function go(i){
   if(i<0||i>=total||i===cur||anim)return;
   anim=true;
   slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');
-  sw.style.transform=`translateX(-${cur*100}vw)`;
+  sw.style.transform=`translateX(-${cur*100}%)`;
   pn.textContent=cur+1;
   pf.style.width=((cur+1)/total*100)+'%';
   prevBtn.disabled=cur===0;nextBtn.disabled=cur===total-1;
   dots.forEach((d,j)=>d.classList.toggle('active',j===cur));
+  sbItems.forEach((it,j)=>{
+    it.classList.toggle('active',j===cur);
+    if(j===cur&&slides[j].dataset.section==='補足資料')it.classList.add('sup-active');
+    else it.classList.remove('sup-active');
+  });
+  // scroll sidebar item into view
+  if(sbItems[cur])sbItems[cur].scrollIntoView({block:'nearest',behavior:'smooth'});
   if(slides[cur].dataset.section==='補足資料'){secLabel.classList.add('show')}else{secLabel.classList.remove('show')}
+  slides[cur].scrollTop=0;
   setTimeout(()=>anim=false,550);
 }
+
 prevBtn.addEventListener('click',()=>go(cur-1));
 nextBtn.addEventListener('click',()=>go(cur+1));
 document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();go(cur+1)}
-  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(cur-1)}
+  if(e.key==='ArrowRight'){e.preventDefault();go(cur+1)}
+  if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1)}
 });
 let tx=0,ty=0;
 document.addEventListener('touchstart',e=>{tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});
 document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){dx<0?go(cur+1):go(cur-1)}},{passive:true});
-let wc=false;
-document.addEventListener('wheel',e=>{if(wc)return;if(Math.abs(e.deltaY)>30){wc=true;e.deltaY>0?go(cur+1):go(cur-1);setTimeout(()=>wc=false,800)}},{passive:true});
+
+// Sidebar toggle
+const overlay=document.getElementById('sbOverlay');
+const sbClose=document.getElementById('sbClose');
+function openSb(){sidebar.classList.add('open');overlay.classList.add('show')}
+function closeSb(){sidebar.classList.remove('open');overlay.classList.remove('show')}
+sbToggle.addEventListener('click',openSb);
+sbClose.addEventListener('click',closeSb);
+// overlay click does NOT close — only ✕ button closes
 </script>
 </body>
 </html>
