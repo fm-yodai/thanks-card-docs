@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ありがとうカード プロジェクト — ドキュメント</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --dark-sub: #2d2d4a;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+    --card-shadow: 0 2px 24px rgba(0,0,0,0.045);
+    --card-hover-shadow: 0 12px 40px rgba(0,0,0,0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--dark);
+    color: #fff;
+    padding: 72px 40px 100px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 700px 500px at 15% 40%, rgba(255,107,107,0.13), transparent),
+      radial-gradient(ellipse 600px 500px at 85% 60%, rgba(77,150,255,0.10), transparent),
+      radial-gradient(ellipse 400px 400px at 50% 80%, rgba(155,114,207,0.08), transparent);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: var(--cream);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto 32px;
+    animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-icon {
+    font-size: 44px;
+    margin-bottom: 18px;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .hero h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 5vw, 42px);
+    line-height: 1.4;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #e0d6ff 50%, #ffd6d6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--yellow), var(--orange), var(--coral));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 300;
+  }
+
+  /* ===== COMPETENCY CHIPS ===== */
+  .comp-strip {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.8s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .comp-mini {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 40px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    transition: all 0.3s;
+  }
+
+  .comp-mini:hover {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+  }
+
+  .comp-mini-icon { font-size: 14px; }
+
+  /* ===== MAIN CONTENT ===== */
+  .main {
+    max-width: 1000px;
+    margin: -20px auto 0;
+    padding: 0 32px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== SECTION ===== */
+  .section {
+    margin-bottom: 52px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .section-label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 6px;
+  }
+
+  .section-title {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--text);
+  }
+
+  .section[data-theme="project"] .section-label {
+    background: rgba(255,107,107,0.1);
+    color: var(--coral);
+  }
+
+  .section[data-theme="dev"] .section-label {
+    background: rgba(77,150,255,0.1);
+    color: var(--sky);
+  }
+
+  .section[data-theme="reference"] .section-label {
+    background: rgba(155,114,207,0.1);
+    color: var(--purple);
+  }
+
+  /* ===== DOCUMENT CARDS ===== */
+  .doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 20px;
+  }
+
+  .doc-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px 26px 24px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .doc-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--card-hover-shadow);
+  }
+
+  .doc-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+
+  .doc-card[data-color="coral"]::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .doc-card[data-color="sky"]::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .doc-card[data-color="mint"]::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .doc-card[data-color="purple"]::before { background: linear-gradient(90deg, var(--purple), var(--coral)); }
+  .doc-card[data-color="orange"]::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+
+  .doc-card-icon {
+    font-size: 32px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .doc-card-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    width: fit-content;
+  }
+
+  .doc-card[data-color="coral"] .doc-card-badge { background: rgba(255,107,107,0.1); color: var(--coral); }
+  .doc-card[data-color="sky"] .doc-card-badge { background: rgba(77,150,255,0.1); color: var(--sky); }
+  .doc-card[data-color="mint"] .doc-card-badge { background: rgba(107,203,119,0.1); color: var(--mint); }
+  .doc-card[data-color="purple"] .doc-card-badge { background: rgba(155,114,207,0.1); color: var(--purple); }
+  .doc-card[data-color="orange"] .doc-card-badge { background: rgba(255,165,82,0.1); color: var(--orange); }
+
+  .doc-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .doc-card p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.75;
+    flex: 1;
+  }
+
+  .doc-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  .doc-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .doc-card-arrow {
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  .doc-card:hover .doc-card-arrow {
+    background: var(--dark);
+    color: #fff;
+    transform: translateX(2px);
+  }
+
+  /* ===== COMING SOON ===== */
+  .doc-card.coming-soon {
+    background: repeating-linear-gradient(
+      -45deg,
+      #fff,
+      #fff 12px,
+      #fefcf8 12px,
+      #fefcf8 24px
+    );
+    opacity: 0.65;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .doc-card.coming-soon:hover {
+    transform: none;
+    box-shadow: var(--card-shadow);
+  }
+
+  .doc-card.coming-soon .doc-card-arrow { display: none; }
+
+  .coming-soon-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.06em;
+    color: var(--text-light);
+    background: rgba(0,0,0,0.05);
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+
+  /* ===== STAGGERED ANIMATIONS ===== */
+  .section {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .section:nth-child(1) { animation-delay: 0.2s; }
+  .section:nth-child(2) { animation-delay: 0.35s; }
+  .section:nth-child(3) { animation-delay: 0.5s; }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 28px 24px 44px;
+    color: var(--text-light);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .footer-logo {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    .hero { padding: 56px 24px 80px; }
+    .main { padding: 0 20px 60px; }
+    .doc-grid { grid-template-columns: 1fr; }
+    .comp-strip { gap: 6px; }
+    .comp-mini { padding: 5px 12px; font-size: 11px; }
+    .section-header { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-icon">📚</div>
+    <h1><span class="accent">ありがとうカード</span><br>プロジェクト ドキュメント</h1>
+    <p class="hero-sub">プロジェクトに関する資料をまとめています</p>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- プロジェクト概要 -->
+  <div class="section" data-theme="project">
+    <div class="section-header">
+      <span class="section-label">PROJECT</span>
+      <span class="section-title">プロジェクト概要</span>
+    </div>
+    <div class="doc-grid">
+
+      <a class="doc-card" data-color="coral" href="./docs/kickoff.html">
+        <span class="doc-card-icon">🚀</span>
+        <span class="doc-card-badge">KICKOFF</span>
+        <h3>ありがとうカード キックオフ</h3>
+        <p>プロジェクトの背景・ビジョン・つくるもの・進め方をまとめたキックオフ資料です。</p>
+        <div class="doc-card-meta">
+          <span>📄 全7セクション</span>
+          <span>⏱ 約5分</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
+
+      <a class="doc-card" data-color="mint" href="./docs/team.html">
+        <span class="doc-card-icon">👥</span>
+        <span class="doc-card-badge">TEAM</span>
+        <h3>プロジェクト体制図</h3>
+        <p>チーム構成・役割分担・コミュニケーションラインを図示した体制資料です。</p>
+        <div class="doc-card-meta">
+          <span>📄 体制図</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 開発ガイド -->
+  <div class="section" data-theme="dev">
+    <div class="section-header">
+      <span class="section-label">DEVELOPMENT</span>
+      <span class="section-title">開発ガイド</span>
+    </div>
+    <div class="doc-grid">
+
+      <a class="doc-card" data-color="sky" href="./docs/dev-guide.html">
+        <span class="doc-card-icon">📘</span>
+        <span class="doc-card-badge">GUIDE</span>
+        <h3>開発の進め方ガイド</h3>
+        <p>アジャイル開発の進め方、スプリントの回し方、プロジェクト全体の流れを解説しています。</p>
+        <div class="doc-card-meta">
+          <span>📄 全10スライド＋補足</span>
+          <span>⏱ 約10分</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
+
+      <div class="doc-card coming-soon" data-color="purple">
+        <span class="doc-card-icon">🎨</span>
+        <span class="doc-card-badge">DESIGN</span>
+        <h3>デザインガイドライン</h3>
+        <p>カラー・タイポグラフィ・コンポーネントのルールをまとめたデザインシステム資料。</p>
+        <span class="coming-soon-tag">COMING SOON</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 参考資料 -->
+  <div class="section" data-theme="reference">
+    <div class="section-header">
+      <span class="section-label">REFERENCE</span>
+      <span class="section-title">参考資料</span>
+    </div>
+    <div class="doc-grid">
+
+      <div class="doc-card coming-soon" data-color="orange">
+        <span class="doc-card-icon">📝</span>
+        <span class="doc-card-badge">TEMPLATE</span>
+        <h3>議事録テンプレート</h3>
+        <p>スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。</p>
+        <span class="coming-soon-tag">COMING SOON</span>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-logo">ありがとうカード プロジェクト</div>
+  <p>若手メンバー主導で、感謝が循環する社内Webアプリをつくります。</p>
+</footer>
+
+</body>
+</html>

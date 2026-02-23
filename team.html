@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ありがとうカード — プロジェクト体制図</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* アイコンに合わせたコーラル〜オレンジ〜ゴールデン */
+    --coral-50: #fff5f2;
+    --coral-100: #ffe8e3;
+    --coral-200: #ffcabc;
+    --coral-300: #ffa898;
+    --coral-400: #f28b7d;
+    --coral-500: #e87060;
+    --coral-600: #d45a4a;
+    --coral-700: #a84440;
+    --coral-800: #7e3230;
+    --coral-900: #5c2222;
+    --orange-400: #e8944c;
+    --orange-500: #d97f38;
+    --orange-600: #c06a28;
+    --golden: #f0c060;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', 'DM Sans', sans-serif;
+    background: var(--slate-900);
+    color: var(--slate-100);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 80px 40px 60px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--coral-400) 0%, transparent 70%);
+    opacity: 0.10;
+    animation: float 8s ease-in-out infinite;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, var(--orange-400) 0%, transparent 70%);
+    opacity: 0.08;
+    animation: float 10s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -20px) scale(1.05); }
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--coral-400);
+    border: 1px solid var(--coral-700);
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease-out both;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--coral-400), var(--orange-400), var(--golden));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeUp 0.6s ease-out 0.1s both;
+  }
+  .hero p {
+    margin-top: 16px;
+    font-size: 1rem;
+    color: var(--slate-400);
+    font-weight: 300;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+    animation: fadeUp 0.6s ease-out 0.2s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 0 40px 48px;
+    animation: fadeUp 0.6s ease-out 0.3s both;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--slate-400);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-dot.owner { background: var(--coral-400); }
+  .legend-dot.learn {
+    background: transparent;
+    border: 2px dashed var(--slate-500);
+    width: 10px; height: 10px;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px 60px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 60px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--coral-500), var(--coral-800), transparent);
+  }
+  @media (max-width: 700px) {
+    .timeline::before { left: 24px; }
+    .timeline { padding: 0 16px 60px; }
+  }
+
+  /* ── PHASE CARD ── */
+  .phase {
+    position: relative;
+    margin-bottom: 48px;
+    padding-left: 80px;
+    animation: fadeUp 0.5s ease-out both;
+  }
+  .phase:nth-child(1) { animation-delay: 0.35s; }
+  .phase:nth-child(2) { animation-delay: 0.45s; }
+  .phase:nth-child(3) { animation-delay: 0.55s; }
+  .phase:nth-child(4) { animation-delay: 0.65s; }
+
+  @media (max-width: 700px) {
+    .phase { padding-left: 48px; }
+  }
+
+  .phase-dot {
+    position: absolute;
+    left: 50px;
+    top: 24px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--slate-900);
+    border: 3px solid var(--coral-400);
+    z-index: 2;
+  }
+  .phase-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--coral-400);
+  }
+  @media (max-width: 700px) {
+    .phase-dot { left: 14px; }
+  }
+
+  .phase-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border: 1px solid var(--slate-700);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.3s, transform 0.3s;
+    backdrop-filter: blur(10px);
+  }
+  .phase-card:hover {
+    border-color: var(--coral-500);
+    transform: translateY(-2px);
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .phase-number {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--coral-400);
+    background: rgba(242, 139, 125, 0.1);
+    border: 1px solid var(--coral-800);
+    padding: 4px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .phase-period {
+    font-size: 0.75rem;
+    color: var(--slate-500);
+    font-weight: 400;
+  }
+
+  .phase-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--slate-50);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .phase-desc {
+    font-size: 0.85rem;
+    color: var(--slate-400);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+
+  .phase-tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .task-tag {
+    font-size: 0.72rem;
+    color: var(--slate-300);
+    background: rgba(100, 116, 139, 0.15);
+    border: 1px solid var(--slate-700);
+    padding: 4px 12px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ── MEMBERS ── */
+  .members-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .member {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--slate-100);
+    background: rgba(242, 139, 125, 0.1);
+    border: 1px solid var(--coral-700);
+    padding: 6px 14px;
+    border-radius: 100px;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .member:hover {
+    background: rgba(242, 139, 125, 0.18);
+  }
+  .member .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--coral-400);
+    flex-shrink: 0;
+  }
+  .member.learn {
+    color: var(--slate-400);
+    background: transparent;
+    border: 1px dashed var(--slate-600);
+  }
+  .member.learn .dot {
+    background: transparent;
+    border: 1.5px dashed var(--slate-500);
+  }
+  .member.learn:hover {
+    background: rgba(100, 116, 139, 0.08);
+  }
+
+  .member-detail {
+    font-size: 0.68rem;
+    color: var(--slate-500);
+    font-weight: 400;
+    margin-left: 2px;
+  }
+
+  /* ── VACANT ── */
+  .vacant-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--slate-500);
+    border: 1px dashed var(--slate-600);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-style: italic;
+  }
+  .vacant-notice::before {
+    content: '💬';
+    font-style: normal;
+  }
+
+  /* ── SPRINT DETAIL ── */
+  .sprint-sub {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--slate-700);
+  }
+  .sprint-sub-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--slate-400);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+  .sprint-area {
+    margin-bottom: 14px;
+  }
+  .sprint-area-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--slate-300);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sprint-area-label .icon {
+    font-style: normal;
+    font-size: 0.9rem;
+  }
+
+  /* ── CROSS-CUTTING ── */
+  .cross-section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+    animation: fadeUp 0.5s ease-out 0.75s both;
+  }
+  .cross-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--golden);
+    margin-bottom: 20px;
+  }
+  .cross-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .cross-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+    border: 1px solid var(--slate-700);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.3s;
+  }
+  .cross-card:hover {
+    border-color: var(--golden);
+  }
+  .cross-role {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--golden);
+    margin-bottom: 4px;
+  }
+  .cross-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--slate-100);
+  }
+  .cross-scope {
+    font-size: 0.72rem;
+    color: var(--slate-500);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── FRONT NOTE ── */
+  .front-note {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px 100px;
+    animation: fadeUp 0.5s ease-out 0.85s both;
+  }
+  .note-box {
+    background: rgba(242, 139, 125, 0.04);
+    border: 1px solid rgba(242, 139, 125, 0.15);
+    border-radius: 12px;
+    padding: 24px 28px;
+  }
+  .note-box h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--coral-400);
+    margin-bottom: 8px;
+  }
+  .note-box p {
+    font-size: 0.82rem;
+    color: var(--slate-400);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* ── SCROLL GLOW ── */
+  #scroll-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse 90% 50% at 50% 120%,
+      rgba(242, 139, 125, 0.25) 0%,
+      rgba(232, 148, 76, 0.12) 35%,
+      transparent 65%);
+    opacity: 0;
+  }
+  .hero, .legend, .timeline, .cross-section, .front-note {
+    position: relative;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+<div id="scroll-glow"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">ありがとうカード プロジェクト</div>
+  <h1>プロジェクト体制図</h1>
+  <p>各フェーズのオーナーと、プロジェクトを横断して支える役割。<br>あなたの「やりたい」を活かせる場所がここにあります。</p>
+</section>
+
+<!-- FRONT NOTE -->
+<section class="front-note">
+  <div class="note-box">
+    <h3>📝 この体制図の見方</h3>
+    <p>
+      各フェーズに配置されたメンバーがオーナーとして責任を持って推進します。
+      配置されていないフェーズでも、学びのために参加するのは自由です（点線のメンバーが「学び参加」の例）。
+    </p>
+  </div>
+</section>
+
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item">
+    <span class="legend-dot owner"></span>
+    オーナー（責任を持って推進）
+  </div>
+  <div class="legend-item">
+    <span class="legend-dot learn"></span>
+    学び参加（任意・誰でもOK）
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<section class="timeline">
+
+  <!-- Phase: 要求定義 -->
+  <div class="phase">
+    <div class="phase-dot"></div>
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 1</span>
+        <span class="phase-period">1〜2週間</span>
+      </div>
+      <h2 class="phase-title">🎯 要求定義</h2>
+      <p class="phase-desc">方向性を揃え、MVPの骨格を描く。プロジェクトチャーター作成と、UX設計・プロトタイプの初版作成まで。</p>
+      <div class="phase-tasks">
+        <span class="task-tag">プロジェクトチャーター作成</span>
+        <span class="task-tag">UX設計</span>
+        <span class="task-tag">プロトタイプ初版</span>
+        <span class="task-tag">ユーザー体験設計</span>
+      </div>
+      <div class="members-row">
+        <span class="member"><span class="dot"></span>藤田<span class="member-detail">全部</span></span>
+        <span class="member"><span class="dot"></span>江崎<span class="member-detail">POとして</span></span>
+        <span class="member"><span class="dot"></span>（川上）<span class="member-detail">稟申のための情報収集</span></span>
+        <span class="member learn"><span class="dot"></span>武田</span>
+        <span class="member learn"><span class="dot"></span>小林</span>
+        <span class="member learn"><span class="dot"></span>その他</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase: Sprint 0 -->
+  <div class="phase">
+    <div class="phase-dot"></div>
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 2 — SPRINT 0</span>
+        <span class="phase-period">1〜2ヵ月</span>
+      </div>
+      <h2 class="phase-title">🛠️ Sprint 0</h2>
+      <p class="phase-desc">要求定義の成果物を受け取り、開発の土台をつくる。技術選定・環境構築・バックログ作成を並行して進め、MVP全体の骨格を確定させる。</p>
+      <div class="phase-tasks">
+        <span class="task-tag">要件定義（骨格）</span>
+        <span class="task-tag">PJ管理ツール決定</span>
+        <span class="task-tag">PBR作成</span>
+        <span class="task-tag">技術選定</span>
+        <span class="task-tag">環境構築</span>
+        <span class="task-tag">インフラ構築</span>
+        <span class="task-tag">UX・プロトタイプ調整</span>
+        <span class="task-tag">デザインシステム（初版）</span>
+      </div>
+      <div class="members-row">
+        <span class="member"><span class="dot"></span>藤田<span class="member-detail">UX・プロトタイプ調整</span></span>
+        <span class="member"><span class="dot"></span>中島<span class="member-detail">要件定義（骨格）</span></span>
+        <span class="member"><span class="dot"></span>絹田<span class="member-detail">インフラ構築・要件定義（見学）</span></span>
+        <span class="member"><span class="dot"></span>まおまお<span class="member-detail">技術選定・環境/インフラ構築</span></span>
+        <span class="member"><span class="dot"></span>森本<span class="member-detail">インフラ構築</span></span>
+        <span class="member"><span class="dot"></span>中嶋<span class="member-detail">インフラ構築</span></span>
+        <span class="member"><span class="dot"></span>朴木<span class="member-detail">インフラ構築</span></span>
+        <span class="member"><span class="dot"></span>猪股<span class="member-detail">インフラ構築</span></span>
+        <span class="member"><span class="dot"></span>川上<span class="member-detail">SMとして（稟申のための情報整理）</span></span>
+        <span class="member"><span class="dot"></span>江崎<span class="member-detail">PO・TLとして（デザインシステム初版・技術選定・稟申のための情報整理）</span></span>
+        <span class="member learn"><span class="dot"></span>武田<span class="member-detail">要件定義（骨格）</span></span>
+        <span class="member learn"><span class="dot"></span>小林<span class="member-detail">要件定義（骨格）</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase: Sprint 1〜N -->
+  <div class="phase">
+    <div class="phase-dot"></div>
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 3 — SPRINT 1〜N</span>
+        <span class="phase-period">スプリントを繰り返す</span>
+      </div>
+      <h2 class="phase-title">💻 開発スプリント</h2>
+      <p class="phase-desc">骨格が固まったら、2週間サイクルで機能を積み上げる。詳細な仕様はプランニングで都度決めながら実装していく。</p>
+
+      <div class="sprint-sub">
+        <div class="sprint-sub-title">担当領域</div>
+
+        <div class="sprint-area">
+          <div class="sprint-area-label"><span class="icon">🔧</span> 全体</div>
+          <div class="members-row">
+            <span class="member"><span class="dot"></span>川上<span class="member-detail">SM</span></span>
+            <span class="member"><span class="dot"></span>江崎<span class="member-detail">PO・TL</span></span>
+            <span class="member"><span class="dot"></span>中島<span class="member-detail">要件定義（詳細）</span></span>
+            <span class="member learn"><span class="dot"></span>武田<span class="member-detail">要件定義（詳細）</span></span>
+          </div>
+        </div>
+
+        <div class="sprint-area">
+          <div class="sprint-area-label"><span class="icon">🤖</span> 生成AI組み込み</div>
+          <div class="members-row">
+            <span class="member"><span class="dot"></span>森本</span>
+            <span class="member"><span class="dot"></span>中嶋</span>
+            <span class="member"><span class="dot"></span>朴木</span>
+            <span class="member"><span class="dot"></span>猪股</span>
+            <span class="member"><span class="dot"></span>中島</span>
+          </div>
+        </div>
+
+        <div class="sprint-area">
+          <div class="sprint-area-label"><span class="icon">📊</span> データ分析フロー</div>
+          <div class="members-row">
+            <span class="member"><span class="dot"></span>猪股</span>
+            <span class="member"><span class="dot"></span>江崎</span>
+          </div>
+        </div>
+
+        <div class="sprint-area">
+          <div class="sprint-area-label"><span class="icon">⚡</span> 生成AIによる開発体験</div>
+          <div class="members-row">
+            <span class="member"><span class="dot"></span>猪股</span>
+            <span class="member"><span class="dot"></span>江崎</span>
+            <span class="member"><span class="dot"></span>吉田</span>
+          </div>
+        </div>
+
+        <!-- デザインシステム -->
+        <div class="sprint-area">
+          <div class="sprint-area-label"><span class="icon">🎨</span> デザインシステム磨きこみ</div>
+          <div class="members-row">
+            <span class="member"><span class="dot"></span>江崎</span>
+          </div>
+        </div>
+
+        <div class="sprint-area">
+          <div class="sprint-area-label"><span class="icon">🚀</span> その他実装</div>
+          <div class="members-row">
+            <span class="member"><span class="dot"></span>生成AI</span>
+            <span class="member"><span class="dot"></span>江崎</span>
+            <span class="member"><span class="dot"></span>武田</span>
+            <span class="member"><span class="dot"></span>森本</span>
+            <span class="member"><span class="dot"></span>中嶋</span>
+            <span class="member"><span class="dot"></span>朴木</span>
+            <span class="member"><span class="dot"></span>猪股</span>
+            <span class="member"><span class="dot"></span>中島</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase: ベータ → MVPリリース -->
+  <div class="phase">
+    <div class="phase-dot"></div>
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">PHASE 4</span>
+        <span class="phase-period">ベータテスト → 展開</span>
+      </div>
+      <h2 class="phase-title">🎉 ベータ → MVPリリース</h2>
+      <p class="phase-desc">先行テスト後、展開。ここがスタート。</p>
+      <div class="phase-tasks">
+        <span class="task-tag">フィードバック収集</span>
+        <span class="task-tag">UI改善</span>
+        <span class="task-tag">AI精度チューニング</span>
+        <span class="task-tag">展開</span>
+      </div>
+      <div class="members-row">
+        <span class="vacant-notice">オーナー未定 — みんなで決めましょう</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- CROSS-CUTTING ROLES -->
+<section class="cross-section">
+  <h2 class="cross-title">🔄 横断的な役割 — 全フェーズを通して機能する</h2>
+  <div class="cross-grid">
+    <div class="cross-card">
+      <div class="cross-role">Product Owner</div>
+      <div class="cross-name">江崎</div>
+      <div class="cross-scope">プロダクトの方向性・優先順位の最終判断</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-role">Tech Lead</div>
+      <div class="cross-name">江崎</div>
+      <div class="cross-scope">技術的なことで迷ったときに最終判断を行う</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-role">Scrum Master</div>
+      <div class="cross-name">川上</div>
+      <div class="cross-scope">スプリント運営・チームの障害除去</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-role">社内案件化推進</div>
+      <div class="cross-name">川上</div>
+      <div class="cross-scope">ステークホルダー調整・社内承認</div>
+    </div>
+    <div class="cross-card" style="grid-column: 1 / -1;">
+      <div class="cross-role">DevOps ・ CI/CD</div>
+      <div class="cross-name">森本・中嶋・朴木・吉田</div>
+      <div class="cross-scope">開発環境の整備・デプロイパイプライン構築・運用自動化</div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var glow = document.getElementById('scroll-glow');
+
+  /* 背景色キーフレーム [scrollProgress, R, G, B] — アイコンのコーラル〜オレンジに合わせて */
+  var stops = [
+    [0.0,  15,  23,  42],   /* slate-900: 冷たいダークブルー */
+    [0.25, 28,  20,  30],   /* やや温かみが出始める（パープル寄り） */
+    [0.50, 50,  25,  25],   /* コーラルの気配 */
+    [0.75, 72,  35,  28],   /* ダークコーラル */
+    [1.0,  85,  48,  22]    /* 暖かいコーラル〜オレンジダーク */
+  ];
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+  function colorAt(t) {
+    for (var i = 0; i < stops.length - 1; i++) {
+      if (t <= stops[i + 1][0]) {
+        var local = (t - stops[i][0]) / (stops[i + 1][0] - stops[i][0]);
+        var e = smoothstep(local);
+        return [
+          Math.round(lerp(stops[i][1], stops[i + 1][1], e)),
+          Math.round(lerp(stops[i][2], stops[i + 1][2], e)),
+          Math.round(lerp(stops[i][3], stops[i + 1][3], e))
+        ];
+      }
+    }
+    var last = stops[stops.length - 1];
+    return [last[1], last[2], last[3]];
+  }
+
+  function update() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var t = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+
+    var c = colorAt(t);
+    document.body.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+
+    /* 下部からの暖かいグロー（二乗イージングで後半に強く） */
+    glow.style.opacity = t * t * 0.7;
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+</script>
+</body>
+</html>
