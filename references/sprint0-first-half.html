@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprint 0 前半 補足資料</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F7F6F2;--card:#FFFFFF;--text:#1E1E2E;--sub:#555568;--muted:#999AAF;--warm:#E07A4B;--warm-light:#FFF3ED;--warm-border:#FDDCCC;--blue:#4A7ADB;--blue-light:#EDF3FE;--blue-border:#C5D8F8;--green:#3CA868;--green-light:#EEFAF2;--green-border:#B8E6C9;--purple:#7B5FC2;--purple-light:#F3EFFC;--purple-border:#CDBFEF;--pink:#C9506E;--pink-light:#FDF0F3;--pink-border:#F0C4CF;--yellow:#C49A1A;--yellow-light:#FDF8EA;--yellow-border:#EFE0A8;--border:#E8E7E3;--r:14px;--rs:10px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.8}
+
+  .wrap{max-width:820px;margin:0 auto;padding:48px 32px 80px}
+
+  /* header */
+  .doc-header{text-align:center;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+  .doc-header h1{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:28px;line-height:1.4;margin-bottom:8px}
+  .doc-sub{font-size:14px;color:var(--sub);margin-bottom:16px}
+  .doc-meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .doc-chip{padding:5px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;font-size:12px;color:var(--sub);font-weight:500}
+
+  /* toc */
+  .toc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;margin-bottom:40px}
+  .toc h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:var(--sub)}
+  .toc ol{padding-left:20px}
+  .toc li{font-size:13.5px;color:var(--sub);margin-bottom:4px}
+  .toc a{color:var(--blue);text-decoration:none;font-weight:500}
+  .toc a:hover{text-decoration:underline}
+  .toc .toc-sec{font-weight:700;color:var(--text);margin-top:10px}
+
+  /* section */
+  .sec{margin-bottom:48px}
+  .sec-tag{display:inline-flex;align-items:center;gap:6px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:6px;margin-bottom:10px}
+  .sec-tag.st-warm{background:var(--warm-light);color:var(--warm)}
+  .sec-tag.st-blue{background:var(--blue-light);color:var(--blue)}
+  .sec-tag.st-green{background:var(--green-light);color:var(--green)}
+  .sec-tag.st-purple{background:var(--purple-light);color:var(--purple)}
+  .sec-tag.st-yellow{background:var(--yellow-light);color:var(--yellow)}
+  .sec h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:22px;line-height:1.45;margin-bottom:8px}
+  .sec h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:17px;margin-bottom:6px;margin-top:24px}
+  .sec p{font-size:14px;color:var(--sub);line-height:1.85;margin-bottom:12px}
+
+  /* card */
+  .cd{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .cd-bar{height:4px;border-radius:var(--r) var(--r) 0 0;margin:-20px -22px 16px -22px}
+  .cd-bar.cb-warm{background:linear-gradient(90deg,var(--warm),#F2A07A)}
+  .cd-bar.cb-blue{background:linear-gradient(90deg,var(--blue),#7BA2EC)}
+  .cd-bar.cb-green{background:linear-gradient(90deg,var(--green),#6CC98B)}
+  .cd-bar.cb-purple{background:linear-gradient(90deg,var(--purple),#A68FD8)}
+  .cd-bar.cb-yellow{background:linear-gradient(90deg,var(--yellow),#D4B44A)}
+  .cd-bar.cb-pink{background:linear-gradient(90deg,var(--pink),#DE8199)}
+  .cd-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+  .cd h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+  .cd p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:8px}
+  .cd p:last-child{margin-bottom:0}
+  .cd .emoji{font-size:20px;margin-bottom:8px;display:block}
+
+  /* example box */
+  .ex-box{margin-top:10px;padding:10px 14px;border-radius:var(--rs);font-size:12.5px;line-height:1.7;border-left:3px solid}
+  .ex-box.ex-warm{background:var(--warm-light);border-color:var(--warm);color:var(--text)}
+  .ex-box.ex-blue{background:var(--blue-light);border-color:var(--blue);color:var(--text)}
+  .ex-box.ex-purple{background:var(--purple-light);border-color:var(--purple);color:var(--text)}
+
+  /* callout */
+  .co{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--rs);margin-bottom:14px}
+  .co.co-warm{background:var(--warm-light);border:1px solid var(--warm-border)}
+  .co.co-blue{background:var(--blue-light);border:1px solid var(--blue-border)}
+  .co.co-green{background:var(--green-light);border:1px solid var(--green-border)}
+  .co.co-purple{background:var(--purple-light);border:1px solid var(--purple-border)}
+  .co.co-yellow{background:var(--yellow-light);border:1px solid var(--yellow-border)}
+  .co-i{font-size:18px;flex-shrink:0;margin-top:1px}
+  .co p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:0}
+  .co strong{color:var(--text)}
+
+  /* grid */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+
+  /* template box */
+  .tmpl{background:#F9F8F5;border:1px dashed var(--border);border-radius:var(--rs);padding:16px 18px;margin:12px 0;font-size:13px;line-height:1.8;color:var(--sub)}
+  .tmpl strong{color:var(--text)}
+
+  /* slider */
+  .slider-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12.5px}
+  .slider-label{min-width:80px;font-weight:600;color:var(--text)}
+  .slider-bar{flex:1;height:8px;background:#E8E7E3;border-radius:4px;position:relative}
+  .slider-fill{height:100%;border-radius:4px}
+  .slider-min,.slider-max{font-size:10px;color:var(--muted);min-width:28px}
+
+  /* day card */
+  .day{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden}
+  .day::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+  .day.d1::before{background:var(--blue)}
+  .day.d2::before{background:var(--green)}
+  .day.d3::before{background:var(--purple)}
+  .day.d4::before{background:var(--warm)}
+  .day.d5::before{background:var(--pink)}
+  .day-label{font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;letter-spacing:.1em;margin-bottom:4px}
+  .day.d1 .day-label{color:var(--blue)}
+  .day.d2 .day-label{color:var(--green)}
+  .day.d3 .day-label{color:var(--purple)}
+  .day.d4 .day-label{color:var(--warm)}
+  .day.d5 .day-label{color:var(--pink)}
+  .day h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+  .day p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:6px}
+  .day p:last-child{margin-bottom:0}
+
+  /* divider */
+  .divider{height:1px;background:var(--border);margin:48px 0}
+
+  /* reference */
+  .ref{font-size:12px;color:var(--muted);line-height:1.7;margin-top:6px}
+
+  @media(max-width:700px){
+    .wrap{padding:32px 18px 60px}
+    .g2,.g3{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .wrap{padding:24px}
+    .cd,.day,.co{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== HEADER ===== -->
+<div class="doc-header">
+  <h1>🧭 Sprint 0 前半　補足資料<br>インセプションデッキ ＆ デザインスプリント</h1>
+  <p class="doc-sub">各プラクティスの一般的な進め方について紹介します。</p>
+  <div class="doc-meta">
+    <span class="doc-chip">🎯 チーム全員向け</span>
+  </div>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="toc">
+  <h2>📑 目次</h2>
+  <ol>
+    <li class="toc-sec">第1部：インセプションデッキ</li>
+    <li><a href="#id-what">インセプションデッキとは</a></li>
+    <li><a href="#id-items">10の質問（タフクエッション）</a></li>
+    <li style="margin-top:10px" class="toc-sec">第2部：デザインスプリント</li>
+    <li><a href="#ds-what">デザインスプリントとは</a></li>
+    <li><a href="#ds-days">5日間の流れ</a></li>
+    <li style="margin-top:10px" class="toc-sec">参考</li>
+    <li><a href="#ref">出典・参考文献</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!--  第1部：インセプションデッキ                                     -->
+<!-- ============================================================ -->
+
+<div class="sec" id="id-what">
+  <div class="sec-tag st-warm">PART 1</div>
+  <h2>インセプションデッキとは</h2>
+  <p>インセプションデッキは、書籍『アジャイルサムライ』（Jonathan Rasmusson 著）で紹介されているプラクティスです。<strong>10の「手強い質問」（タフクエッション）</strong>に答えることで、プロジェクトの方向性・スコープ・リスクについてチーム全員の認識を揃えます。</p>
+  <p>プロジェクト開始時に「質問しにくいけど、聞いておかないと後で困ること」を先に話し合っておくためのツールです。完璧な回答を作ることが目的ではなく、チームで議論するプロセスそのものに価値があります。</p>
+
+  <div class="co co-warm">
+    <div class="co-i">💡</div>
+    <p><strong>ポイント：</strong>10項目すべてをやる必要はありません。プロジェクトの規模や状況に合わせて、必要な項目を選んで実施します。</p>
+  </div>
+</div>
+
+<!-- 10の質問 -->
+<div class="sec" id="id-items">
+  <div class="sec-tag st-warm">10 TOUGH QUESTIONS</div>
+  <h2>10の質問（タフクエッション）</h2>
+  <p>インセプションデッキは、前半5つの「方向性を揃える質問」と、後半5つの「実現可能性を確かめる質問」で構成されています。</p>
+
+  <h3>前半：方向性を揃える（Why・What）</h3>
+
+  <!-- Q1 -->
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <div class="cd-num">QUESTION 01</div>
+    <h4>🎯 我々はなぜここにいるのか</h4>
+    <p>プロジェクトが始まった根本的な理由を確認します。「何を作るか」ではなく「なぜこのプロジェクトが存在するのか」に焦点を当てます。チーム全員がプロジェクトの目的を自分の言葉で説明できる状態を目指します。</p>
+    <div class="ex-box ex-warm">
+      💬 例：「社員同士の感謝を可視化し、組織のつながりを強くするため」
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <div class="cd-num">QUESTION 02</div>
+    <h4>🗣️ エレベーターピッチ</h4>
+    <p>30秒（エレベーターに乗っている時間）でプロダクトを説明できるようにします。以下のテンプレートに沿って作成します。</p>
+    <div class="tmpl">
+      <strong>［課題を解決したい／ニーズを満たしたい］</strong><br>
+      <strong>［対象ユーザー］</strong>向けに作られた<br>
+      <strong>［プロダクト名］</strong>というプロダクトは、<br>
+      <strong>［プロダクトのカテゴリー］</strong>です。<br>
+      これは<strong>［重要な利点・説得力のある理由］</strong>ができ、<br>
+      <strong>［代替手段の最有力候補］</strong>とは違って、<br>
+      <strong>［差別化の決定的な特徴］</strong>が備わっている。
+    </div>
+    <div class="ex-box ex-warm">
+      💬 例：「日頃の感謝を伝えたい全社員向けに作られた『ありがとうカード』は、社内感謝共有アプリです。AIが感謝の内容を自動分類でき、口頭やメールとは違って、感謝が蓄積・可視化される特徴が備わっている。」
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <div class="cd-num">QUESTION 03</div>
+    <h4>📦 パッケージデザイン</h4>
+    <p>もしプロダクトが店頭に並ぶ商品だったら、箱に何を書くか？という思考実験です。機能そのものではなく、「ユーザーにとっての効能」を考えます。キャッチコピー、トップ3の売り文句を考えることで、プロダクトの魅力を端的に表現します。</p>
+    <div class="ex-box ex-warm">
+      💬 例：キャッチコピー「ありがとうが、見える。つながる。」<br>
+      売り文句①「3タップで感謝を送れる」②「AIが感謝を自動分類」③「月次レポートでチームの雰囲気が見える」
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <div class="cd-num">QUESTION 04</div>
+    <h4>🚫 やらないことリスト</h4>
+    <p>プロジェクトのスコープの境界を定めます。すべての要望を「<strong>やる</strong>」「<strong>やらない</strong>」「<strong>あとで決める</strong>」の3つに仕分けます。「やらない」を明確にすることで、チームが本当に重要なことに集中でき、顧客もプロジェクトに何を期待できるかが明確になります。</p>
+    <div class="co co-warm">
+      <div class="co-i">⚠️</div>
+      <p>「やらない」は「永久にやらない」ではなく、<strong>今回のスコープでは対象外</strong>という意味です。「あとで決める」は判断を先送りするのではなく、今の時点では情報が不十分なので保留にする、という意味です。</p>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <div class="cd-num">QUESTION 05</div>
+    <h4>👥 ご近所さんを探せ</h4>
+    <p>プロジェクトに関わるステークホルダーを洗い出します。直接の開発メンバーだけでなく、承認者、運用担当、セキュリティ担当、想定ユーザーなど、プロジェクトの成功に影響を与えるすべての人を把握します。</p>
+    <p>プロジェクトのコミュニティは想像しているよりも常に大きいものです。助けが必要になる前から関係者と信頼関係を築いておくことが大切です。</p>
+  </div>
+
+  <h3>後半：実現可能性を確かめる（How）</h3>
+
+  <!-- Q6 -->
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <div class="cd-num">QUESTION 06</div>
+    <h4>🏗️ 解決案を描く</h4>
+    <p>概要レベルのアーキテクチャ設計図を描きます。システムをどのように構築しようとしているのかを視覚化することで、技術的な課題やリスクが明確になります。完璧な設計図ではなく、チーム全員が「だいたいこういう構成」と理解できるレベルで十分です。</p>
+    <p>ここで確認すべきことは3つです。①システムの構築方針が伝わるか、②どこにリスクがあるか、③みんなが同意しているか。</p>
+  </div>
+
+  <!-- Q7 -->
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <div class="cd-num">QUESTION 07</div>
+    <h4>😰 夜も眠れない問題</h4>
+    <p>プロジェクトのリスクや不安を洗い出します。技術的な不確実性、メンバーのスキル不足、スケジュールの懸念など、「うまくいかないかもしれない」と感じていることを全員でテーブルに出します。</p>
+    <p>洗い出したリスクは「<strong>取り組むべきリスク</strong>」と「<strong>どうしようもないリスク</strong>」に分類します。全部を解決する必要はなく、チームが認識を共有すること自体に価値があります。</p>
+    <div class="co co-blue">
+      <div class="co-i">💡</div>
+      <p>話し合うだけで気持ちが楽になる効果もあります。一人で抱えていた不安をチームで共有することで、「自分だけが心配していたわけじゃない」とわかることも大事です。</p>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <div class="cd-num">QUESTION 08</div>
+    <h4>📅 期間を見極める</h4>
+    <p>プロジェクトの大まかなスケジュールを把握します。ただし、プロジェクト開始時点の見積もりは「最善を尽くしたあてずっぽう」に過ぎません。最大4倍の誤差があり得ることを前提に、期間の見通しを関係者と共有します。</p>
+    <p>アプローチは2つあります。①期日を固定して、収まるようにスコープを調整する。②コア機能の提供にはコミットするが、期日には幅を持たせる。いずれにしても、最初の計画はコミットメントではなく予測であることを関係者に理解してもらうことが大事です。</p>
+  </div>
+
+  <!-- Q9 -->
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <div class="cd-num">QUESTION 09</div>
+    <h4>⚖️ 何を諦めるのか（トレードオフスライダー）</h4>
+    <p>プロジェクトに影響する4つの要素「<strong>時間・予算・品質・スコープ</strong>」の優先順位を決めます。すべてを最大にはできないので、どれを優先し、どれに柔軟性を持たせるかを明示します。</p>
+    <div class="cd" style="background:#F9F8F5;border:1px dashed var(--border);margin-top:12px">
+      <p style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:10px">トレードオフスライダーの例：</p>
+      <div class="slider-row"><span class="slider-label">スコープ</span><span class="slider-min">低</span><div class="slider-bar"><div class="slider-fill" style="width:40%;background:var(--warm)"></div></div><span class="slider-max">高</span></div>
+      <div class="slider-row"><span class="slider-label">予算</span><span class="slider-min">低</span><div class="slider-bar"><div class="slider-fill" style="width:60%;background:var(--blue)"></div></div><span class="slider-max">高</span></div>
+      <div class="slider-row"><span class="slider-label">時間</span><span class="slider-min">低</span><div class="slider-bar"><div class="slider-fill" style="width:75%;background:var(--purple)"></div></div><span class="slider-max">高</span></div>
+      <div class="slider-row"><span class="slider-label">品質</span><span class="slider-min">低</span><div class="slider-bar"><div class="slider-fill" style="width:90%;background:var(--green)"></div></div><span class="slider-max">高</span></div>
+      <p style="font-size:11.5px;color:var(--muted);margin-top:8px">※ 各項目は他と同じ位置にはできない（必ず優先順位が付く）</p>
+    </div>
+    <div class="co co-blue" style="margin-top:14px">
+      <div class="co-i">📖</div>
+      <p>『アジャイルサムライ』では、どれか1つを動かすなら<strong>スコープ</strong>を推奨しています。期間・予算・品質を維持しつつ、作る範囲を調整するのが最もリスクが低いためです。</p>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <div class="cd-num">QUESTION 10</div>
+    <h4>🧑‍🤝‍🧑 何がどれだけ必要なのか</h4>
+    <p>プロジェクトに必要なチーム構成・スキル・コストを見積もります。特に重要なのは<strong>顧客（プロダクトオーナー）の関与度合い</strong>です。質問に答える時間が取れるか？意思決定を下せるか？を確認します。</p>
+    <p>ステークホルダーが複数いる場合、開発チームに語りかける声は1つに絞ります。複数の声が同時に届くと現場が混乱するためです。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  第2部：デザインスプリント                                       -->
+<!-- ============================================================ -->
+
+<div class="sec" id="ds-what">
+  <div class="sec-tag st-purple">PART 2</div>
+  <h2>デザインスプリントとは</h2>
+  <p>デザインスプリントは、Google Ventures の Jake Knapp が開発した手法で、書籍『Sprint』で詳しく解説されています。<strong>5日間でビジネス上の重要な問いに答える</strong>ためのプロセスです。アイデアをプロトタイプにし、実際のユーザーでテストすることで、何ヶ月もかかる議論や開発を1週間に圧縮します。</p>
+  <p>最大の価値は「<strong>作る前に検証できる</strong>」ことです。本格的に開発に着手する前に、「このアイデアはうまくいくのか？」を確かめられるため、コストのかかる手戻りを防げます。</p>
+
+  <div class="co co-purple">
+    <div class="co-i">🏢</div>
+    <p>Google 以外にも、Slack、Airbnb、Uber、LEGO、国連、ニューヨーク・タイムズなど、多くの組織で採用されています。</p>
+  </div>
+
+  <h3>デザインスプリントの前提条件</h3>
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">👥</span>
+      <h4>チーム構成</h4>
+      <p>4〜7人が理想。多様な視点（デザイン、技術、ビジネス）を含むチーム。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">👑</span>
+      <h4>Decider（決定者）</h4>
+      <p>最終的な意思決定ができる人（今回のPO）。スプリント中に必ず参加する必要がある。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⏰</span>
+      <h4>時間の確保</h4>
+      <p>参加者は5日間のスケジュールを空ける。中途半端な参加では効果が薄い。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">🎯</span>
+      <h4>解くべき課題</h4>
+      <p>「5日間かける価値のある課題」があること。小さすぎる課題には向かない。</p>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="ds-days">
+  <div class="sec-tag st-purple">5-DAY PROCESS</div>
+  <h2>5日間の流れ</h2>
+  <p>デザインスプリントの各日には明確な目的と成果物があります。</p>
+
+  <!-- Day 1 -->
+  <div class="day d1">
+    <div class="day-label">DAY 1 — MONDAY</div>
+    <h4>🗺️ Map（理解する）</h4>
+    <p><strong>目的：</strong>課題の全体像を把握し、スプリントで焦点を当てるターゲットを1つ決める。</p>
+    <p><strong>午前：</strong>長期的なゴールを設定する。「2年後、このプロダクトはどうなっていてほしいか？」を話し合い、成功の定義を明確にする。次に、ユーザーの行動を「マップ」として描く。左端にユーザー、右端にゴールを置き、その間のステップを書き出す。</p>
+    <p><strong>午後：</strong>チーム内外の「専門家」にインタビューする。プロダクトに関する知識、ユーザーの声、技術的な制約などを集める。インタビューで得た気づきを「How Might We（どうすれば〜できるだろう？）」の形でメモし、マップ上に貼る。</p>
+    <p><strong>夕方：</strong>マップの中から、今回のスプリントで焦点を当てるターゲット（特定のユーザーと特定のステップ）を1つ選ぶ。Decider が最終決定。</p>
+    <div class="co co-blue" style="margin-top:10px">
+      <div class="co-i">📌</div>
+      <p><strong>成果物：</strong>長期ゴール、ユーザーマップ、スプリントターゲット</p>
+    </div>
+  </div>
+
+  <!-- Day 2 -->
+  <div class="day d2">
+    <div class="day-label">DAY 2 — TUESDAY</div>
+    <h4>✏️ Sketch（発散する）</h4>
+    <p><strong>目的：</strong>Day 1 で決めたターゲットに対する解決策を、各自がスケッチする。</p>
+    <p><strong>午前 — Lightning Demos：</strong>既存の製品やサービスから「いいな」と思うアイデアを各自が持ち寄り、3分ずつ共有する。他社・他業界のアイデアを「リミックス」して自分たちの課題に活かすヒントにする。</p>
+    <p><strong>午後 — 4ステップスケッチ：</strong></p>
+    <p>① <strong>Notes（メモ）</strong> 20分 — これまでの情報を見返し、気になるポイントをメモ<br>
+    ② <strong>Ideas（アイデア）</strong> 20分 — ラフなアイデアを書き出す<br>
+    ③ <strong>Crazy 8s</strong> 8分 — 紙を8つに折り、1マス1分で8つのバリエーションを描く<br>
+    ④ <strong>Solution Sketch</strong> 30分〜 — ベストなアイデアを3パネルのストーリーボード形式で清書する</p>
+    <div class="co co-green" style="margin-top:10px">
+      <div class="co-i">💡</div>
+      <p><strong>重要：</strong>すべて個人ワークです。グループでブレストすると声の大きい人に引っ張られますが、個人で描くことで多様なアイデアが出ます。絵のうまさは関係ありません。</p>
+    </div>
+    <div class="co co-green">
+      <div class="co-i">📌</div>
+      <p><strong>成果物：</strong>全員分の Solution Sketch（匿名で掲示）</p>
+    </div>
+  </div>
+
+  <!-- Day 3 -->
+  <div class="day d3">
+    <div class="day-label">DAY 3 — WEDNESDAY</div>
+    <h4>🏆 Decide（決める）</h4>
+    <p><strong>目的：</strong>Day 2 で出た複数のスケッチから最良のアイデアを選び、プロトタイプのストーリーボードを作る。</p>
+    <p><strong>午前 — 投票で決める：</strong></p>
+    <p>① <strong>Art Museum（美術館）</strong> — 全員のスケッチを壁に貼り出す（作者名は伏せる）<br>
+    ② <strong>Heat Map</strong> — 各自がドットシールで「いい」と思う部分に投票する（無言で）<br>
+    ③ <strong>Speed Critique</strong> — 投票が集まった部分について3分ずつ議論する<br>
+    ④ <strong>Supervote</strong> — Decider が最終的に大きなシールで「これをプロトタイプにする」を選ぶ</p>
+    <p><strong>午後 — ストーリーボード作成：</strong>選ばれたアイデアをもとに、プロトタイプの画面遷移を6〜12コマのストーリーボードとして描く。これがDay 4のプロトタイプの設計図になる。</p>
+    <div class="co co-purple" style="margin-top:10px">
+      <div class="co-i">📌</div>
+      <p><strong>成果物：</strong>プロトタイプのストーリーボード（画面遷移の設計図）</p>
+    </div>
+  </div>
+
+  <!-- Day 4 -->
+  <div class="day d4">
+    <div class="day-label">DAY 4 — THURSDAY</div>
+    <h4>🔨 Prototype（作る）</h4>
+    <p><strong>目的：</strong>Day 3 のストーリーボードをもとに、1日でリアルなプロトタイプを作る。</p>
+    <p><strong>原則 — "Fake it"：</strong>本物のソフトウェアを作るのではなく、ユーザーが触って反応できるレベルの「ハリボテ」を作ります。Figma や Keynote などのツールで、見た目は本物っぽいが中身は動かないプロトタイプを作成します。</p>
+    <p><strong>役割分担の例：</strong></p>
+    <p>• <strong>Maker</strong>（2名程度）— プロトタイプを実際に作る人<br>
+    • <strong>Stitcher</strong>（1名）— 各画面をつなげて一連のフローにする人<br>
+    • <strong>Writer</strong>（1名）— 画面内のテキスト（ボタン名、説明文など）を書く人<br>
+    • <strong>Interviewer</strong>（1名）— 翌日のテストに向けてインタビュースクリプトを準備する人</p>
+    <div class="co co-warm" style="margin-top:10px">
+      <div class="co-i">📌</div>
+      <p><strong>成果物：</strong>クリッカブルプロトタイプ、インタビュースクリプト</p>
+    </div>
+  </div>
+
+  <!-- Day 5 -->
+  <div class="day d5">
+    <div class="day-label">DAY 5 — FRIDAY</div>
+    <h4>🧪 Test（検証する）</h4>
+    <p><strong>目的：</strong>プロトタイプを実際のユーザーに触ってもらい、フィードバックを得る。</p>
+    <p><strong>5人のユーザーテスト：</strong>ユーザビリティ研究の知見から、5人のテストでユーザビリティ問題の約85%が見つかるとされています。1人あたり約1時間のインタビューを5回実施します。</p>
+    <p><strong>進め方：</strong></p>
+    <p>• <strong>Interviewer</strong> が別室でユーザーと1対1でインタビューを行う<br>
+    • 残りのチームメンバーは別の部屋でライブ中継を見ながら、気づきをメモする<br>
+    • 各セッションの後にパターンを探す：「3人以上が同じ反応をした」ことは重要なシグナル</p>
+    <p><strong>テスト後：</strong>ホワイトボードに Day 1 の長期ゴールとターゲットを書き出し、テスト結果と照らし合わせる。「うまくいったこと」「うまくいかなかったこと」「次にやること」を整理する。</p>
+    <div class="co co-purple" style="margin-top:10px">
+      <div class="co-i">📌</div>
+      <p><strong>成果物：</strong>ユーザーテスト結果、学びの一覧、次のアクション</p>
+    </div>
+  </div>
+
+  <div class="co co-yellow" style="margin-top:20px">
+    <div class="co-i">🔑</div>
+    <p><strong>デザインスプリントの本質：</strong>「完璧なプロダクトを作る」ことではなく「作る前に学ぶ」ことです。5日間で得た学びは、その後の開発の方向性を大きく左右します。たとえテストで「このアイデアはダメだ」とわかったとしても、それは失敗ではなく、何ヶ月もの無駄な開発を防いだ成功です。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== 参考 ===== -->
+<div class="sec" id="ref">
+  <div class="sec-tag st-green">REFERENCES</div>
+  <h2>出典・参考文献</h2>
+  <div class="cd">
+    <p class="ref">Jonathan Rasmusson.『アジャイルサムライ — 達人開発者への道』オーム社, 2011.<br>（原著: The Agile Samurai, Pragmatic Bookshelf, 2010）</p>
+    <p class="ref" style="margin-top:10px">Jake Knapp, John Zeratsky, Braden Kowitz.『Sprint — How to Solve Big Problems and Test New Ideas in Just Five Days』Simon & Schuster, 2016.</p>
+    <p class="ref" style="margin-top:10px">The Sprint Book — The Design Sprint<br>https://www.thesprintbook.com/the-design-sprint</p>
+    <p class="ref" style="margin-top:10px">Google Ventures — The Design Sprint<br>https://www.gv.com/sprint/</p>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>
