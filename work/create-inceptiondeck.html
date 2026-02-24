@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インセプションデッキ ワーク</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #0f0f1a;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .slide-inner {
+            width: 90%;
+            max-width: 800px;
+            padding: 50px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            font-weight: 900;
+            margin-bottom: 24px;
+        }
+
+        .lead-text {
+            font-size: 1.1em;
+            line-height: 2;
+            color: #444;
+        }
+
+        .lead-text strong {
+            font-weight: 700;
+        }
+
+        /* ── カード型リスト ── */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .step-item .step-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .step-item .step-text {
+            font-size: 1em;
+            line-height: 1.7;
+        }
+
+        .step-item .step-text strong {
+            font-weight: 700;
+        }
+
+        /* ── 問いかけボックス ── */
+        .question-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 36px 40px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .question-box .q-emoji {
+            font-size: 52px;
+            margin-bottom: 16px;
+        }
+
+        .question-box .q-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            line-height: 1.8;
+        }
+
+        .question-box .q-sub {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 12px;
+            line-height: 1.7;
+        }
+
+        .question-box .q-examples {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .question-box .q-example-tag {
+            display: inline-block;
+            background: #f0edff;
+            color: #6c5bbf;
+            font-size: 0.85em;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 50px;
+        }
+
+        /* ── 分類テーブル ── */
+        .sort-columns {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .sort-col {
+            flex: 1;
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            min-height: 140px;
+        }
+
+        .sort-col h3 {
+            font-size: 1.1em;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .sort-col .sort-desc {
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+
+        .sort-col.do {
+            background: rgba(74, 158, 110, 0.12);
+            border: 2px dashed rgba(74, 158, 110, 0.4);
+            color: #3a8a64;
+        }
+
+        .sort-col.dont {
+            background: rgba(200, 80, 110, 0.1);
+            border: 2px dashed rgba(200, 80, 110, 0.35);
+            color: #b8456a;
+        }
+
+        .sort-col.later {
+            background: rgba(180, 160, 60, 0.1);
+            border: 2px dashed rgba(180, 160, 60, 0.35);
+            color: #9a8a30;
+        }
+
+        /* ── 対策ペア ── */
+        .pair-box {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            align-items: stretch;
+        }
+
+        .pair-side {
+            flex: 1;
+            border-radius: 20px;
+            padding: 28px 24px;
+            text-align: center;
+        }
+
+        .pair-side h3 {
+            font-size: 1.1em;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .pair-side .pair-desc {
+            font-size: 0.9em;
+            line-height: 1.7;
+        }
+
+        .pair-side.worry {
+            background: rgba(230, 126, 34, 0.1);
+            border: 2px dashed rgba(230, 126, 34, 0.35);
+            color: #c06a20;
+        }
+
+        .pair-side.action {
+            background: rgba(74, 122, 219, 0.1);
+            border: 2px dashed rgba(74, 122, 219, 0.35);
+            color: #3a6abf;
+        }
+
+        .pair-arrow {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            color: #ccc;
+            flex-shrink: 0;
+        }
+
+        /* ── スライドごとの背景 ── */
+
+        /* ④ 説明 */
+        .slide-intro-not {
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+        }
+        .slide-intro-not .slide-inner {
+            background: rgba(255,255,255,0.92);
+        }
+        .slide-intro-not h2 {
+            color: #5b7cfa;
+        }
+        .slide-intro-not .step-item strong {
+            color: #5b7cfa;
+        }
+
+        /* ④ やりたいこと出し */
+        .slide-wish {
+            background: linear-gradient(135deg, #a29bfe 0%, #c4b5fd 100%);
+        }
+        .slide-wish .slide-inner {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            color: #fff;
+        }
+        .slide-wish h2 {
+            color: #fff;
+        }
+        .slide-wish .question-box {
+            background: rgba(255,255,255,0.92);
+            color: #333;
+        }
+        .slide-wish .question-box .q-text {
+            color: #5b4cba;
+        }
+
+        /* ④ 分類 */
+        .slide-sort {
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+        }
+        .slide-sort .slide-inner {
+            background: rgba(255,255,255,0.95);
+        }
+        .slide-sort h2 {
+            color: #555;
+        }
+
+        /* ⑦ 説明 */
+        .slide-intro-night {
+            background: linear-gradient(135deg, #fdcb6e 0%, #f9a870 100%);
+        }
+        .slide-intro-night .slide-inner {
+            background: rgba(255,255,255,0.92);
+        }
+        .slide-intro-night h2 {
+            color: #e67e22;
+        }
+        .slide-intro-night .step-item strong {
+            color: #e67e22;
+        }
+
+        /* ⑦ プレモーテム */
+        .slide-premortem {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+        }
+        .slide-premortem .slide-inner {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            color: #fff;
+        }
+        .slide-premortem h2 {
+            color: #fff;
+        }
+        .slide-premortem .question-box {
+            background: rgba(255,255,255,0.92);
+            color: #333;
+        }
+        .slide-premortem .question-box .q-text {
+            color: #d63031;
+        }
+
+        /* ⑦ 対策 */
+        .slide-counter {
+            background: linear-gradient(135deg, #55efc4 0%, #81ecec 100%);
+        }
+        .slide-counter .slide-inner {
+            background: rgba(255,255,255,0.95);
+        }
+        .slide-counter h2 {
+            color: #00a878;
+        }
+
+        /* ラスト */
+        .slide-next {
+            background: linear-gradient(135deg, #fda0b4 0%, #f0956e 100%);
+        }
+        .slide-next .slide-inner {
+            background: rgba(255,255,255,0.22);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            color: #fff;
+        }
+        .slide-next h2 {
+            color: #fff;
+            margin-bottom: 28px;
+        }
+
+        .next-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .next-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 16px;
+            padding: 18px 22px;
+        }
+
+        .next-item .next-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .next-item .next-text {
+            font-size: 1em;
+            line-height: 1.7;
+            color: #fff;
+        }
+
+        .next-item .next-text strong {
+            color: #fff;
+        }
+
+        .thanks-msg {
+            margin-top: 32px;
+            font-size: 1.5em;
+            font-weight: 900;
+        }
+
+        /* ── ナビゲーション ── */
+        .nav-area {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.1);
+            background: #fff;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+            transform: none;
+        }
+
+        .page-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .page-dot.active {
+            background: #fff;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .key-hint {
+            position: fixed;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* ── タイマー ── */
+        .timer-hint {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            margin-top: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .timer-hint-dark {
+            display: inline-block;
+            background: rgba(0,0,0,0.06);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            margin-top: 16px;
+            color: #999;
+        }
+
+        @media (max-width: 600px) {
+            .slide-inner {
+                padding: 30px 24px;
+            }
+
+            h2 {
+                font-size: 1.4em !important;
+            }
+
+            .sort-columns {
+                flex-direction: column;
+            }
+
+            .pair-box {
+                flex-direction: column;
+            }
+
+            .pair-arrow {
+                justify-content: center;
+                transform: rotate(90deg);
+            }
+
+            .question-box {
+                padding: 24px 20px;
+            }
+
+            .question-box .q-text {
+                font-size: 1.1em;
+            }
+
+            .question-box .q-examples {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ④ やらないことリスト：説明      -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-intro-not active" data-slide="0">
+            <div class="slide-inner">
+                <h2>📋 やらないことリストを作ろう</h2>
+                <p class="lead-text" style="margin-bottom: 24px;">
+                    最初のリリースで<strong>何に集中するか</strong>を決めるために、<br>
+                    まず「やりたいこと」を全部出して、<br>
+                    そこから仕分けしていきます。
+                </p>
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-icon">💡</div>
+                        <div class="step-text">
+                            <strong>Step 1</strong> — やりたいことを全部出す（付箋に書き出し）
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-icon">📌</div>
+                        <div class="step-text">
+                            <strong>Step 2</strong> — 「やる・やらない・あとで決める」に分類
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ④ ワーク：やりたいこと出し       -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-wish" data-slide="1">
+            <div class="slide-inner">
+                <h2>💡 Step 1：やりたいこと出し</h2>
+                <div class="question-box">
+                    <div class="q-emoji">✨</div>
+                    <div class="q-text">
+                        このアプリが完成したとして、<br>
+                        どんなことができたら嬉しいですか？
+                    </div>
+                    <div class="q-sub">
+                        実現可能性は気にしなくて OK。<br>
+                        なんでも、たくさん出してください！
+                    </div>
+                    <div class="q-examples">
+                        <span class="q-example-tag">例：カードを送ったら相手に通知が届く</span>
+                        <span class="q-example-tag">例：もらったカードを一覧で振り返れる</span>
+                        <span class="q-example-tag">例：チーム全体のやりとりが見える</span>
+                    </div>
+                </div>
+                <div class="timer-hint">⏱ 付箋に書き出し — 5〜10 分</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ④ ワーク：分類                  -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-sort" data-slide="2">
+            <div class="slide-inner">
+                <h2>📌 Step 2：仕分けしよう</h2>
+                <p class="lead-text" style="margin-bottom: 20px; text-align: center;">
+                    出てきた付箋を、3 つのエリアに分類していきます。
+                </p>
+                <div class="sort-columns">
+                    <div class="sort-col do">
+                        <h3>✅ やる</h3>
+                        <div class="sort-desc">
+                            最初のリリースに<br>絶対必要なもの
+                        </div>
+                    </div>
+                    <div class="sort-col dont">
+                        <h3>🚫 やらない</h3>
+                        <div class="sort-desc">
+                            このプロジェクトでは<br>対象外とするもの
+                        </div>
+                    </div>
+                    <div class="sort-col later">
+                        <h3>🤔 あとで決める</h3>
+                        <div class="sort-desc">
+                            今は判断できない・<br>状況を見て決めるもの
+                        </div>
+                    </div>
+                </div>
+                <div class="timer-hint-dark">⏱ チームで議論しながら — 15〜20 分</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ⑦ 夜も眠れない問題：説明        -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-intro-night" data-slide="3">
+            <div class="slide-inner">
+                <h2>😰 夜も眠れない問題を洗い出そう</h2>
+                <p class="lead-text" style="margin-bottom: 24px;">
+                    プロジェクトの<strong>リスクや不安</strong>を<br>
+                    全員でテーブルに出して、対策を考えます。
+                </p>
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-icon">💀</div>
+                        <div class="step-text">
+                            <strong>Step 1</strong> — 「大失敗した未来」を想像して原因を書き出す
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-icon">💊</div>
+                        <div class="step-text">
+                            <strong>Step 2</strong> — 出てきた不安に対策をセットで考える
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ⑦ ワーク：プレモーテム           -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-premortem" data-slide="4">
+            <div class="slide-inner">
+                <h2>💀 Step 1：プレモーテム</h2>
+                <div class="question-box">
+                    <div class="q-emoji">💥</div>
+                    <div class="q-text">
+                        半年後、このプロジェクトが<br>
+                        大失敗したとします。<br><br>
+                        何が原因だったと思いますか？
+                    </div>
+                    <div class="q-sub">
+                        技術・チーム・スケジュール・組織…<br>
+                        カテゴリは問いません。なんでも出してください。
+                    </div>
+                </div>
+                <div class="timer-hint">⏱ 付箋に書き出し — 5〜10 分</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ⑦ ワーク：対策を考える           -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-counter" data-slide="5">
+            <div class="slide-inner">
+                <h2>💊 Step 2：対策を考えよう</h2>
+                <p class="lead-text" style="margin-bottom: 20px; text-align: center;">
+                    出てきた不安ひとつひとつに、<br>
+                    「どうすれば防げそうか？」を考えます。
+                </p>
+                <div class="pair-box">
+                    <div class="pair-side worry">
+                        <h3>😰 不安・リスク</h3>
+                        <div class="pair-desc">
+                            出てきた付箋を<br>ここに貼る
+                        </div>
+                    </div>
+                    <div class="pair-arrow">→</div>
+                    <div class="pair-side action">
+                        <h3>💡 対策・アクション</h3>
+                        <div class="pair-desc">
+                            防ぐために<br>何ができるか？
+                        </div>
+                    </div>
+                </div>
+                <div class="timer-hint-dark">⏱ チームで議論しながら — 15〜20 分</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- ラスト：次のアクション            -->
+        <!-- ═══════════════════════════════ -->
+        <div class="slide slide-next" data-slide="6">
+            <div class="slide-inner">
+                <h2>📣 Next Action</h2>
+                <div class="next-list">
+                    <div class="next-item">
+                        <div class="next-icon">🏗️</div>
+                        <div class="next-text">
+                            <strong>⑥ 解決案を描く</strong> — 担当メンバーが叩きを作成 → 後日チームレビュー
+                        </div>
+                    </div>
+                    <div class="next-item">
+                        <div class="next-icon">🎨</div>
+                        <div class="next-text">
+                            <strong>UX 設計（デザインスプリント簡略版）</strong> — 別途ご案内します
+                        </div>
+                    </div>
+                </div>
+                <div class="thanks-msg">おつかれさまでした！ 🎉</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ナビゲーション -->
+    <div class="nav-area">
+        <button class="nav-btn" id="prevBtn" disabled>◀</button>
+        <div class="page-dots" id="pageDots"></div>
+        <button class="nav-btn" id="nextBtn">▶</button>
+    </div>
+    <div class="key-hint">← → キーでも操作できます</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageDots = document.getElementById('pageDots');
+
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('page-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            pageDots.appendChild(dot);
+        }
+
+        function goToSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            pageDots.children[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            pageDots.children[currentSlide].classList.add('active');
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) goToSlide(currentSlide - 1);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                if (currentSlide > 0) goToSlide(currentSlide - 1);
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentSlide < totalSlides - 1) {
+                    goToSlide(currentSlide + 1);
+                } else if (diff < 0 && currentSlide > 0) {
+                    goToSlide(currentSlide - 1);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
