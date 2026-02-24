@@ -111,7 +111,7 @@
   .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
   .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
-  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}.mb28{margin-bottom:28px}
+  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}.mb28{margin-bottom:28px}.mb40{margin-bottom:40px}.mb48{margin-bottom:48px}.mb64{margin-bottom:64px}.mb80{margin-bottom:80px}
 
   /* ── PITCH BOX ── */
   .pitch { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 32px; position: relative; overflow: hidden; }
@@ -477,30 +477,10 @@
   <h2>パッケージデザイン</h2>
   <p class="lead">もしこのプロダクトを一つの箱に入れて誰かに手渡すなら、どんな言葉を添えますか？<br>コンセプト：<strong>忙しさの中で忘れかけた温もりを、そっと思い出させてくれるもの</strong>——そんな存在を目指して。</p>
 
-  <div class="g3 mb20">
-    <div class="pkg pkg-warm">
-      <div class="pkg-label">PATTERN A — ひだまり</div>
-      <h3>声にならなかった<br>「ありがとう」を送ろう。</h3>
-      <p>忙しさの中で、ふと温もりを思い出す場所。<br>30秒のひとことが、誰かの一日をやさしく照らします。</p>
-      <div class="pkg-features">
-        <span class="pkg-feat">想いを届ける</span>
-        <span class="pkg-feat">AIが読みとる</span>
-        <span class="pkg-feat">みんなで照らす</span>
-      </div>
-    </div>
-    <div class="pkg pkg-cool">
-      <div class="pkg-label">PATTERN B — 波紋</div>
-      <h3>ひとつの感謝が<br>やがて共通言語になる。</h3>
-      <p>あなたが送った「ありがとう」が、組織に静かな波紋を広げる。<br>やがて大きな波となり、組織の原動力へ。</p>
-      <div class="pkg-features">
-        <span class="pkg-feat">言葉が文化になる</span>
-        <span class="pkg-feat">部署を超えて</span>
-        <span class="pkg-feat">未来の土台になる</span>
-      </div>
-    </div>
-    <div class="pkg pkg-nature">
-      <div class="pkg-label">PATTERN C — 種まき</div>
-      <h3>今日の「ありがとう」は<br>明日の土壌になる。</h3>
+  <div style="max-width:480px;margin:0 auto" class="mb48">
+    <div class="pkg pkg-nature" style="border-width:2px;border-color:rgba(107,203,119,0.4);box-shadow:0 0 40px rgba(107,203,119,0.08);">
+      <div class="pkg-label" style="font-size:11px;">SELECTED — PATTERN C — 種まき</div>
+      <h3 style="font-size:26px;">今日の「ありがとう」は<br>明日の土壌になる。</h3>
       <p>日々の「助かった」を言葉にする。ただそれだけのことが、<br>気づけば組織の根を静かに強くしていきます。</p>
       <div class="pkg-features">
         <span class="pkg-feat">手のひらから届く</span>
@@ -510,13 +490,9 @@
     </div>
   </div>
 
-  <div class="discuss">
-    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
-    <p>
-      <strong>Q1.</strong> A〜Cのうち、社員が最も手に取りたくなるのはどれ？ あるいは組み合わせたい？<br>
-      <strong>Q2.</strong> パッケージの裏面に書く「推薦の声」はどんな内容がイメージできる？<br>
-      <strong>Q3.</strong> 箱を開けたとき、最初に目に入る体験（＝初回利用体験）はどうあるべき？
-    </p>
+  <div class="co co-mint mb20" style="border-color:rgba(107,203,119,0.2);background:rgba(107,203,119,0.05); margin-top: 20px;">
+    <svg class="icon-sm co-i" style="color:var(--mint)"><use href="#i-check"/></svg>
+    <p><strong>決定済み</strong> — チーム議論の結果、「種まき」コンセプトを採用。日常の感謝が組織の土壌となり、根を張っていくというメタファーがプロダクトのビジョンに最もフィットするため。</p>
   </div>
 </div>
 </div>
