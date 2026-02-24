@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インセプションデッキ — ありがとうカード プロジェクト</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.15);
+    --text: #f0eff4;
+    --text-sub: rgba(255,255,255,0.55);
+    --text-muted: rgba(255,255,255,0.3);
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --pink: #F472B6;
+    --r: 16px;
+    --rs: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+  /* ── ICONS ── */
+  .icon { width: 24px; height: 24px; flex-shrink: 0; display: inline-block; vertical-align: middle; }
+  .icon-sm { width: 18px; height: 18px; }
+  .icon-lg { width: 32px; height: 32px; }
+  .icon-xl { width: 40px; height: 40px; }
+  .icon-hero { width: 44px; height: 44px; }
+  .icon-card { width: 28px; height: 28px; display: block; margin-bottom: 12px; }
+  .icon-sol { width: 28px; height: 28px; display: block; margin: 0 auto 10px; }
+  .icon-not { width: 22px; height: 22px; flex-shrink: 0; }
+
+  /* ── SLIDE WRAPPER ── */
+  .sw { display: flex; height: 100vh; transition: transform .55s cubic-bezier(.22,1,.36,1); }
+  .sl { min-width: 100vw; height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 72px 64px 80px; overflow-y: auto; position: relative; }
+  .sl::-webkit-scrollbar { width: 6px; }
+  .sl::-webkit-scrollbar-track { background: transparent; }
+  .sl::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  .sl.cv { align-items: center; }
+  .sc { max-width: 1024px; width: 100%; opacity: 0; transform: translateX(28px); transition: all .5s cubic-bezier(.22,1,.36,1) .1s; }
+  .sl.active .sc { opacity: 1; transform: translateX(0); }
+
+  /* ── TOP BAR ── */
+  .top { position: fixed; top: 0; left: 0; right: 0; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 200; background: rgba(15,15,26,0.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  .top-t { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 13px; color: var(--text-sub); }
+  .top-p { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12px; color: var(--text-muted); }
+  .prog { position: fixed; top: 48px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.06); z-index: 200; }
+  .prog-f { height: 100%; background: linear-gradient(90deg, var(--coral), var(--orange), var(--yellow)); transition: width .55s cubic-bezier(.22,1,.36,1); border-radius: 0 2px 2px 0; }
+
+  /* ── BOTTOM BAR ── */
+  .bot { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 200; background: rgba(15,15,26,0.88); backdrop-filter: blur(16px); border-top: 1px solid var(--border); }
+  .btn { padding: 8px 22px; border: 1px solid var(--border-strong); border-radius: 8px; background: transparent; color: var(--text-sub); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: 'Noto Sans JP', sans-serif; user-select: none; }
+  .btn:hover { background: rgba(255,255,255,0.1); color: var(--text); border-color: rgba(255,255,255,0.3); }
+  .btn:disabled { opacity: .15; cursor: default; pointer-events: none; }
+  .dots { display: flex; gap: 6px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; padding: 0; cursor: pointer; transition: all .3s; }
+  .dot.active { background: var(--coral); transform: scale(1.4); box-shadow: 0 0 8px rgba(255,107,107,0.4); }
+
+  /* ── TYPOGRAPHY ── */
+  .slide-num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 8px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 16px; padding: 5px 14px; border-radius: 6px; }
+  .tag.t-coral { background: rgba(255,107,107,0.12); color: var(--coral); }
+  .tag.t-orange { background: rgba(255,165,82,0.12); color: var(--orange); }
+  .tag.t-yellow { background: rgba(255,217,61,0.12); color: var(--yellow); }
+  .tag.t-mint { background: rgba(107,203,119,0.12); color: var(--mint); }
+  .tag.t-sky { background: rgba(77,150,255,0.12); color: var(--sky); }
+  .tag.t-purple { background: rgba(155,114,207,0.12); color: var(--purple); }
+  .tag.t-pink { background: rgba(244,114,182,0.12); color: var(--pink); }
+  h2 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: clamp(24px, 3.5vw, 36px); line-height: 1.45; margin-bottom: 12px; }
+  h3 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+  .lead { font-size: 14.5px; color: var(--text-sub); line-height: 1.9; margin-bottom: 28px; }
+
+  /* ── CARD ── */
+  .cd { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; transition: border-color .3s, transform .2s; }
+  .cd:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .cd-accent { height: 3px; border-radius: var(--r) var(--r) 0 0; margin: -24px -24px 20px -24px; }
+  .cd-accent.a-coral { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .cd-accent.a-sky { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .cd-accent.a-mint { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .cd-accent.a-purple { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+  .cd-accent.a-yellow { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+  .cd-accent.a-pink { background: linear-gradient(90deg, var(--pink), var(--coral)); }
+  .cd h3 { font-size: 15px; margin-bottom: 6px; }
+  .cd p, .cd-p { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+
+  /* ── CALLOUT ── */
+  .co { display: flex; gap: 12px; align-items: flex-start; padding: 18px 22px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); }
+  .co.co-coral { background: rgba(255,107,107,0.06); border-color: rgba(255,107,107,0.15); }
+  .co.co-yellow { background: rgba(255,217,61,0.06); border-color: rgba(255,217,61,0.15); }
+  .co.co-sky { background: rgba(77,150,255,0.06); border-color: rgba(77,150,255,0.15); }
+  .co.co-mint { background: rgba(107,203,119,0.06); border-color: rgba(107,203,119,0.15); }
+  .co.co-purple { background: rgba(155,114,207,0.06); border-color: rgba(155,114,207,0.15); }
+  .co-i { flex-shrink: 0; margin-top: 2px; }
+  .co p { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+  .co strong { color: var(--text); }
+
+  /* ── DISCUSS BOX ── */
+  .discuss { padding: 18px 22px; border-radius: var(--rs); border: 1.5px dashed rgba(255,217,61,0.3); background: rgba(255,217,61,0.04); }
+  .discuss-label { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .1em; color: var(--yellow); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .discuss p { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+
+  /* ── GRIDS ── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}.mb28{margin-bottom:28px}
+
+  /* ── PITCH BOX ── */
+  .pitch { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 32px; position: relative; overflow: hidden; }
+  .pitch::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--coral), var(--orange), var(--yellow), var(--mint), var(--sky)); }
+  .pitch p { font-size: 15px; line-height: 2.2; color: var(--text-sub); }
+  .pitch .hl { color: var(--text); font-weight: 700; background: linear-gradient(transparent 60%, rgba(255,107,107,0.2) 60%); }
+  .pitch .hl-sky { color: var(--sky); font-weight: 700; }
+  .pitch .hl-mint { color: var(--mint); font-weight: 700; }
+
+  /* ── NOT LIST ── */
+  .not-item { display: flex; align-items: center; gap: 14px; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); transition: transform .2s; }
+  .not-item:hover { transform: translateX(4px); }
+  .not-item h4 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+  .not-item p { font-size: 12px; color: var(--text-sub); line-height: 1.6; }
+  .not-item.later { border-color: rgba(77,150,255,0.2); background: rgba(77,150,255,0.04); }
+  .not-item.never { border-color: rgba(255,107,107,0.2); background: rgba(255,107,107,0.04); }
+
+  /* ── NEIGHBOR MAP ── */
+  .nb { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px 24px; }
+  .nb-role { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .08em; margin-bottom: 6px; }
+  .nb-name { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .nb-desc { font-size: 12px; color: var(--text-sub); line-height: 1.7; }
+  .nb.nb-coral .nb-role { color: var(--coral); }
+  .nb.nb-sky .nb-role { color: var(--sky); }
+  .nb.nb-mint .nb-role { color: var(--mint); }
+  .nb.nb-yellow .nb-role { color: var(--yellow); }
+  .nb.nb-purple .nb-role { color: var(--purple); }
+
+  /* ── SOLUTION ── */
+  .sol-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; }
+  .sol-step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); padding: 16px 18px; text-align: center; min-width: 130px; flex: 1; }
+  .sol-step h4 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+  .sol-step p { font-size: 11px; color: var(--text-sub); line-height: 1.5; }
+  .sol-arr { padding: 0 8px; color: var(--text-muted); font-size: 14px; }
+
+  /* ── RISK ── */
+  .risk { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 22px; position: relative; overflow: hidden; }
+  .risk::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px; }
+  .risk.r-high::before { background: var(--coral); }
+  .risk.r-mid::before { background: var(--orange); }
+  .risk-level { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .08em; margin-bottom: 6px; }
+  .risk.r-high .risk-level { color: var(--coral); }
+  .risk.r-mid .risk-level { color: var(--orange); }
+  .risk h3 { font-size: 15px; margin-bottom: 6px; }
+  .risk p { font-size: 12.5px; color: var(--text-sub); line-height: 1.7; }
+  .risk-counter { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--mint); line-height: 1.7; }
+
+  /* ── SLIDER ── */
+  .slider-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .slider-row:last-child { border-bottom: none; }
+  .slider-label { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 14px; min-width: 100px; display: flex; align-items: center; gap: 8px; }
+  .slider-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; }
+  .slider-fill { height: 100%; border-radius: 4px; position: relative; }
+  .slider-fill.sf-coral { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .slider-fill.sf-sky { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .slider-fill.sf-mint { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .slider-fill.sf-yellow { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+  .slider-fill::after { content: ''; position: absolute; right: -5px; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px rgba(0,0,0,0.3); }
+  .slider-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 12px; color: var(--text-muted); min-width: 20px; text-align: right; }
+
+  /* ── TIMELINE ── */
+  .tl { position: relative; padding-left: 36px; }
+  .tl::before { content: ''; position: absolute; left: 10px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(180deg, var(--coral), var(--sky), var(--purple), var(--mint)); border-radius: 2px; }
+  .tli { position: relative; margin-bottom: 14px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); transition: transform .2s; }
+  .tli:hover { transform: translateX(4px); }
+  .tli:last-child { margin-bottom: 0; }
+  .tli::before { content: ''; position: absolute; left: -32px; top: 20px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg); }
+  .tli:nth-child(1)::before { background: var(--coral); box-shadow: 0 0 0 2px var(--coral); }
+  .tli:nth-child(2)::before { background: var(--sky); box-shadow: 0 0 0 2px var(--sky); }
+  .tli:nth-child(3)::before { background: var(--purple); box-shadow: 0 0 0 2px var(--purple); }
+  .tli:nth-child(4)::before { background: var(--mint); box-shadow: 0 0 0 2px var(--mint); }
+  .tl-p { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: .06em; margin-bottom: 2px; }
+  .tli:nth-child(1) .tl-p { color: var(--coral); }
+  .tli:nth-child(2) .tl-p { color: var(--sky); }
+  .tli:nth-child(3) .tl-p { color: var(--purple); }
+  .tli:nth-child(4) .tl-p { color: var(--mint); }
+  .tli h3 { font-size: 14.5px; margin-bottom: 2px; }
+  .tli p { font-size: 12.5px; color: var(--text-sub); line-height: 1.7; }
+
+  /* ── TABLE ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+  .tbl th { background: rgba(255,255,255,0.04); font-weight: 700; font-size: 11.5px; color: var(--text-sub); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-sub); line-height: 1.7; vertical-align: top; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl .t-label { font-weight: 700; color: var(--text); }
+
+  /* ── HERO ── */
+  .hero { text-align: center; position: relative; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 600px 400px at 30% 40%, rgba(255,107,107,0.08), transparent), radial-gradient(ellipse 500px 400px at 70% 60%, rgba(77,150,255,0.06), transparent), radial-gradient(ellipse 400px 300px at 50% 80%, rgba(155,114,207,0.05), transparent); }
+  .hero .sc { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+  .hero-icon { width: 80px; height: 80px; border-radius: 24px; background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(255,165,82,0.1)); border: 1px solid rgba(255,107,107,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 28px; color: var(--coral); }
+  .hero h1 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: clamp(30px,5vw,50px); line-height: 1.35; margin-bottom: 16px; background: linear-gradient(135deg, #fff 0%, #ffd6d6 40%, #ffe8c2 70%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero .lead { max-width: 520px; margin-bottom: 36px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+  .hero-chip { padding: 7px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-size: 12.5px; color: var(--text-sub); display: flex; align-items: center; gap: 6px; }
+  .hint { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+  .key { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 22px; border: 1px solid var(--border-strong); border-radius: 5px; font-size: 11px; color: var(--text-sub); }
+
+  /* ── WHY SECTION ── */
+  .why-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 32px; position: relative; overflow: hidden; }
+  .why-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .why-block p { font-size: 14.5px; color: var(--text-sub); line-height: 2.1; }
+  .why-block .hl { color: var(--text); font-weight: 700; }
+  .comp-list { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+  .comp-tag { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid; }
+  .comp-tag:nth-child(1) { color: var(--coral); border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.08); }
+  .comp-tag:nth-child(2) { color: var(--orange); border-color: rgba(255,165,82,0.3); background: rgba(255,165,82,0.08); }
+  .comp-tag:nth-child(3) { color: var(--sky); border-color: rgba(77,150,255,0.3); background: rgba(77,150,255,0.08); }
+  .comp-tag:nth-child(4) { color: var(--mint); border-color: rgba(107,203,119,0.3); background: rgba(107,203,119,0.08); }
+  .comp-tag:nth-child(5) { color: var(--purple); border-color: rgba(155,114,207,0.3); background: rgba(155,114,207,0.08); }
+
+  /* ── PKG (Package Design) ── */
+  .pkg { border-radius: var(--r); padding: 32px; text-align: center; border: 1px solid var(--border); position: relative; overflow: hidden; }
+  .pkg-label { font-family: 'Montserrat', sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: .1em; margin-bottom: 16px; text-transform: uppercase; }
+  .pkg h3 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: 22px; line-height: 1.5; margin-bottom: 10px; }
+  .pkg p { font-size: 13px; line-height: 1.8; margin-bottom: 12px; }
+  .pkg-features { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .pkg-feat { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+  .pkg.pkg-warm { background: linear-gradient(135deg, #1a1210, #1e1515); border-color: rgba(255,107,107,0.2); }
+  .pkg.pkg-warm .pkg-label { color: var(--coral); }
+  .pkg.pkg-warm h3 { color: #fff; }
+  .pkg.pkg-warm p { color: rgba(255,255,255,0.55); }
+  .pkg.pkg-warm .pkg-feat { background: rgba(255,107,107,0.15); color: var(--coral); }
+  .pkg.pkg-cool { background: linear-gradient(135deg, #0f1520, #121828); border-color: rgba(77,150,255,0.2); }
+  .pkg.pkg-cool .pkg-label { color: var(--sky); }
+  .pkg.pkg-cool h3 { color: #fff; }
+  .pkg.pkg-cool p { color: rgba(255,255,255,0.55); }
+  .pkg.pkg-cool .pkg-feat { background: rgba(77,150,255,0.15); color: var(--sky); }
+  .pkg.pkg-nature { background: linear-gradient(135deg, #0f1a14, #121e18); border-color: rgba(107,203,119,0.2); }
+  .pkg.pkg-nature .pkg-label { color: var(--mint); }
+  .pkg.pkg-nature h3 { color: #fff; }
+  .pkg.pkg-nature p { color: rgba(255,255,255,0.55); }
+  .pkg.pkg-nature .pkg-feat { background: rgba(107,203,119,0.15); color: var(--mint); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:800px) {
+    .sl { padding: 72px 22px 80px; }
+    .g2,.g3,.g4 { grid-template-columns: 1fr; }
+    .sol-flow { flex-direction: column; }
+    .sol-arr { transform: rotate(90deg); padding: 4px 0; }
+    .slider-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .slider-track { width: 100%; }
+    .slider-label { min-width: auto; }
+    .comp-list { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SVG ICON SPRITE ===== -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+  </symbol>
+  <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/>
+  </symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </symbol>
+  <symbol id="i-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>
+  </symbol>
+  <symbol id="i-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 7v6"/><path d="M6 9.3V16a6 6 0 0 0 12 0V9.3"/>
+  </symbol>
+  <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>
+  </symbol>
+  <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+  </symbol>
+  <symbol id="i-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>
+  </symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>
+  </symbol>
+  <symbol id="i-handshake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3L14 8l-4-2-3 3 2 4Z"/><path d="m13 19 2 2a1 1 0 1 0 3-3"/><path d="M2 14l6-6"/><path d="m10 7 5-1 4 4-1 5"/><path d="M22 14l-6-6"/>
+  </symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+  </symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/>
+  </symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
+  </symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/>
+  </symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+  </symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+  </symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
+  </symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/>
+  </symbol>
+  <symbol id="i-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </symbol>
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+  </symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
+  </symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>
+  </symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+  </symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+  </symbol>
+  <symbol id="i-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+  </symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+  </symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+  </symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+  </symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </symbol>
+</svg>
+
+<div class="top">
+  <div class="top-t">インセプションデッキ</div>
+  <div class="top-p"><span id="pn">1</span> / <span id="tt"></span></div>
+</div>
+<div class="prog"><div class="prog-f" id="pf"></div></div>
+
+<div class="sw" id="sw">
+
+<!-- ==================== SLIDE 1: HERO ==================== -->
+<div class="sl hero cv active" data-title="表紙">
+<div class="sc">
+  <div class="hero-icon"><svg class="icon-hero"><use href="#i-compass"/></svg></div>
+  <h1>インセプションデッキ</h1>
+  <p class="lead">ありがとうカード プロジェクトの全体像を<br>チームで共有し、合意するための10枚のスライド。</p>
+  <div class="hero-chips">
+    <div class="hero-chip"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-file"/></svg> 全10スライド</div>
+    <div class="hero-chip"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-users"/></svg> チーム全員で議論</div>
+    <div class="hero-chip"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-target"/></svg> Sprint 0 の最初に実施</div>
+  </div>
+  <div class="hint"><span class="key">←</span><span class="key">→</span> or 下のボタンで操作</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 2: WHY ARE WE HERE ==================== -->
+<div class="sl" data-title="01 我々はなぜここにいるのか">
+<div class="sc">
+  <div class="slide-num">01 / 10</div>
+  <div class="tag t-coral">WHY ARE WE HERE</div>
+  <h2>我々はなぜここにいるのか</h2>
+  <p class="lead">プロジェクトが始まった根本的な理由を確認します。</p>
+
+  <div class="why-block mb24">
+    日々の業務で埋もれる「ありがとう」を可視化し、<br>感謝を通してコアコンピテンシーを浸透させる。
+    <p style="padding-top: 2rem;">
+      日々の業務の忙しさの中で感謝の気持ちは表面化されにくい。<br>
+      ストレスや多忙により、忘れてしまう感謝もあるだろう。
+    </p>
+    <br>
+    <p>
+      組織力向上フォーラムが Lighthouse や社員の声をもとに策定した5つのコアコンピテンシー、
+    </p>
+    <div class="comp-list">
+      <span class="comp-tag">誠実</span>
+      <span class="comp-tag">当事者意識</span>
+      <span class="comp-tag">協働</span>
+      <span class="comp-tag">挑戦への意欲</span>
+      <span class="comp-tag">創造的思考</span>
+    </div>
+    <p>
+      これらは周知されているものの、<span class="hl">日常業務で意識されることはほとんどない。</span><br>
+      「理想論」として受け止められている側面もある。
+    </p>
+    <br>
+    <p>
+      <span class="hl">本プロジェクトでは、社員が自然にコンピテンシーを意識し、体現できる状態を目指す。</span>
+    </p>
+  </div>
+
+  <div class="co co-yellow">
+    <svg class="icon-sm co-i" style="color:var(--yellow)"><use href="#i-graduation"/></svg>
+    <p><strong>もう一つの目的：</strong>若手メンバーが 0 からプロダクトを作り切る経験を通じて成長すること。このプロジェクトは「プロダクト」と「人」の両方を育てる取り組みです。</p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 3: ELEVATOR PITCH ==================== -->
+<div class="sl" data-title="02 エレベーターピッチ">
+<div class="sc">
+  <div class="slide-num">02 / 10</div>
+  <div class="tag t-orange">ELEVATOR PITCH</div>
+  <h2>エレベーターピッチ</h2>
+  <p class="lead">30秒でプロダクトの価値を伝える。</p>
+
+  <div class="pitch mb24">
+    <p>
+      <span class="hl-sky">日々の感謝を伝えそびれている</span> FREEMIND の全社員のための<br>
+      <span class="hl">「ありがとうカード」</span>というプロダクトは、<br>
+      <span class="hl-sky">社内向け感謝カード × AI ラベリングアプリ</span>です。<br><br>
+      これは<span class="hl-mint">感謝メッセージを送るだけで、AIが自動でコアコンピテンシーをラベル付け</span>でき、<br>
+      <span class="hl-sky">Chatwork でのお礼や対面での「ありがとう」</span>とは違って、<br>
+      <span class="hl">感謝が記録として蓄積され、コンピテンシーが自然と共通言語になる</span>ことが特徴です。
+    </p>
+  </div>
+
+  <h3 class="mb12">なぜ外部SaaSではなく自社開発なのか</h3>
+  <div class="g2 mb20">
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--orange)"><use href="#i-graduation"/></svg>
+      <h3>若手の成長機会</h3>
+      <p>若手は、0 からプロダクトを作り切る経験ができない。企画・設計・開発・リリース・運用の全工程を若手メンバーが体験する。</p>
+    </div>
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--sky)"><use href="#i-building"/></svg>
+      <h3>自社文化への最適化</h3>
+      <p>5つのコアコンピテンシーに完全に合わせたAIラベリングは、汎用SaaSでは実現できない。</p>
+    </div>
+  </div>
+
+  <div class="discuss">
+    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
+    <p>このエレベーターピッチで伝わりますか？ 社員に説明するとき、最も響くポイントはどこでしょうか？</p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 4: PACKAGE DESIGN ==================== -->
+<div class="sl" data-title="03 パッケージデザイン">
+<div class="sc">
+  <div class="slide-num">03 / 10</div>
+  <div class="tag t-pink">PRODUCT BOX</div>
+  <h2>パッケージデザイン</h2>
+  <p class="lead">もしこのプロダクトを一つの箱に入れて誰かに手渡すなら、どんな言葉を添えますか？<br>コンセプト：<strong>忙しさの中で忘れかけた温もりを、そっと思い出させてくれるもの</strong>——そんな存在を目指して。</p>
+
+  <div class="g3 mb20">
+    <div class="pkg pkg-warm">
+      <div class="pkg-label">PATTERN A — ひだまり</div>
+      <h3>声にならなかった<br>「ありがとう」を送ろう。</h3>
+      <p>忙しさの中で、ふと温もりを思い出す場所。<br>30秒のひとことが、誰かの一日をやさしく照らします。</p>
+      <div class="pkg-features">
+        <span class="pkg-feat">想いを届ける</span>
+        <span class="pkg-feat">AIが読みとる</span>
+        <span class="pkg-feat">みんなで照らす</span>
+      </div>
+    </div>
+    <div class="pkg pkg-cool">
+      <div class="pkg-label">PATTERN B — 波紋</div>
+      <h3>ひとつの感謝が<br>やがて共通言語になる。</h3>
+      <p>あなたが送った「ありがとう」が、組織に静かな波紋を広げる。<br>やがて大きな波となり、組織の原動力へ。</p>
+      <div class="pkg-features">
+        <span class="pkg-feat">言葉が文化になる</span>
+        <span class="pkg-feat">部署を超えて</span>
+        <span class="pkg-feat">未来の土台になる</span>
+      </div>
+    </div>
+    <div class="pkg pkg-nature">
+      <div class="pkg-label">PATTERN C — 種まき</div>
+      <h3>今日の「ありがとう」は<br>明日の土壌になる。</h3>
+      <p>日々の「助かった」を言葉にする。ただそれだけのことが、<br>気づけば組織の根を静かに強くしていきます。</p>
+      <div class="pkg-features">
+        <span class="pkg-feat">手のひらから届く</span>
+        <span class="pkg-feat">習慣が根を張る</span>
+        <span class="pkg-feat">空気が変わる</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="discuss">
+    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
+    <p>
+      <strong>Q1.</strong> A〜Cのうち、社員が最も手に取りたくなるのはどれ？ あるいは組み合わせたい？<br>
+      <strong>Q2.</strong> パッケージの裏面に書く「推薦の声」はどんな内容がイメージできる？<br>
+      <strong>Q3.</strong> 箱を開けたとき、最初に目に入る体験（＝初回利用体験）はどうあるべき？
+    </p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 5: NOT LIST ==================== -->
+<div class="sl" data-title="04 やらないことリスト">
+<div class="sc">
+  <div class="slide-num">04 / 10</div>
+  <div class="tag t-coral">NOT LIST</div>
+  <h2>やらないことリスト</h2>
+  <p class="lead">スコープを守るために「やらないこと」を明確にする。境界線を引くことで、チームが迷わず進める。</p>
+
+  <h3 class="mb12">やらないこと（MVP以降も対象外）</h3>
+  <div style="display:flex;flex-direction:column;gap:10px" class="mb24">
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
+      <div>
+        <h4>ランキング機能</h4>
+        <p>競争を煽る仕組みは本プロジェクトの趣旨（感謝の文化づくり）と合わない。</p>
+      </div>
+    </div>
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
+      <div>
+        <h4>人事評価との連動</h4>
+        <p>気軽に使ってもらうことが最優先。評価と紐づくと、送る側も受け取る側も身構えてしまう。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mb12">今はやらないこと（v2以降で検討）</h3>
+  <div style="display:flex;flex-direction:column;gap:10px" class="mb20">
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>スタンプ・画像添付 / 複数リアクション</h4>
+        <p>MVPではテキスト+AIラベルに集中。表現の幅はv2以降で段階的に拡充。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>ゲーミフィケーション</h4>
+        <p>利用モチベーション施策は、定着率を見ながら検討する。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>部署別月次レポート</h4>
+        <p>データ蓄積後に本格化。MVP段階では送受信とAIラベリングに集中。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>個人のコンピテンシー累計表示</h4>
+        <p>個人の評価や比較につながるリスクがある。感謝のハードルを上げてしまう。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>ユーザー自動同期（Google Workspace連携）</h4>
+        <p>60名規模なのでMVPでは手動管理。運用負荷が高ければv2で自動化。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="discuss">
+    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
+    <p>他に「やらない」と明確にしておきたいことはありますか？ 境界が曖昧なものがあれば議論しましょう。</p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 6: MEET YOUR NEIGHBORS ==================== -->
+<div class="sl" data-title="05 ご近所さんを探せ">
+<div class="sc">
+  <div class="slide-num">05 / 10</div>
+  <div class="tag t-mint">MEET YOUR NEIGHBORS</div>
+  <h2>ご近所さんを探せ</h2>
+  <p class="lead">プロジェクトに関わるすべてのステークホルダーを把握する。開発チームだけでは完結しない。</p>
+
+  <div class="g3 mb16">
+    <div class="nb nb-coral">
+      <div class="nb-role">CORE TEAM</div>
+      <div class="nb-name">開発チーム</div>
+      <div class="nb-desc">PO（江崎）、TL（江崎）、SM（川上）、企画リード（藤田）、開発メンバー9名。プロダクトを企画・設計・開発・リリースする。</div>
+    </div>
+    <div class="nb nb-yellow">
+      <div class="nb-role">VALIDATOR</div>
+      <div class="nb-name">組織力向上フォーラム</div>
+      <div class="nb-desc">5つのコアコンピテンシーの策定元。AIラベリングの妥当性検証を依頼。ラベリング精度の判断基準を持つ唯一の存在。</div>
+    </div>
+    <div class="nb nb-purple">
+      <div class="nb-role">APPROVER</div>
+      <div class="nb-name">経営層</div>
+      <div class="nb-desc">社内案件稟議の申請・承認。インフラ予算（50 USD/月）の確保とメンバー稼働費の承認に関わる。</div>
+    </div>
+  </div>
+  <div class="g2 mb20">
+    <div class="nb nb-sky">
+      <div class="nb-role">END USERS</div>
+      <div class="nb-name">全社員60名</div>
+      <div class="nb-desc">4部署（営業4名・開発52名・DX企画2名・管理3名）。アプリのエンドユーザーであり、フィードバックをもらい改善してデリバリーする関係。</div>
+    </div>
+    <div class="nb nb-mint">
+      <div class="nb-role">SPONSOR</div>
+      <div class="nb-name">社内案件化推進（川上・江崎・藤田・小林）</div>
+      <div class="nb-desc">ステークホルダー調整・社内承認を推進。稟議のための情報整理も担当。プロジェクトと経営層をつなぐ架け橋。</div>
+    </div>
+  </div>
+
+  <div class="co co-mint">
+    <svg class="icon-sm co-i" style="color:var(--mint)"><use href="#i-handshake"/></svg>
+    <p><strong>ポイント：</strong>組織力向上フォーラムには早い段階からAIラベリングの精度検証に関わってもらう。エンドユーザーにはベータテストで早期フィードバックを得る。</p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 7: SHOW THE SOLUTION ==================== -->
+<div class="sl" data-title="06 解決案を描く">
+<div class="sc">
+  <div class="slide-num">06 / 10</div>
+  <div class="tag t-sky">SHOW THE SOLUTION</div>
+  <h2>解決案を描く</h2>
+  <p class="lead">プロダクトの全体像と、ユーザーが体験するフローを描く。</p>
+
+  <h3 class="mb12">ユーザー体験フロー</h3>
+  <div class="sol-flow mb24">
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-user"/></svg><h4>ログイン</h4><p>Google認証<br>(@freemind.co.jp)</p></div>
+    <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-pen"/></svg><h4>カード作成</h4><p>宛先を選び<br>メッセージ入力<br>(100文字以内)</p></div>
+    <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-cpu"/></svg><h4>AIラベリング</h4><p>生成AIが<br>コンピテンシーを<br>自動判定</p></div>
+    <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-send"/></svg><h4>送信</h4><p>匿名/実名<br>公開/非公開<br>を選択して送信</p></div>
+    <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-list"/></svg><h4>タイムライン</h4><p>公開カードを<br>全社で閲覧<br>いいねできる</p></div>
+  </div>
+
+  <h3 class="mb12">システム概要</h3>
+  <div class="g2 mb20">
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--sky)"><use href="#i-cloud"/></svg>
+      <h3>インフラ：AWS</h3>
+      <p>月額 50 USD の予算制約の中で構成。詳細な構成は Sprint 0 で決定。</p>
+    </div>
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--purple)"><use href="#i-gear"/></svg>
+      <h3>技術スタック：Sprint 0 で決定</h3>
+      <p>言語・フレームワーク・CI/CD はメンバーによる技術選定もプロジェクトの学びの一環。</p>
+    </div>
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--mint)"><use href="#i-lock"/></svg>
+      <h3>認証：Google OAuth</h3>
+      <p>会社ドメイン(@freemind.co.jp) の Google アカウントによるログイン。</p>
+    </div>
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--orange)"><use href="#i-phone"/></svg>
+      <h3>対応端末：レスポンシブ</h3>
+      <p>PC・スマートフォン両対応必須。通勤中・休憩中など業務外の利用も想定。</p>
+    </div>
+  </div>
+
+  <div class="co co-sky">
+    <svg class="icon-sm co-i" style="color:var(--sky)"><use href="#i-wrench"/></svg>
+    <p><strong>MVP のコア機能：</strong>カード送受信 → AIラベリング → 不適切コンテンツフィルタ → タイムライン → マイカード一覧 → いいね → 通知</p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 8: WHAT KEEPS US UP AT NIGHT ==================== -->
+<div class="sl" data-title="07 夜も眠れない問題">
+<div class="sc">
+  <div class="slide-num">07 / 10</div>
+  <div class="tag t-coral">WHAT KEEPS US UP AT NIGHT</div>
+  <h2>夜も眠れない問題</h2>
+  <p class="lead">このプロジェクトを脅かすリスクと、その対策案。不安を共有し、チームで向き合う。</p>
+
+  <div class="g3 mb20">
+    <div class="risk r-high">
+      <div class="risk-level">HIGH RISK</div>
+      <h3>全社展開後の定着率</h3>
+      <p>リリースしても社員が使わなくなる可能性。60名全員に「使い続けたい」と思ってもらえるかが最大の不確実性。</p>
+      <div class="risk-counter">
+        <strong>対策案：</strong>ベータテストで早期フィードバック。通知によるリマインド。ランダム通知で「今日の感謝」を促す。使い始めのハードルを極限まで下げる。
+      </div>
+    </div>
+    <div class="risk r-high">
+      <div class="risk-level">HIGH RISK</div>
+      <h3>予算制約（50 USD/月）</h3>
+      <p>インフラ費 + AI API コストを月50ドルに収める必要がある。生成AI のAPI呼び出しコストが読みにくい。</p>
+      <div class="risk-counter">
+        <strong>対策案：</strong>軽量モデルの採用。バッチ処理によるコスト最適化。Sprint 0 で概算コスト試算を実施。超過時のフォールバック設計。
+      </div>
+    </div>
+    <div class="risk r-mid">
+      <div class="risk-level">MEDIUM RISK</div>
+      <h3>経験不足による遅延</h3>
+      <p>経験年数3年未満の若手9名が主体。技術的なハマりポイントで想定以上に時間がかかる可能性。</p>
+      <div class="risk-counter">
+        <strong>対策案：</strong>TL/PO による技術サポート。2週間スプリントで早期に遅れを検知。「学び」が最優先なので、スコープ調整で対応。
+      </div>
+    </div>
+  </div>
+
+  <div class="discuss">
+    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
+    <p>他に「眠れなくなるほど不安なこと」はありますか？ AI精度の不確実性、チーム内コミュニケーション、稟議の不透明さなど、思いつくものがあれば挙げてください。</p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 9: SIZE IT UP ==================== -->
+<div class="sl" data-title="08 期間を見極める">
+<div class="sc">
+  <div class="slide-num">08 / 10</div>
+  <div class="tag t-sky">SIZE IT UP</div>
+  <h2>期間を見極める</h2>
+  <p class="lead">約6ヶ月でMVPリリースを目指す。ただし硬い締切ではなく、学びを優先した目安として設定。</p>
+
+  <div class="tl mb24">
+    <div class="tli">
+      <div class="tl-p">SPRINT 0 — 1〜2ヶ月</div>
+      <h3>準備期間</h3>
+      <p>インセプションデッキ、UX設計、技術選定・環境構築、バックログ作成、DoD策定。開発の土台をつくる。</p>
+    </div>
+    <div class="tli">
+      <div class="tl-p">SPRINT 1〜2</div>
+      <h3>コア機能開発</h3>
+      <p>カード送受信 → AIラベリング → タイムライン表示。最も重要な機能を先に形にする。</p>
+    </div>
+    <div class="tli">
+      <div class="tl-p">SPRINT 3〜5</div>
+      <h3>フィードバック & 拡充</h3>
+      <p>UI改善、通知機能、AI精度チューニング。声を聞きながら繰り返す。骨格の見直しもOK。</p>
+    </div>
+    <div class="tli">
+      <div class="tl-p">SPRINT 6（目標）</div>
+      <h3>ベータ → MVPリリース</h3>
+      <p>先行テスト後、全社60名へ展開。ここはゴールではなくスタート。</p>
+    </div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="co co-yellow">
+      <svg class="icon-sm co-i" style="color:var(--yellow)"><use href="#i-clock"/></svg>
+      <p><strong>タイムラインの硬さ：目安</strong><br>6ヶ月は目安であり、硬い締切ではない。学びが最優先なので、必要に応じてスコープを調整して対応する。</p>
+    </div>
+    <div class="co co-sky">
+      <svg class="icon-sm co-i" style="color:var(--sky)"><use href="#i-refresh"/></svg>
+      <p><strong>スプリントの長さ：2週間</strong><br>2週間を1サイクルとして毎回「動くもの」を作る。途中で方向転換もOK。大事なのは学びのスピード。</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 10: TRADE-OFF SLIDERS ==================== -->
+<div class="sl" data-title="09 トレードオフスライダー">
+<div class="sc">
+  <div class="slide-num">09 / 10</div>
+  <div class="tag t-yellow">TRADE-OFF SLIDERS</div>
+  <h2>何を優先し、何を犠牲にするか</h2>
+  <p class="lead">すべてを最高にはできない。チームで優先順位を合意し、判断に迷ったときの羅針盤にする。<br>以下はPOの初期案です。チームで議論して調整しましょう。</p>
+
+  <div class="cd mb24" style="padding:28px 32px">
+    <div class="slider-row">
+      <div class="slider-label"><svg class="icon-sm" style="color:var(--coral)"><use href="#i-graduation"/></svg> 学び</div>
+      <div class="slider-track"><div class="slider-fill sf-coral" style="width:90%"></div></div>
+      <div class="slider-val">MAX</div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-label"><svg class="icon-sm" style="color:var(--sky)"><use href="#i-sparkle"/></svg> 品質</div>
+      <div class="slider-track"><div class="slider-fill sf-sky" style="width:65%"></div></div>
+      <div class="slider-val"></div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-label"><svg class="icon-sm" style="color:var(--mint)"><use href="#i-calendar"/></svg> 納期</div>
+      <div class="slider-track"><div class="slider-fill sf-mint" style="width:45%"></div></div>
+      <div class="slider-val"></div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-package"/></svg> スコープ</div>
+      <div class="slider-track"><div class="slider-fill sf-yellow" style="width:45%"></div></div>
+      <div class="slider-val"></div>
+    </div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="co co-yellow">
+      <svg class="icon-sm co-i" style="color:var(--yellow)"><use href="#i-graduation"/></svg>
+      <p><strong>学び = 最優先</strong><br>メンバーの成長機会がプロジェクトの最大目的。納期やスコープは多少犠牲にしても、学びの質を落とさない。</p>
+    </div>
+    <div class="co co-coral">
+      <svg class="icon-sm co-i" style="color:var(--coral)"><use href="#i-package"/></svg>
+      <p><strong>スコープ = 調整弁</strong><br>遅延が発生したらスコープを削って対応。機能を減らしてでも、学びと品質を守る。</p>
+    </div>
+  </div>
+
+  <div class="discuss">
+    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
+    <p>
+      <strong>Q1.</strong> このスライダーの位置に違和感はある？ 特に品質と納期のバランスについて。<br>
+      <strong>Q2.</strong> 「学びのために納期を延ばす」はどこまで許容できる？ 稟議との兼ね合いは？<br>
+      <strong>Q3.</strong> 予算（50 USD/月）は固定制約？ それとも交渉の余地がある？
+    </p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 11: WHAT IT'S GOING TO TAKE ==================== -->
+<div class="sl" data-title="10 何がどれだけ必要か">
+<div class="sc">
+  <div class="slide-num">10 / 10</div>
+  <div class="tag t-purple">WHAT IT'S GOING TO TAKE</div>
+  <h2>何がどれだけ必要か</h2>
+  <p class="lead">プロジェクトを実現するために必要なリソースの全体像。</p>
+
+  <h3 class="mb12">チーム構成</h3>
+  <table class="tbl mb24">
+    <thead>
+      <tr><th>役割</th><th>人数</th><th>担当</th><th>備考</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="t-label">PO / TL</td>
+        <td>1名</td>
+        <td>江崎</td>
+        <td>プロダクトの方向性・技術的判断の最終意思決定</td>
+      </tr>
+      <tr>
+        <td class="t-label">SM</td>
+        <td>1名</td>
+        <td>川上</td>
+        <td>スプリント運営 + 社内案件化推進</td>
+      </tr>
+      <tr>
+        <td class="t-label">企画リード</td>
+        <td>1名</td>
+        <td>藤田</td>
+        <td>Sprint 0 前半を主導。UX設計・プロトタイプ作成後、離脱</td>
+      </tr>
+      <tr>
+        <td class="t-label">開発メンバー</td>
+        <td>9名</td>
+        <td>中島, 絹田, まおまお, 森本, 中嶋, 朴木, 猪股, 武田, 小林 ほか</td>
+        <td>経験年数3年未満の若手。各自が担当領域を持つ</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="mb12">必要なリソース</h3>
+  <div class="g4 mb20">
+    <div class="cd" style="text-align:center">
+      <svg class="icon-card" style="color:var(--orange);margin:0 auto 12px"><use href="#i-dollar"/></svg>
+      <h3>予算</h3>
+      <p>月額 50 USD<br><span style="font-size:11px;color:var(--text-muted)">(インフラ + AI API)</span></p>
+    </div>
+    <div class="cd" style="text-align:center">
+      <svg class="icon-card" style="color:var(--sky);margin:0 auto 12px"><use href="#i-calendar"/></svg>
+      <h3>期間</h3>
+      <p>約6ヶ月<br><span style="font-size:11px;color:var(--text-muted)">(目安)</span></p>
+    </div>
+    <div class="cd" style="text-align:center">
+      <svg class="icon-card" style="color:var(--mint);margin:0 auto 12px"><use href="#i-users"/></svg>
+      <h3>人数</h3>
+      <p>12名<br><span style="font-size:11px;color:var(--text-muted)">(PO/TL/SM + 企画 + 開発9名)</span></p>
+    </div>
+    <div class="cd" style="text-align:center">
+      <svg class="icon-card" style="color:var(--purple);margin:0 auto 12px"><use href="#i-cloud"/></svg>
+      <h3>インフラ</h3>
+      <p>AWS<br><span style="font-size:11px;color:var(--text-muted)">(詳細は Sprint 0 で決定)</span></p>
+    </div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="co co-purple">
+      <svg class="icon-sm co-i" style="color:var(--purple)"><use href="#i-warning"/></svg>
+      <p><strong>未確定事項：</strong>メンバー稼働費（社内案件稟議の可否による）。技術スタック（Sprint 0 で決定）。通知手段（Sprint 0 で決定）。</p>
+    </div>
+    <div class="co co-mint">
+      <svg class="icon-sm co-i" style="color:var(--mint)"><use href="#i-check"/></svg>
+      <p><strong>確定事項：</strong>チーム構成。Google認証(@freemind.co.jp)。レスポンシブ必須。5つのコアコンピテンシー定義。AWSインフラ。</p>
+    </div>
+  </div>
+
+  <div class="discuss">
+    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
+    <p>
+      <strong>Q1.</strong> 稟議の見通しはいつ頃つきそう？ 承認前に着手していいラインは？<br>
+      <strong>Q2.</strong> 50 USD/月 で足りない場合の代替案やエスカレーション先は？<br>
+      <strong>Q3.</strong> メンバーの稼働率（本業との兼ね合い）はどの程度見込んでいる？
+    </p>
+  </div>
+</div>
+</div>
+
+</div><!-- /sw -->
+
+<div class="bot">
+  <button class="btn" id="prev" disabled>← 前へ</button>
+  <div class="dots" id="dots"></div>
+  <button class="btn" id="next">次へ →</button>
+</div>
+
+<script>
+const sw=document.getElementById('sw'),slides=[...document.querySelectorAll('.sl')],total=slides.length;
+const prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next');
+const pn=document.getElementById('pn'),tt=document.getElementById('tt'),pf=document.getElementById('pf');
+const dotsEl=document.getElementById('dots');
+let cur=0,anim=false;
+tt.textContent=total;
+slides.forEach((_,i)=>{const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>go(i));dotsEl.appendChild(d)});
+const dots=[...document.querySelectorAll('.dot')];
+function go(i){
+  if(i<0||i>=total||i===cur||anim)return;
+  anim=true;
+  slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');
+  sw.style.transform=`translateX(-${cur*100}%)`;
+  pn.textContent=cur+1;
+  pf.style.width=((cur+1)/total*100)+'%';
+  prevBtn.disabled=cur===0;nextBtn.disabled=cur===total-1;
+  dots.forEach((d,j)=>d.classList.toggle('active',j===cur));
+  slides[cur].scrollTop=0;
+  setTimeout(()=>anim=false,550);
+}
+prevBtn.addEventListener('click',()=>go(cur-1));
+nextBtn.addEventListener('click',()=>go(cur+1));
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){e.preventDefault();go(cur+1)}
+  if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1)}
+});
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.changedTouches[0].screenX},{passive:true});
+document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-tx;if(Math.abs(dx)>50){dx<0?go(cur+1):go(cur-1)}},{passive:true});
+</script>
+</body>
+</html>
