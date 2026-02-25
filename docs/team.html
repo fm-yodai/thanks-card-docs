@@ -45,6 +45,30 @@
     overflow-x: hidden;
   }
 
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 24px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--slate-300);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .back-btn:hover { opacity: 1; background: rgba(255,255,255,0.14); color: var(--slate-100); }
+
   /* ── HERO ── */
   .hero {
     position: relative;
@@ -465,6 +489,9 @@
 </head>
 <body>
 <div id="scroll-glow"></div>
+
+<!-- Back to Index -->
+<a href="../index.html" class="back-btn">← ドキュメント一覧</a>
 
 <!-- HERO -->
 <section class="hero">

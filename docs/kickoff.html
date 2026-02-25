@@ -770,6 +770,32 @@
     animation: float 2.5s ease-in-out infinite;
   }
 
+  /* ===== BACK BUTTON ===== */
+  .back-btn {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0,0,0,0.08);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .back-btn:hover { opacity: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .back-btn.light { background: rgba(30,30,46,0.6); color: #fff; border-color: rgba(255,255,255,0.1); }
+
   /* ===== PAGE COUNTER ===== */
   .page-counter {
     position: fixed;
@@ -801,6 +827,9 @@
 </style>
 </head>
 <body>
+
+<!-- Back to Index -->
+<a href="../index.html" class="back-btn" id="backBtn">← ドキュメント一覧</a>
 
 <!-- Navigation Dots -->
 <nav>
@@ -1069,6 +1098,7 @@
   const navLinks = document.querySelectorAll('nav a');
   const pageCounter = document.querySelector('.page-counter');
   const currentPageEl = document.getElementById('currentPage');
+  const backBtn = document.getElementById('backBtn');
 
   const darkSections = new Set(['hero', 'competency', 'cta']);
 
@@ -1090,11 +1120,13 @@
         // Update page counter
         currentPageEl.textContent = index + 1;
 
-        // Light/dark counter
+        // Light/dark counter & back button
         if (darkSections.has(id)) {
           pageCounter.classList.add('light');
+          backBtn.classList.add('light');
         } else {
           pageCounter.classList.remove('light');
+          backBtn.classList.remove('light');
         }
       }
     });
