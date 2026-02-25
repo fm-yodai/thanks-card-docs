@@ -18,7 +18,7 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
   - `lighthouse.md` — Company philosophy (Lighthouse principles)
   - `ideal-candidate-profile.md` — Core competency definitions with Do/Don't examples
 - `.claude-plugin/` — Plugin manifest (Agent Skills standard)
-- `skills/project/` — AI agent skill (Agent Skills open standard, 40+ tools compatible):
+- `skills/thanks-card-overview/` — AI agent skill (Agent Skills open standard, 40+ tools compatible):
   - `SKILL.md` — スキル定義（ドキュメントカタログ + 制約サマリ）
   - `references/` — プロジェクトドキュメント一式（Markdown）
 
