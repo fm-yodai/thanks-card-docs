@@ -38,6 +38,42 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 - Responsive breakpoints at 640px–800px depending on the page
 - Animations use `cubic-bezier(0.22, 1, 0.36, 1)` easing consistently
 
+## Document Grouping (index.html)
+
+`index.html` のドキュメントカードはグループ（セクション）単位で分類する。新しいドキュメントを追加する際は、既存グループに合うものがあればそこに入れ、なければ新しいグループを作成する。
+
+現在のグループと分類方針:
+
+| グループ | data-theme | 方針 |
+|----------|------------|------|
+| **プロジェクト概要** (PROJECT) | `project` | プロジェクトの「今」を表すドキュメント（体制図、インセプションデッキなど） |
+| **開発ガイド** (DEVELOPMENT) | `dev` | 開発プロセス・手法に関するガイドやテンプレート |
+| **Sprint N** | `reference` | 各スプリントフェーズで作成・使用した資料。Sprint単位でグループを作る |
+
+新しいグループを作る場合:
+- `data-theme` は既存の `project` / `dev` / `reference` から選ぶか、必要に応じて新しいテーマを追加する（その場合 `.section[data-theme="..."] .section-label` のCSSも追加する）
+- セクションラベルは英語大文字（`SPRINT 1` など）、セクションタイトルは日本語
+- アニメーション遅延は `.section:nth-child(N)` で設定されている（現在3つ分）。グループが増えたら追加する
+
+## Skill References (skills/thanks-card-overview/)
+
+スキルの `references/` にはプロジェクトの**現在の状態**を表す安定的なドキュメントだけを置く。AIエージェントがプロジェクトについて正確に回答できることが目的。
+
+### 含めるもの
+- チームで合意済みのプロジェクト定義（インセプションデッキなど）
+- コンピテンシー定義、チーム体制など、長期間変わらない情報
+- 開発プロセスやガイドなど、プロジェクト全体を通して参照されるもの
+
+### 含めないもの
+- 特定スプリントの活動資料（ワークシート、補足資料など一過性のもの）
+- キックオフ資料など、作成時点のスナップショットで現在と乖離しうるもの
+- 一般的な手法解説（インセプションデッキの作り方、デザインスプリントの進め方など）
+
+### 更新タイミング
+- `index.html` に新しいドキュメントを追加したとき → 上記の基準に照らしてスキル参照への追加を検討する
+- プロジェクトの方針・体制に変更があったとき → 既存の参照ドキュメントを更新する
+- `SKILL.md` のドキュメント一覧テーブルも参照ファイルの追加・削除に合わせて更新する
+
 ## Key Project Context (from requirements.md)
 
 - Target: 60 employees across 4 departments (営業部, 開発部, DX企画部, 管理部)

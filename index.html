@@ -163,7 +163,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 8px;
   }
 
   .section-label {
@@ -181,6 +181,13 @@
     font-weight: 700;
     font-size: 17px;
     color: var(--text);
+  }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 18px;
+    line-height: 1.6;
   }
 
   .section[data-theme="project"] .section-label {
@@ -416,19 +423,8 @@
       <span class="section-label">PROJECT</span>
       <span class="section-title">プロジェクト概要</span>
     </div>
+    <p class="section-desc">プロジェクトの現在の姿を表すドキュメントです。変更があれば随時更新されます。</p>
     <div class="doc-grid">
-
-      <a class="doc-card" data-color="coral" href="./docs/kickoff.html">
-        <span class="doc-card-icon">🚀</span>
-        <span class="doc-card-badge">KICKOFF</span>
-        <h3>ありがとうカード キックオフ</h3>
-        <p>プロジェクトの背景・ビジョン・つくるもの・進め方をまとめたキックオフ資料です。</p>
-        <div class="doc-card-meta">
-          <span>📄 全7セクション</span>
-          <span>⏱ 約5分</span>
-          <div class="doc-card-arrow">→</div>
-        </div>
-      </a>
 
       <a class="doc-card" data-color="mint" href="./docs/team.html">
         <span class="doc-card-icon">👥</span>
@@ -461,6 +457,7 @@
       <span class="section-label">DEVELOPMENT</span>
       <span class="section-title">開発ガイド</span>
     </div>
+    <p class="section-desc">開発プロセスを通して繰り返し参照するガイド・テンプレートです。</p>
     <div class="doc-grid">
 
       <a class="doc-card" data-color="sky" href="./docs/dev-guide.html">
@@ -483,16 +480,37 @@
         <span class="coming-soon-tag">COMING SOON</span>
       </div>
 
+      <div class="doc-card coming-soon" data-color="orange">
+        <span class="doc-card-icon">📝</span>
+        <span class="doc-card-badge">TEMPLATE</span>
+        <h3>議事録テンプレート</h3>
+        <p>スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。</p>
+        <span class="coming-soon-tag">COMING SOON</span>
+      </div>
+
     </div>
   </div>
 
-  <!-- 参考資料 -->
+  <!-- Sprint 0 -->
   <div class="section" data-theme="reference">
     <div class="section-header">
-      <span class="section-label">REFERENCE</span>
-      <span class="section-title">参考資料</span>
+      <span class="section-label">SPRINT 0</span>
+      <span class="section-title">Sprint 0</span>
     </div>
+    <p class="section-desc">Sprint 0 で作成・使用した資料です。当時の内容がそのまま残っています。</p>
     <div class="doc-grid">
+
+      <a class="doc-card" data-color="coral" href="./docs/kickoff.html">
+        <span class="doc-card-icon">🚀</span>
+        <span class="doc-card-badge">KICKOFF</span>
+        <h3>ありがとうカード キックオフ</h3>
+        <p>プロジェクトの背景・ビジョン・つくるもの・進め方をまとめたキックオフ資料です。</p>
+        <div class="doc-card-meta">
+          <span>📄 全7セクション</span>
+          <span>⏱ 約5分</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
 
       <a class="doc-card" data-color="purple" href="./references/sprint0-first-half.html">
         <span class="doc-card-icon">📘</span>
@@ -515,14 +533,6 @@
           <div class="doc-card-arrow">→</div>
         </div>
       </a>
-
-      <div class="doc-card coming-soon" data-color="orange">
-        <span class="doc-card-icon">📝</span>
-        <span class="doc-card-badge">TEMPLATE</span>
-        <h3>議事録テンプレート</h3>
-        <p>スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。</p>
-        <span class="coming-soon-tag">COMING SOON</span>
-      </div>
 
     </div>
   </div>

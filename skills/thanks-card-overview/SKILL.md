@@ -15,12 +15,10 @@ FREEMIND社の社内感謝カードWebアプリ。感謝メッセージに対し
 
 | ファイル | 内容 | こんなときに読む |
 |---------|------|----------------|
-| [project-overview.md](references/project-overview.md) | 背景・目的・ビジョン・進め方 | プロジェクトの全体像、目的、価値を知りたい |
+| [inception-deck.md](references/inception-deck.md) | インセプションデッキ10枚（エレベーターピッチ、トレードオフ等） | プロジェクトの全体像、目的、スコープ・制約・トレードオフの確認 |
 | [competencies.md](references/competencies.md) | 5つのコアコンピテンシーの定義とDo/Don't行動例 | AIラベリング設計、判定基準、感謝メッセージの分類 |
 | [development-guide.md](references/development-guide.md) | スクラム開発プロセス、スプリントサイクル、役割定義 | 開発の進め方、スプリント計画 |
 | [team.md](references/team.md) | 13名のチーム構成、各フェーズの役割分担 | 担当者の確認、誰に何を聞くか |
-| [inception-deck.md](references/inception-deck.md) | インセプションデッキ10枚（エレベーターピッチ、トレードオフ等） | スコープ・制約・トレードオフの確認 |
-| [sprint0.md](references/sprint0.md) | インセプションデッキとデザインスプリントの進め方 | Sprint 0の具体的な進め方を学ぶ |
 
 ## 主な制約
 
