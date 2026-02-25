@@ -1,0 +1,17 @@
+{
+  "name": "thanks-card-docs",
+  "version": "1.0.0",
+  "description": "ありがとうカードプロジェクトのドキュメントスキル。プロジェクト概要・コンピテンシー定義・開発プロセス・チーム体制などをAIエージェントに提供します。",
+  "author": {
+    "name": "FREEMIND Inc."
+  },
+  "repository": "https://github.com/freemind-inc/thanks-card-docs",
+  "license": "MIT",
+  "keywords": [
+    "thanks-card",
+    "freemind",
+    "documentation",
+    "agile",
+    "competency"
+  ]
+}

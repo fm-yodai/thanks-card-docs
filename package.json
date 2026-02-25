@@ -1,0 +1,17 @@
+{
+  "name": "thanks-card-docs",
+  "version": "1.0.0",
+  "description": "ありがとうカードプロジェクトのドキュメントスキル",
+  "keywords": [
+    "claude-code-plugin",
+    "agent-skills",
+    "thanks-card",
+    "freemind",
+    "documentation"
+  ],
+  "license": "MIT",
+  "files": [
+    ".claude-plugin/",
+    "skills/"
+  ]
+}
