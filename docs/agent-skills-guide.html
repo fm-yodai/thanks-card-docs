@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Skills 導入ガイド — ありがとうカード プロジェクト</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+    --border: #e8e4dc;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --code-green: #a6e3a1;
+    --code-blue: #89b4fa;
+    --code-yellow: #f9e2af;
+    --code-comment: #6c7086;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.9;
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--dark);
+    color: #fff;
+    padding: 56px 40px 72px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 50%, rgba(77,150,255,0.12), transparent),
+      radial-gradient(ellipse 500px 400px at 80% 50%, rgba(155,114,207,0.10), transparent);
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--cream);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+    animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header-icon { font-size: 40px; margin-bottom: 14px; display: inline-block; }
+
+  .header h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(22px, 4vw, 34px);
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 300;
+  }
+
+  .back-link {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    z-index: 2;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: rgba(255,255,255,0.8); }
+
+  /* ===== MAIN ===== */
+  .main {
+    max-width: 760px;
+    margin: -16px auto 0;
+    padding: 0 28px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== SECTION ===== */
+  .section {
+    margin-bottom: 40px;
+  }
+
+  .section h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section h2 .num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    background: var(--dark);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin: 20px 0 8px;
+    color: var(--text);
+  }
+
+  .section p {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .section ul, .section ol {
+    font-size: 14px;
+    padding-left: 1.5em;
+    margin-bottom: 12px;
+  }
+
+  .section li {
+    margin-bottom: 6px;
+  }
+
+  /* ===== CODE BLOCK ===== */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 14px 0 18px;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block code {
+    font-family: 'DM Sans', 'Menlo', 'Consolas', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--code-text);
+    white-space: pre;
+  }
+
+  .code-label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--code-comment);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .c-g { color: var(--code-green); }
+  .c-b { color: var(--code-blue); }
+  .c-y { color: var(--code-yellow); }
+  .c-c { color: var(--code-comment); }
+
+  /* ===== INFO BOX ===== */
+  .info-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 14px 0;
+    border-left: 4px solid var(--sky);
+    font-size: 14px;
+  }
+
+  .info-box.warn {
+    border-left-color: var(--orange);
+  }
+
+  .info-box strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  /* ===== TABLE ===== */
+  .tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 14px 0 18px;
+  }
+
+  .tbl th, .tbl td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tbl th {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    background: rgba(0,0,0,0.02);
+  }
+
+  .tbl code {
+    font-family: 'DM Sans', monospace;
+    font-size: 12.5px;
+    background: rgba(0,0,0,0.04);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 24px 24px 40px;
+    color: var(--text-light);
+    font-size: 12px;
+  }
+
+  .footer-logo {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    .header { padding: 48px 20px 64px; }
+    .main { padding: 0 18px 60px; }
+    .code-block { padding: 16px 18px; border-radius: 10px; }
+    .code-block code { font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-link" href="../index.html">← ドキュメント一覧</a>
+  <div class="header-inner">
+    <div class="header-icon">🤖</div>
+    <h1>Agent Skills 導入ガイド</h1>
+    <p class="header-sub">AIエージェントにプロジェクト知識を持たせる方法</p>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- What -->
+  <div class="section">
+    <h2><span class="num">1</span>Agent Skills とは</h2>
+    <p>Agent Skills は、AIエージェント（Claude Code、Cursor、Cline など 40以上のツール）にプロジェクト固有の知識を持たせるためのオープンな仕組みです。</p>
+    <p>ありがとうカードプロジェクトでは、以下の情報をスキルとして提供しています。</p>
+    <ul>
+      <li>インセプションデッキ（プロジェクトの全体像・目的・トレードオフ）</li>
+      <li>5つのコアコンピテンシーの定義と行動例</li>
+      <li>開発プロセス（スクラム、スプリントの進め方）</li>
+      <li>チーム体制と役割分担</li>
+    </ul>
+    <p>スキルをインストールすると、AIエージェントがこれらの情報を参照してプロジェクトに関する質問に正確に回答できるようになります。</p>
+  </div>
+
+  <!-- Prerequisites -->
+  <div class="section">
+    <h2><span class="num">2</span>前提条件</h2>
+    <ul>
+      <li><strong>Node.js</strong>（v18以上）がインストールされていること</li>
+      <li><strong>Claude Code</strong> などの対応AIエージェントが利用可能であること</li>
+    </ul>
+    <div class="info-box">
+      <strong>Node.js が入っているか確認するには</strong>
+      ターミナルで <code>node -v</code> を実行して、バージョンが表示されればOKです。
+    </div>
+  </div>
+
+  <!-- Install -->
+  <div class="section">
+    <h2><span class="num">3</span>インストール</h2>
+    <p>プロジェクトのルートディレクトリで以下のコマンドを実行します。</p>
+    <div class="code-block">
+      <span class="code-label">TERMINAL</span>
+      <code><span class="c-b">npx</span> skills add <span class="c-g">fm-yodai/thanks-card-docs</span></code>
+    </div>
+    <p>これだけで完了です。次回 AIエージェントを起動したとき、プロジェクトの情報が自動的に参照されます。</p>
+  </div>
+
+  <!-- Usage -->
+  <div class="section">
+    <h2><span class="num">4</span>使い方</h2>
+    <p>スキルをインストールした状態で、AIエージェントにプロジェクトについて質問するだけです。</p>
+    <h3>質問の例</h3>
+    <ul>
+      <li>「ありがとうカードプロジェクトの目的は？」</li>
+      <li>「5つのコアコンピテンシーを教えて」</li>
+      <li>「スプリントの進め方を説明して」</li>
+      <li>「チームの役割分担はどうなっている？」</li>
+      <li>「AIラベリングで使う判定基準は？」</li>
+    </ul>
+  </div>
+
+  <!-- Update -->
+  <div class="section">
+    <h2><span class="num">5</span>更新の確認と適用</h2>
+    <p>プロジェクトの進行に伴い、スキルの内容は随時更新されます。定期的に更新を確認してください。</p>
+
+    <h3>更新があるか確認する</h3>
+    <div class="code-block">
+      <span class="code-label">TERMINAL</span>
+      <code><span class="c-b">npx</span> skills check</code>
+    </div>
+
+    <h3>更新を適用する</h3>
+    <div class="code-block">
+      <span class="code-label">TERMINAL</span>
+      <code><span class="c-b">npx</span> skills update</code>
+    </div>
+
+    <div class="info-box warn">
+      <strong>自動更新はありません</strong>
+      更新は手動で実行する必要があります。スプリントの切り替え時など、定期的に <code>npx skills check</code> を実行する習慣をつけましょう。
+    </div>
+  </div>
+
+  <!-- Commands -->
+  <div class="section">
+    <h2><span class="num">6</span>コマンド一覧</h2>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>コマンド</th>
+          <th>説明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>npx skills add &lt;パッケージ&gt;</code></td>
+          <td>スキルをインストール</td>
+        </tr>
+        <tr>
+          <td><code>npx skills list</code></td>
+          <td>インストール済みスキルの一覧</td>
+        </tr>
+        <tr>
+          <td><code>npx skills check</code></td>
+          <td>更新があるか確認</td>
+        </tr>
+        <tr>
+          <td><code>npx skills update</code></td>
+          <td>すべてのスキルを最新版に更新</td>
+        </tr>
+        <tr>
+          <td><code>npx skills remove</code></td>
+          <td>スキルをアンインストール</td>
+        </tr>
+        <tr>
+          <td><code>npx skills find</code></td>
+          <td>公開スキルを検索</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-logo">ありがとうカード プロジェクト</div>
+  <p>若手メンバー主導で、感謝が循環する社内Webアプリをつくります。</p>
+</footer>
+
+</body>
+</html>
