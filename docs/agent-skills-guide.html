@@ -301,23 +301,44 @@
   <!-- What -->
   <div class="section">
     <h2><span class="num">1</span>Agent Skills とは</h2>
-    <p>Agent Skills は、AIエージェント（Claude Code、Cursor、Cline など 40以上のツール）にプロジェクト固有の知識を持たせるためのオープンな仕組みです。</p>
-    <p>ありがとうカードプロジェクトでは、以下の情報をスキルとして提供しています。</p>
-    <ul>
-      <li>インセプションデッキ（プロジェクトの全体像・目的・トレードオフ）</li>
-      <li>5つのコアコンピテンシーの定義と行動例</li>
-      <li>開発プロセス（スクラム、スプリントの進め方）</li>
-      <li>チーム体制と役割分担</li>
-    </ul>
-    <p>スキルをインストールすると、AIエージェントがこれらの情報を参照してプロジェクトに関する質問に正確に回答できるようになります。</p>
+    <p>Agent Skills は、AIエージェントにプロジェクト固有の知識を持たせるためのオープンな仕組みです。</p>
+    <p>通常、AIエージェントは一般的な知識しか持っていないため、自分たちのプロジェクト特有のルールや背景を知りません。Agent Skills を使うと、プロジェクトの情報をパッケージとして配布でき、<code>npx skills add</code> 1つでチーム全員のAI環境に同じ知識を共有できます。</p>
+    <div class="info-box">
+      <strong>スキルに含められる情報の例</strong>
+      プロジェクトの目的・方針、コーディング規約、チーム体制、ドメイン用語の定義、開発プロセスなど、AIに知っておいてほしい情報なら何でもスキルにできます。
+    </div>
+  </div>
+
+  <!-- Supported Tools -->
+  <div class="section">
+    <h2><span class="num">2</span>対応ツール</h2>
+    <p>本プロジェクトでは以下のAIエージェントを使用しています。どちらも Agent Skills に対応しています。</p>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>ツール</th>
+          <th>備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Claude Code</strong></td>
+          <td>Anthropic 公式CLI。ターミナルで動作</td>
+        </tr>
+        <tr>
+          <td><strong>GitHub Copilot</strong></td>
+          <td>VS Code / JetBrains などのエディタ拡張</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>この他にも Cursor、Cline、Windsurf など 40以上のツールに対応しています。</p>
   </div>
 
   <!-- Prerequisites -->
   <div class="section">
-    <h2><span class="num">2</span>前提条件</h2>
+    <h2><span class="num">3</span>前提条件</h2>
     <ul>
       <li><strong>Node.js</strong>（v18以上）がインストールされていること</li>
-      <li><strong>Claude Code</strong> などの対応AIエージェントが利用可能であること</li>
     </ul>
     <div class="info-box">
       <strong>Node.js が入っているか確認するには</strong>
@@ -325,57 +346,35 @@
     </div>
   </div>
 
-  <!-- Install -->
+  <!-- Install & Usage -->
   <div class="section">
-    <h2><span class="num">3</span>インストール</h2>
-    <p>プロジェクトのルートディレクトリで以下のコマンドを実行します。</p>
+    <h2><span class="num">4</span>インストールと使い方</h2>
+    <p>プロジェクトのルートディレクトリで、スキルのパッケージ名を指定してインストールします。</p>
     <div class="code-block">
       <span class="code-label">TERMINAL</span>
-      <code><span class="c-b">npx</span> skills add <span class="c-g">fm-yodai/thanks-card-docs</span></code>
+      <code><span class="c-b">npx</span> skills add <span class="c-g">&lt;パッケージ名&gt;</span></code>
     </div>
-    <p>これだけで完了です。次回 AIエージェントを起動したとき、プロジェクトの情報が自動的に参照されます。</p>
-  </div>
+    <p>これだけで完了です。次回 AIエージェントを起動したとき、スキルの情報が自動的に参照されます。特別な設定や操作は不要で、普段どおり質問するだけでスキルの知識を活用した回答が得られます。</p>
 
-  <!-- Usage -->
-  <div class="section">
-    <h2><span class="num">4</span>使い方</h2>
-    <p>スキルをインストールした状態で、AIエージェントにプロジェクトについて質問するだけです。</p>
-    <h3>質問の例</h3>
-    <ul>
-      <li>「ありがとうカードプロジェクトの目的は？」</li>
-      <li>「5つのコアコンピテンシーを教えて」</li>
-      <li>「スプリントの進め方を説明して」</li>
-      <li>「チームの役割分担はどうなっている？」</li>
-      <li>「AIラベリングで使う判定基準は？」</li>
-    </ul>
-  </div>
-
-  <!-- Update -->
-  <div class="section">
-    <h2><span class="num">5</span>更新の確認と適用</h2>
-    <p>プロジェクトの進行に伴い、スキルの内容は随時更新されます。定期的に更新を確認してください。</p>
-
-    <h3>更新があるか確認する</h3>
+    <h3>更新</h3>
+    <p>スキルの内容は提供元によって随時更新されます。定期的に更新を確認・適用してください。</p>
     <div class="code-block">
       <span class="code-label">TERMINAL</span>
-      <code><span class="c-b">npx</span> skills check</code>
-    </div>
+      <code><span class="c-c"># 更新があるか確認</span>
+<span class="c-b">npx</span> skills check
 
-    <h3>更新を適用する</h3>
-    <div class="code-block">
-      <span class="code-label">TERMINAL</span>
-      <code><span class="c-b">npx</span> skills update</code>
+<span class="c-c"># 更新を適用</span>
+<span class="c-b">npx</span> skills update</code>
     </div>
-
     <div class="info-box warn">
       <strong>自動更新はありません</strong>
-      更新は手動で実行する必要があります。スプリントの切り替え時など、定期的に <code>npx skills check</code> を実行する習慣をつけましょう。
+      更新は手動で実行する必要があります。スプリントの切り替え時など、定期的に確認する習慣をつけましょう。
     </div>
   </div>
 
   <!-- Commands -->
   <div class="section">
-    <h2><span class="num">6</span>コマンド一覧</h2>
+    <h2><span class="num">5</span>コマンド一覧</h2>
     <table class="tbl">
       <thead>
         <tr>
@@ -410,6 +409,23 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Project Skill -->
+  <div class="section">
+    <h2><span class="num">6</span>ありがとうカードプロジェクトのスキル</h2>
+    <p>本プロジェクトでは、以下のスキルを提供しています。</p>
+    <div class="code-block">
+      <span class="code-label">TERMINAL</span>
+      <code><span class="c-b">npx</span> skills add <span class="c-g">fm-yodai/thanks-card-docs</span></code>
+    </div>
+    <p>インストールすると、AIエージェントがプロジェクトの以下の情報を参照できるようになります。</p>
+    <ul>
+      <li>インセプションデッキ（プロジェクトの全体像・目的・トレードオフ）</li>
+      <li>5つのコアコンピテンシーの定義と行動例</li>
+      <li>開発プロセス（スクラム、スプリントの進め方）</li>
+      <li>チーム体制と役割分担</li>
+    </ul>
   </div>
 
 </main>
