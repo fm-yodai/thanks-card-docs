@@ -19,6 +19,7 @@ FREEMIND社の社内感謝カードWebアプリ。感謝メッセージに対し
 | [competencies.md](references/competencies.md) | 5つのコアコンピテンシーの定義とDo/Don't行動例 | AIラベリング設計、判定基準、感謝メッセージの分類 |
 | [development-guide.md](references/development-guide.md) | スクラム開発プロセス、スプリントサイクル、役割定義 | 開発の進め方、スプリント計画 |
 | [team.md](references/team.md) | 13名のチーム構成、各フェーズの役割分担 | 担当者の確認、誰に何を聞くか |
+| [design-system.md](references/design-system.md) | デザインシステム定義（コンセプト・トークン・コンポーネント・パターン・Pencil連携・保守運用） | デザインシステムの仕様、UIコンポーネント、トークン定義、命名規約、Pencil MCPワークフロー |
 
 ## 主な制約
 

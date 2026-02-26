@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>デザインシステムガイド — ありがとうカード プロジェクト</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF8F0;
+    --bg-alt: #FDF5EC;
+    --card: #FFFFFF;
+    --text: #1E1E2E;
+    --sub: #555568;
+    --muted: #999AAF;
+    --warm: #E07A4B;
+    --warm-light: #FFF3ED;
+    --warm-border: #FDDCCC;
+    --blue: #4A7ADB;
+    --blue-light: #EDF3FE;
+    --blue-border: #C5D8F8;
+    --green: #3CA868;
+    --green-light: #EEFAF2;
+    --green-border: #B8E6C9;
+    --purple: #7B5FC2;
+    --purple-light: #F3EFFC;
+    --purple-border: #CDBFEF;
+    --pink: #C9506E;
+    --pink-light: #FDF0F3;
+    --pink-border: #F0C4CF;
+    --yellow: #C49A1A;
+    --yellow-light: #FDF8EA;
+    --yellow-border: #EFE0A8;
+    --border: #E8E3D8;
+    --r: 14px;
+    --rs: 10px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{height:100%;scroll-behavior:smooth}
+  body{min-height:100%;font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.7}
+
+  /* ── LAYOUT ── */
+  .layout{display:flex;min-height:100vh}
+
+  /* ── SIDEBAR ── */
+  .sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;background:var(--card);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .sidebar.closed{transform:translateX(-100%)}
+  .sb-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+  .sb-back{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:14px;background:var(--bg);border:1px solid var(--border);color:var(--sub);font-size:11px;font-weight:500;text-decoration:none;transition:all .15s;margin-bottom:14px}
+  .sb-back:hover{background:var(--text);color:#fff;border-color:var(--text)}
+  .sb-brand{display:flex;align-items:center;gap:10px}
+  .sb-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#FFF1EB,#FDE4D6);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 10px rgba(224,122,75,.12)}
+  .sb-title{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:14px;line-height:1.3}
+  .sb-subtitle{font-size:10.5px;color:var(--muted);font-weight:400}
+
+  .sb-nav{flex:1;overflow-y:auto;padding:12px 0}
+  .sb-nav::-webkit-scrollbar{width:4px}
+  .sb-nav::-webkit-scrollbar-thumb{background:#E0DED8;border-radius:2px}
+  .sb-section{padding:8px 22px 4px;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .sb-item{display:flex;align-items:center;gap:10px;padding:9px 22px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:12.5px;color:var(--sub);line-height:1.4;text-decoration:none}
+  .sb-item:hover{background:var(--bg-alt);color:var(--text)}
+  .sb-item.active{background:var(--warm-light);color:var(--warm);border-left-color:var(--warm);font-weight:600}
+  .sb-num{font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;color:var(--muted);min-width:22px;text-align:right}
+  .sb-item.active .sb-num{color:var(--warm)}
+  .sb-divider{height:1px;background:var(--border);margin:8px 22px}
+
+  .sb-toggle{position:fixed;top:12px;left:12px;z-index:201;width:34px;height:34px;border-radius:8px;background:var(--card);border:1px solid var(--border);cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;color:var(--sub);box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .15s}
+  .sb-toggle:hover{background:var(--text);color:#fff;border-color:var(--text)}
+  .sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:99;opacity:0;pointer-events:none;transition:opacity .3s}
+  .sb-overlay.show{opacity:1;pointer-events:auto}
+
+  /* ── CONTENT ── */
+  .content{margin-left:280px;flex:1;min-height:100vh;padding:0 0 80px}
+  .content-inner{max-width:880px;margin:0 auto;padding:48px 48px 0}
+
+  /* ── TOP BAR (mobile) ── */
+  .top-bar{display:none;position:fixed;top:0;left:0;right:0;height:50px;background:rgba(255,248,240,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:50;align-items:center;padding:0 16px 0 56px}
+  .top-bar-title{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--sub)}
+
+  /* ── SECTION STYLES ── */
+  .section{margin-bottom:56px;opacity:0;transform:translateY(20px);transition:all .5s cubic-bezier(.22,1,.36,1)}
+  .section.visible{opacity:1;transform:translateY(0)}
+
+  .section-anchor{display:block;position:relative;top:-32px;visibility:hidden}
+
+  .section-header{margin-bottom:28px}
+  .section-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .section-num .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .section-num.sn-warm{color:var(--warm)}.section-num.sn-warm .dot{background:var(--warm)}
+  .section-num.sn-blue{color:var(--blue)}.section-num.sn-blue .dot{background:var(--blue)}
+  .section-num.sn-green{color:var(--green)}.section-num.sn-green .dot{background:var(--green)}
+  .section-num.sn-purple{color:var(--purple)}.section-num.sn-purple .dot{background:var(--purple)}
+  .section-num.sn-pink{color:var(--pink)}.section-num.sn-pink .dot{background:var(--pink)}
+  .section-num.sn-yellow{color:var(--yellow)}.section-num.sn-yellow .dot{background:var(--yellow)}
+
+  h1{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:clamp(26px,4vw,38px);line-height:1.35;margin-bottom:12px}
+  h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:clamp(22px,3vw,28px);line-height:1.4;margin-bottom:8px}
+  h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:17px;margin-bottom:8px;line-height:1.45}
+  h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14.5px;margin-bottom:6px}
+  .lead{font-size:14.5px;color:var(--sub);line-height:1.85}
+  p{font-size:13.5px;color:var(--sub);line-height:1.8}
+
+  /* ── HERO ── */
+  .hero{text-align:center;padding:64px 0 48px;background:linear-gradient(170deg,#FFF8F0 0%,#FDF5EC 50%,#F5EFFF 100%);margin:-48px -48px 48px;padding:80px 48px 48px;border-bottom:1px solid var(--border)}
+  .hero-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#FFF1EB,#FDE4D6);display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 24px;box-shadow:0 4px 20px rgba(224,122,75,.12)}
+  .hero h1{margin-bottom:14px}
+  .hero .lead{max-width:560px;margin:0 auto 28px}
+  .hero-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .chip{padding:7px 16px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:12.5px;font-weight:500;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,.03)}
+
+  /* ── BLOCKQUOTE ── */
+  blockquote{position:relative;margin:20px 0;padding:20px 24px 20px 28px;background:var(--warm-light);border-left:4px solid var(--warm);border-radius:0 var(--rs) var(--rs) 0;font-size:15px;font-weight:500;color:var(--text);line-height:1.75;font-style:italic}
+
+  /* ── CARDS ── */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:0 1px 6px rgba(0,0,0,.03);transition:transform .2s}
+  .card:hover{transform:translateY(-2px)}
+  .card-top{height:4px;border-radius:var(--r) var(--r) 0 0;margin:-22px -22px 18px}
+  .ct-warm{background:linear-gradient(90deg,var(--warm),#F2A07A)}
+  .ct-blue{background:linear-gradient(90deg,var(--blue),#7BA2EC)}
+  .ct-green{background:linear-gradient(90deg,var(--green),#6CC98B)}
+  .ct-purple{background:linear-gradient(90deg,var(--purple),#A68FD8)}
+  .ct-pink{background:linear-gradient(90deg,var(--pink),#DE8199)}
+  .ct-yellow{background:linear-gradient(90deg,var(--yellow),#D4B44A)}
+  .card-label{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
+
+  /* ── CALLOUT ── */
+  .callout{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--rs);margin:16px 0}
+  .callout-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+  .callout p{font-size:13px;color:var(--sub);line-height:1.8}
+  .callout strong{color:var(--text)}
+  .callout.co-warm{background:var(--warm-light);border:1px solid var(--warm-border)}
+  .callout.co-blue{background:var(--blue-light);border:1px solid var(--blue-border)}
+  .callout.co-green{background:var(--green-light);border:1px solid var(--green-border)}
+  .callout.co-purple{background:var(--purple-light);border:1px solid var(--purple-border)}
+  .callout.co-yellow{background:var(--yellow-light);border:1px solid var(--yellow-border)}
+
+  /* ── AGENT NOTE ── */
+  .agent-note{background:var(--purple-light);border:1px solid var(--purple-border);border-radius:var(--rs);padding:16px 20px;margin:16px 0}
+  .agent-note-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
+  .agent-note ul{list-style:none;padding:0}
+  .agent-note li{font-size:12.5px;color:var(--sub);line-height:1.8;padding-left:18px;position:relative}
+  .agent-note li::before{content:'>';position:absolute;left:0;color:var(--purple);font-weight:700;font-family:'Montserrat',sans-serif}
+
+  /* ── TAG ── */
+  .tag{display:inline-flex;align-items:center;gap:6px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:6px}
+  .tag.t-warm{background:var(--warm-light);color:var(--warm)}
+  .tag.t-blue{background:var(--blue-light);color:var(--blue)}
+  .tag.t-green{background:var(--green-light);color:var(--green)}
+  .tag.t-purple{background:var(--purple-light);color:var(--purple)}
+  .tag.t-yellow{background:var(--yellow-light);color:var(--yellow)}
+  .tag.t-pink{background:var(--pink-light);color:var(--pink)}
+
+  /* ── TABLE ── */
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.02);margin:16px 0}
+  .tbl th{background:#F5F0E8;font-weight:700;font-size:11.5px;color:var(--sub);text-align:left;padding:11px 16px;border-bottom:1px solid var(--border)}
+  .tbl td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--sub);line-height:1.7;vertical-align:top;font-size:12.5px}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl .t-label{font-weight:700;color:var(--text)}
+  .tbl code{font-size:11.5px;background:var(--bg-alt);padding:2px 6px;border-radius:4px;font-family:'Montserrat',monospace;color:var(--warm)}
+
+  /* ── LAYER DIAGRAM ── */
+  .layer-diagram{display:flex;flex-direction:column;gap:0;margin:24px 0}
+  .layer-row{display:flex;align-items:stretch;border:1px solid var(--border);border-bottom:none;background:var(--card);transition:transform .2s}
+  .layer-row:first-child{border-radius:var(--r) var(--r) 0 0}
+  .layer-row:last-child{border-bottom:1px solid var(--border);border-radius:0 0 var(--r) var(--r)}
+  .layer-row:hover{transform:translateX(4px)}
+  .layer-id{width:56px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+  .layer-row:nth-child(1) .layer-id{background:var(--purple)}
+  .layer-row:nth-child(2) .layer-id{background:var(--pink)}
+  .layer-row:nth-child(3) .layer-id{background:var(--blue)}
+  .layer-row:nth-child(4) .layer-id{background:var(--warm)}
+  .layer-body{flex:1;padding:16px 20px}
+  .layer-name{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14.5px;margin-bottom:2px}
+  .layer-desc{font-size:12px;color:var(--muted)}
+
+  /* ── GRIDS ── */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}.mb32{margin-bottom:32px}.mb40{margin-bottom:40px}
+  .mt16{margin-top:16px}.mt24{margin-top:24px}.mt32{margin-top:32px}
+
+  /* ── COLOR SWATCH ── */
+  .swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:16px 0}
+  .swatch{border-radius:var(--rs);overflow:hidden;border:1px solid var(--border);background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .swatch-color{height:48px}
+  .swatch-info{padding:8px 10px}
+  .swatch-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;letter-spacing:.04em;color:var(--text);margin-bottom:2px}
+  .swatch-use{font-size:10.5px;color:var(--muted)}
+
+  /* ── SPACING VISUAL ── */
+  .spacing-demo{display:flex;align-items:flex-end;gap:8px;margin:16px 0;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--r)}
+  .sp-bar{background:linear-gradient(180deg,var(--warm),#F2A07A);border-radius:4px 4px 0 0;min-width:28px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6px;transition:transform .2s}
+  .sp-bar:hover{transform:scaleY(1.08);transform-origin:bottom}
+  .sp-val{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;color:#fff;writing-mode:vertical-lr;text-orientation:mixed}
+  .sp-label{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;color:var(--muted);text-align:center;margin-top:6px}
+
+  /* ── COMPONENT CARD ── */
+  .comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0}
+  .comp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:14px 16px;transition:all .2s}
+  .comp-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+  .comp-card-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;color:var(--text);margin-bottom:3px}
+  .comp-card-desc{font-size:11.5px;color:var(--muted);line-height:1.55}
+  .comp-card-cat{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+
+  /* ── DO/DON'T ── */
+  .do-dont{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+  .do-box,.dont-box{border-radius:var(--rs);padding:18px 20px}
+  .do-box{background:var(--green-light);border:1px solid var(--green-border)}
+  .dont-box{background:var(--pink-light);border:1px solid var(--pink-border)}
+  .do-box h4{color:var(--green)}
+  .dont-box h4{color:var(--pink)}
+  .do-box li,.dont-box li{font-size:12.5px;color:var(--sub);line-height:1.75;margin-bottom:4px}
+
+  /* ── FLOW DIAGRAM ── */
+  .flow{display:flex;align-items:stretch;gap:0;margin:20px 0}
+  .flow-step{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:14px 12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .flow-step h4{font-size:12.5px;margin-bottom:3px}
+  .flow-step p{font-size:11px;line-height:1.5}
+  .flow-arrow{display:flex;align-items:center;padding:0 6px;color:var(--muted);font-size:14px}
+  .flow-step.f-warm{border-color:var(--warm-border);border-top:3px solid var(--warm)}
+  .flow-step.f-blue{border-color:var(--blue-border);border-top:3px solid var(--blue)}
+  .flow-step.f-green{border-color:var(--green-border);border-top:3px solid var(--green)}
+  .flow-step.f-purple{border-color:var(--purple-border);border-top:3px solid var(--purple)}
+  .flow-step.f-pink{border-color:var(--pink-border);border-top:3px solid var(--pink)}
+
+  /* ── CHECKLIST ── */
+  .checklist{list-style:none;padding:0;margin:12px 0}
+  .checklist li{font-size:13px;color:var(--sub);line-height:1.8;padding:6px 0 6px 28px;position:relative;border-bottom:1px solid rgba(0,0,0,.04)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'\2610';position:absolute;left:0;font-size:16px;color:var(--warm)}
+
+  /* ── CODE BLOCK ── */
+  .code-block{background:#2D2B3D;border-radius:var(--rs);padding:18px 22px;margin:14px 0;overflow-x:auto}
+  .code-block pre{font-family:'Montserrat',monospace;font-size:12px;line-height:1.7;color:#E0DEF4;white-space:pre;margin:0}
+  .code-block .ck{color:#9CCFD8}
+  .code-block .cv{color:#F6C177}
+  .code-block .cc{color:#6E6A86;font-style:italic}
+
+  /* ── NAMING TABLE ── */
+  .naming-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-bottom:none;font-size:12.5px}
+  .naming-row:first-child{border-radius:var(--r) var(--r) 0 0}
+  .naming-row:last-child{border-bottom:1px solid var(--border);border-radius:0 0 var(--r) var(--r)}
+  .naming-target{font-weight:700;color:var(--text);min-width:130px}
+  .naming-convention{font-family:'Montserrat',monospace;font-size:11.5px;color:var(--warm);background:var(--warm-light);padding:3px 8px;border-radius:4px}
+  .naming-example{color:var(--muted);font-size:11.5px}
+
+  /* ── SUBSECTION ── */
+  .subsection{margin:28px 0}
+  .subsection-divider{height:1px;background:linear-gradient(90deg,var(--border),transparent);margin:32px 0}
+
+  ul.bullet{list-style:none;padding:0;margin:10px 0}
+  ul.bullet li{font-size:13px;color:var(--sub);line-height:1.8;padding:3px 0 3px 20px;position:relative}
+  ul.bullet li::before{content:'\2022';position:absolute;left:4px;color:var(--warm);font-weight:700}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:800px){
+    .sidebar{transform:translateX(-100%)}
+    .sidebar.open{transform:translateX(0)}
+    .sb-toggle{display:flex}
+    .top-bar{display:flex}
+    .content{margin-left:0}
+    .content-inner{padding:68px 20px 0}
+    .hero{margin:-68px -20px 32px;padding:90px 20px 36px}
+    .g2,.g3{grid-template-columns:1fr}
+    .do-dont{grid-template-columns:1fr}
+    .flow{flex-direction:column}
+    .flow-arrow{justify-content:center;padding:4px 0;transform:rotate(90deg)}
+    .layer-row{flex-direction:column}
+    .layer-id{width:100%;height:36px;flex-direction:row;gap:8px;font-size:12px}
+    .swatch-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+    .comp-grid{grid-template-columns:1fr}
+    .spacing-demo{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sb-overlay" id="sbOverlay"></div>
+<button class="sb-toggle" id="sbToggle" aria-label="目次を開く">&#9776;</button>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <a href="../index.html" class="sb-back">&larr; ドキュメント一覧</a>
+    <div class="sb-brand">
+      <div class="sb-icon">&#127793;</div>
+      <div>
+        <div class="sb-title">デザインシステム<br>ガイド</div>
+        <div class="sb-subtitle">ありがとうカード</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-nav" id="sbNav">
+    <div class="sb-section">overview</div>
+    <a class="sb-item active" href="#overview" data-target="overview">
+      <span class="sb-num">00</span> はじめに
+    </a>
+    <div class="sb-divider"></div>
+    <div class="sb-section">sections</div>
+    <a class="sb-item" href="#concept" data-target="concept">
+      <span class="sb-num">01</span> コンセプト
+    </a>
+    <a class="sb-item" href="#tokens" data-target="tokens">
+      <span class="sb-num">02</span> デザイントークン
+    </a>
+    <a class="sb-item" href="#components" data-target="components">
+      <span class="sb-num">03</span> コンポーネント
+    </a>
+    <a class="sb-item" href="#patterns" data-target="patterns">
+      <span class="sb-num">04</span> パターン・ガイドライン
+    </a>
+    <a class="sb-item" href="#pencil" data-target="pencil">
+      <span class="sb-num">05</span> Pencil MCP 連携
+    </a>
+    <a class="sb-item" href="#maintenance" data-target="maintenance">
+      <span class="sb-num">06</span> 保守・運用
+    </a>
+  </div>
+</nav>
+
+<!-- TOP BAR (mobile) -->
+<div class="top-bar" id="topBar">
+  <div class="top-bar-title">デザインシステムガイド</div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+<div class="content-inner">
+
+<!-- HERO -->
+<div class="hero" id="overview">
+  <div class="hero-icon">&#127793;</div>
+  <h1>デザインシステムガイド</h1>
+  <p class="lead">「ありがとうカード」のフロントエンド品質を長期的に維持するためのデザインシステム定義。<br>「種まき」コンセプトを世界観の起点としています。</p>
+  <div class="hero-chips">
+    <div class="chip">&#128196; 全6セクション</div>
+    <div class="chip">&#127912; デザイン &times; 開発</div>
+    <div class="chip">&#127919; チーム全員 &amp; AIエージェント向け</div>
+  </div>
+</div>
+
+<!-- LAYER STRUCTURE (prominent) -->
+<div class="section visible">
+  <div class="section-header">
+    <h3>レイヤー構造</h3>
+    <p>デザインシステムは 4 層で構成されます。下層ほど抽象的・汎用的で、上層ほどプロジェクト固有になります。</p>
+  </div>
+  <div class="layer-diagram">
+    <div class="layer-row">
+      <div class="layer-id">L4</div>
+      <div class="layer-body">
+        <div class="layer-name">パターン・ガイドライン</div>
+        <div class="layer-desc">使い方の「約束」 &#8212; レイアウト、インタラクション、トーンガイド</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-id">L3</div>
+      <div class="layer-body">
+        <div class="layer-name">ドメインコンポーネント</div>
+        <div class="layer-desc">プロジェクト固有の UI 部品 &#8212; ThankYouCard, CardComposer 等</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-id">L2</div>
+      <div class="layer-body">
+        <div class="layer-name">基盤コンポーネント</div>
+        <div class="layer-desc">汎用 UI 部品 &#8212; Button, Input, Avatar, Toast 等</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-id">L1</div>
+      <div class="layer-body">
+        <div class="layer-name">デザイントークン</div>
+        <div class="layer-desc">すべての土台となる「値」 &#8212; 色・余白・フォント・影・モーション</div>
+      </div>
+    </div>
+  </div>
+  <div class="callout co-warm">
+    <div class="callout-icon">&#128161;</div>
+    <p>AI コード生成の一貫性は <strong>L1 の整備度に最も依存</strong>します。トークンの網羅性がそのまま生成品質に直結します。</p>
+  </div>
+
+  <h4 class="mt24">基本原則</h4>
+  <table class="tbl">
+    <thead><tr><th style="width:40%">原則</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td class="t-label">トークン準拠</td><td>すべての色・余白・フォントサイズ等は CSS 変数（トークン）で指定する。ハードコード値は原則禁止。</td></tr>
+      <tr><td class="t-label">コンポーネント再利用</td><td>既存の基盤コンポーネントがあれば新規作成しない。</td></tr>
+      <tr><td class="t-label">命名の統一</td><td>コンポーネント、トークン、Pencil レイヤーの命名規約を守る。</td></tr>
+      <tr><td class="t-label">Grid ベースのレスポンシブ</td><td>CSS Grid を主軸に、コンテナクエリは最小限で補完。メディアクエリは使用しない。</td></tr>
+      <tr><td class="t-label">Single Source of Truth</td><td>トークンの正は <code>tokens.css</code>。コンポーネントの正は <code>src/components/</code>。<code>.pen</code> は視覚的表現であり、コード側を正とする。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="subsection-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 01: CONCEPT -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="concept"></span>
+<div class="section" data-section="concept">
+  <div class="section-header">
+    <div class="section-num sn-warm"><span class="dot"></span> SECTION 01</div>
+    <h2>コンセプト</h2>
+    <p class="lead">デザインシステムのすべての判断の起点となるプロダクトの世界観を定義します。</p>
+  </div>
+
+  <blockquote>忙しさの中で忘れかけた温もりを、そっと思い出させてくれるもの。</blockquote>
+
+  <div class="subsection">
+    <h3>&#127793; 種まき</h3>
+    <blockquote>今日の「ありがとう」は 明日の土壌になる。</blockquote>
+    <p class="mb16">日々の「助かった」を言葉にする。ただそれだけのことが、気づけば組織の根を静かに強くしていく。</p>
+
+    <table class="tbl">
+      <thead><tr><th>メタファー</th><th>意味</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">手のひらから届く</td><td>感謝は大げさなものではない。日常の延長で、気軽に、自然に送れる</td></tr>
+        <tr><td class="t-label">習慣が根を張る</td><td>一回きりのイベントではなく、繰り返すことで文化になる</td></tr>
+        <tr><td class="t-label">空気が変わる</td><td>個人の行動が積み重なり、組織全体の雰囲気をじわりと変えていく</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3>デザインへの翻訳</h3>
+
+    <h4>トーン</h4>
+    <ul class="bullet">
+      <li><strong>そっと、静かに。</strong> 派手な演出や過度な装飾ではなく、落ち着いた温かさを基調とする。</li>
+      <li><strong>押しつけない。</strong> ユーザーに行動を強制する UI（しつこい通知、煽る文言）は避ける。自然と手が伸びる設計を目指す。</li>
+      <li><strong>誠実に。</strong> 飾りすぎない。伝えるべきことを、まっすぐに伝える。</li>
+    </ul>
+
+    <h4 class="mt24">ビジュアルの方向性</h4>
+    <ul class="bullet">
+      <li>色調は温かみのあるトーンを基本とする。具体的な色値はデザイントークンで定義。</li>
+      <li>余白を十分にとる。情報を詰め込みすぎず、呼吸のあるレイアウトを心がける。</li>
+      <li>アニメーションは控えめに。「種が芽吹く」ような静かな動きが似合う。速すぎず、遅すぎず。</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <h4>やること・やらないこと</h4>
+    <div class="do-dont">
+      <div class="do-box">
+        <h4>&#10004; やること</h4>
+        <ul class="bullet">
+          <li>感謝を送る行為のハードルを下げる</li>
+          <li>受け取った人がそっと嬉しくなる見せ方</li>
+          <li>日常に溶け込む控えめな UI</li>
+          <li>静かに積み重なっていく感覚の演出</li>
+          <li>「送ってみようかな」と思わせる仕掛け</li>
+        </ul>
+      </div>
+      <div class="dont-box">
+        <h4>&#10008; やらないこと</h4>
+        <ul class="bullet">
+          <li>派手な通知やポップアップで驚かせる</li>
+          <li>使うたびに存在を主張する UI</li>
+          <li>即時的な報酬感・射幸心を煽る仕掛け</li>
+          <li>送信数のランキングなど競争を促す仕組み</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h4>ゲーミフィケーションについて</h4>
+    <p class="mb12">他者との競争を煽る仕組みは設けない。ただし、個人の内発的な動機を静かに後押しするゲーミフィケーションは積極的に取り入れる。</p>
+    <div class="g3">
+      <div class="card">
+        <div class="card-top ct-green"></div>
+        <div class="card-label" style="color:var(--green)">&#127793; 種が育つ感覚</div>
+        <p>自分が送った「ありがとう」の積み重なりが、静かに可視化される（例: 畑に種が増えていくような表現）</p>
+      </div>
+      <div class="card">
+        <div class="card-top ct-blue"></div>
+        <div class="card-label" style="color:var(--blue)">&#128197; 習慣のリズム</div>
+        <p>連続して送っていることがさりげなく伝わる。ただしストリークが途切れたことを責めない</p>
+      </div>
+      <div class="card">
+        <div class="card-top ct-purple"></div>
+        <div class="card-label" style="color:var(--purple)">&#128301; 自分だけの振り返り</div>
+        <p>自分がどんなコンピテンシーの感謝を多く送っているか等、内省につながるフィードバック</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="agent-note">
+    <div class="agent-note-header">&#129302; Agent Instructions</div>
+    <ul>
+      <li>UI の文言、色調、余白感、アニメーションなど、感覚的な判断を伴う場面ではこのコンセプトに立ち返ること。</li>
+      <li>迷ったときは「種をまく人の手つき」を想像せよ。派手さではなく、静かな確かさを選ぶ。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="subsection-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 02: TOKENS -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="tokens"></span>
+<div class="section" data-section="tokens">
+  <div class="section-header">
+    <div class="section-num sn-blue"><span class="dot"></span> SECTION 02</div>
+    <h2>デザイントークン</h2>
+    <p class="lead">デザインの最小単位。色・余白・フォント・角丸・影・モーションなどの値を CSS 変数として一元定義します。すべてのコンポーネントはこのトークンのみを参照します。</p>
+  </div>
+
+  <div class="subsection">
+    <h4>命名規則</h4>
+    <div class="code-block"><pre><span class="ck">--ds-</span><span class="cv">{カテゴリ}</span><span class="ck">-</span><span class="cv">{名前}</span>
+
+<span class="cc">/* 例 */</span>
+<span class="ck">--ds-color-primary-500</span>
+<span class="ck">--ds-space-4</span>
+<span class="ck">--ds-font-size-base</span></pre></div>
+  </div>
+
+  <div class="subsection">
+    <h3>Color &#8212; カラーシステム</h3>
+    <p class="mb16">「種まき」コンセプトに基づき、温かみのあるトーンを基調とします。色トークンは Primitive（実値）と Semantic（用途名）の 2 層で管理します。</p>
+
+    <div class="code-block"><pre><span class="cc">/* 2層構造 */</span>
+<span class="cv">Primitive（実値）</span>           <span class="cv">Semantic（用途名）</span>
+──────────────────        ──────────────────
+<span class="ck">--ds-color-primary-500</span>  &larr;  <span class="ck">--ds-color-interactive-default</span>
+<span class="ck">--ds-color-neutral-900</span>  &larr;  <span class="ck">--ds-color-text-primary</span>
+<span class="ck">--ds-color-neutral-50</span>   &larr;  <span class="ck">--ds-color-surface-base</span></pre></div>
+
+    <div class="callout co-blue">
+      <div class="callout-icon">&#128161;</div>
+      <p>この分離により、将来の<strong>ダークモード対応</strong>は Semantic 層の参照先を切り替えるだけで済みます。</p>
+    </div>
+
+    <h4 class="mt24">Primitive カラー</h4>
+    <table class="tbl">
+      <thead><tr><th>グループ</th><th>スケール</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label"><code>primary</code></td><td>50 &#12316; 900&#65288;10 段階&#65289;</td><td>メインカラー</td></tr>
+        <tr><td class="t-label"><code>neutral</code></td><td>50 &#12316; 900&#65288;10 段階&#65289;</td><td>グレースケール</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">Semantic カラー</h4>
+    <table class="tbl">
+      <thead><tr><th>カテゴリ</th><th>トークン例</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">テキスト</td><td><code>text-primary</code>, <code>text-secondary</code>, <code>text-tertiary</code>, <code>text-inverse</code></td><td>文字色</td></tr>
+        <tr><td class="t-label">サーフェス</td><td><code>surface-base</code>, <code>surface-card</code>, <code>surface-overlay</code></td><td>背景色</td></tr>
+        <tr><td class="t-label">ボーダー</td><td><code>border-default</code>, <code>border-strong</code></td><td>境界線</td></tr>
+        <tr><td class="t-label">インタラクティブ</td><td><code>interactive-default</code>, <code>interactive-hover</code>, <code>interactive-active</code>, <code>interactive-disabled</code></td><td>ボタン・リンク等</td></tr>
+        <tr><td class="t-label">ステータス</td><td><code>success</code>, <code>warning</code>, <code>error</code>, <code>info</code></td><td>フィードバック</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">コンピテンシーカラー</h4>
+    <p class="mb12">5 つのコアコンピテンシーにそれぞれ固有の色を割り当てます。通常版と背景用の薄い版（<code>-subtle</code>）を用意します。</p>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:linear-gradient(135deg,#E07A4B,#F2A07A)"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">sincerity</div>
+          <div class="swatch-use">誠実</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:linear-gradient(135deg,#4A7ADB,#7BA2EC)"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">ownership</div>
+          <div class="swatch-use">当事者意識</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:linear-gradient(135deg,#3CA868,#6CC98B)"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">collaboration</div>
+          <div class="swatch-use">協働</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:linear-gradient(135deg,#C49A1A,#D4B44A)"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">challenge</div>
+          <div class="swatch-use">挑戦への意欲</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:linear-gradient(135deg,#7B5FC2,#A68FD8)"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">creativity</div>
+          <div class="swatch-use">創造的思考</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted)">各コンピテンシーにはピクトグラム画像を用意。Emoji は使用しません。</p>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>Spacing &#8212; スペーシング</h3>
+    <p class="mb12">4px 刻みの 8 段階。余白・パディング・ギャップにはこのスケールのみを使用します。</p>
+
+    <div class="spacing-demo">
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:16px;width:28px"><span class="sp-val" style="font-size:8px">4</span></div>
+        <div class="sp-label">sp-1</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:32px;width:28px"><span class="sp-val">8</span></div>
+        <div class="sp-label">sp-2</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:48px;width:28px"><span class="sp-val">12</span></div>
+        <div class="sp-label">sp-3</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:64px;width:28px"><span class="sp-val">16</span></div>
+        <div class="sp-label">sp-4</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:96px;width:28px"><span class="sp-val">24</span></div>
+        <div class="sp-label">sp-5</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:128px;width:28px"><span class="sp-val">32</span></div>
+        <div class="sp-label">sp-6</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:192px;width:28px"><span class="sp-val">48</span></div>
+        <div class="sp-label">sp-7</div>
+      </div>
+      <div style="text-align:center">
+        <div class="sp-bar" style="height:220px;width:28px"><span class="sp-val">64</span></div>
+        <div class="sp-label">sp-8</div>
+      </div>
+    </div>
+
+    <table class="tbl">
+      <thead><tr><th>トークン</th><th>値</th><th>用途の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label"><code>space-1</code></td><td>4px</td><td>アイコンとテキストの間など最小の間隔</td></tr>
+        <tr><td class="t-label"><code>space-2</code></td><td>8px</td><td>コンパクトな要素内のパディング</td></tr>
+        <tr><td class="t-label"><code>space-3</code></td><td>12px</td><td>関連する要素間の余白</td></tr>
+        <tr><td class="t-label"><code>space-4</code></td><td>16px</td><td>カード内パディング、標準的な余白</td></tr>
+        <tr><td class="t-label"><code>space-5</code></td><td>24px</td><td>セクション内の要素間</td></tr>
+        <tr><td class="t-label"><code>space-6</code></td><td>32px</td><td>セクション間の余白</td></tr>
+        <tr><td class="t-label"><code>space-7</code></td><td>48px</td><td>ページレベルの大きな余白</td></tr>
+        <tr><td class="t-label"><code>space-8</code></td><td>64px</td><td>ヒーローセクション等の特大余白</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>Typography &#8212; タイポグラフィ</h3>
+    <table class="tbl">
+      <thead><tr><th>カテゴリ</th><th>トークン</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">ファミリー</td><td><code>font-family-display</code>, <code>font-family-body</code>, <code>font-family-mono</code></td><td>日本語対応フォントを選定する</td></tr>
+        <tr><td class="t-label">サイズ</td><td><code>font-size-xs</code>(12) &#12316; <code>font-size-3xl</code>(30) の 7 段階</td><td></td></tr>
+        <tr><td class="t-label">ウェイト</td><td><code>font-weight-regular</code>(400), <code>medium</code>(500), <code>semibold</code>(600), <code>bold</code>(700)</td><td></td></tr>
+        <tr><td class="t-label">行間</td><td><code>line-height-tight</code>(1.25), <code>normal</code>(1.5), <code>relaxed</code>(1.75)</td><td>日本語本文には <code>relaxed</code> を推奨</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>Shape &#8212; 形状</h3>
+    <table class="tbl">
+      <thead><tr><th>カテゴリ</th><th>トークン</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">角丸</td><td><code>radius-none</code>(0), <code>sm</code>(4), <code>md</code>(8), <code>lg</code>(12), <code>xl</code>(16), <code>full</code>(9999)</td><td>Avatar 等の円形要素には <code>full</code></td></tr>
+        <tr><td class="t-label">影</td><td><code>shadow-sm</code>, <code>shadow-md</code>, <code>shadow-lg</code></td><td></td></tr>
+        <tr><td class="t-label">罫線幅</td><td><code>border-thin</code>(1px), <code>border-medium</code>(2px)</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>Motion &#8212; モーション</h3>
+    <p class="mb12">アニメーションは控えめに。「種が芽吹く」ような静かな動きを基調とします。</p>
+    <table class="tbl">
+      <thead><tr><th>カテゴリ</th><th>トークン</th><th>用途の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">持続時間</td><td><code>duration-fast</code>(150ms), <code>duration-normal</code>(250ms), <code>duration-slow</code>(400ms)</td><td></td></tr>
+        <tr><td class="t-label">イージング</td><td><code>easing-default</code>(ease-out), <code>easing-in-out</code>, <code>easing-spring</code></td><td>カード送信演出等には <code>spring</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>レスポンシブ設計</h3>
+    <p class="mb16">メディアクエリではなく <strong>CSS Grid + コンテナクエリ</strong> で対応します。</p>
+
+    <div class="code-block"><pre><span class="cv">設計の優先順位</span>
+
+<span class="ck">1.</span> CSS Grid&#65288;auto-fill / minmax 等&#65289;で暗黙的にレスポンシブにする &larr; <span class="cv">最優先</span>
+<span class="ck">2.</span> Grid だけでは不足する場合にコンテナクエリで補う    &larr; <span class="cv">限定的に使用</span>
+<span class="ck">3.</span> メディアクエリ                                  &larr; <span class="cv">使用しない</span></pre></div>
+
+    <h4 class="mt16">コンテナクエリのサイズ目安</h4>
+    <table class="tbl">
+      <thead><tr><th>目安</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">&lt; 400px</td><td>コンパクト表示（カードの縦積み等）</td></tr>
+        <tr><td class="t-label">400px &#12316; 640px</td><td>標準表示</td></tr>
+        <tr><td class="t-label">&gt; 640px</td><td>拡張表示（横並びレイアウト等）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="agent-note">
+    <div class="agent-note-header">&#129302; Agent Instructions</div>
+    <ul>
+      <li>すべての視覚的な値には <code>var(--ds-*)</code> を使え。ハードコード値は禁止。</li>
+      <li>定義にない値が必要になった場合は、新しいトークンの追加を提案せよ。勝手にハードコードしてはならない。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="subsection-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 03: COMPONENTS -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="components"></span>
+<div class="section" data-section="components">
+  <div class="section-header">
+    <div class="section-num sn-green"><span class="dot"></span> SECTION 03</div>
+    <h2>コンポーネント</h2>
+    <p class="lead">コンポーネントは 2 つのレイヤーに分かれます。L2&#65288;基盤&#65289;は汎用 UI 部品、L3&#65288;ドメイン&#65289;はプロジェクト固有の UI 部品です。L3 は L2 の組み合わせで構築します。</p>
+  </div>
+
+  <div class="subsection">
+    <h3>L2 基盤コンポーネント</h3>
+    <p class="mb12">配置先: <code>src/components/ui/</code></p>
+
+    <h4>操作</h4>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--warm)">CONTROLS</div>
+        <div class="comp-card-name">Button</div>
+        <div class="comp-card-desc">Variant: primary / secondary / ghost / danger<br>Size: sm / md / lg</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--warm)">CONTROLS</div>
+        <div class="comp-card-name">Input</div>
+        <div class="comp-card-desc">テキスト入力。バリデーション状態の視覚表現を含む</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--warm)">CONTROLS</div>
+        <div class="comp-card-name">Textarea</div>
+        <div class="comp-card-desc">複数行テキスト入力</div>
+      </div>
+    </div>
+
+    <h4 class="mt24">表示</h4>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--blue)">DISPLAY</div>
+        <div class="comp-card-name">Badge</div>
+        <div class="comp-card-desc">汎用ラベル</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--blue)">DISPLAY</div>
+        <div class="comp-card-name">Tag</div>
+        <div class="comp-card-desc">取り外し可能なタグ</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--blue)">DISPLAY</div>
+        <div class="comp-card-name">Avatar</div>
+        <div class="comp-card-desc">ユーザーアイコン。イニシャルフォールバック付き</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--blue)">DISPLAY</div>
+        <div class="comp-card-name">Icon</div>
+        <div class="comp-card-desc">アイコンセットのラッパー</div>
+      </div>
+    </div>
+
+    <h4 class="mt24">レイアウト</h4>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--green)">LAYOUT</div>
+        <div class="comp-card-name">Stack</div>
+        <div class="comp-card-desc">Flexbox ベースの汎用配置（垂直・水平）</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--green)">LAYOUT</div>
+        <div class="comp-card-name">Container</div>
+        <div class="comp-card-desc">最大幅制約 + 中央寄せ</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--green)">LAYOUT</div>
+        <div class="comp-card-name">Grid</div>
+        <div class="comp-card-desc">レスポンシブグリッド</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--green)">LAYOUT</div>
+        <div class="comp-card-name">Divider</div>
+        <div class="comp-card-desc">区切り線</div>
+      </div>
+    </div>
+
+    <h4 class="mt24">フィードバック</h4>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--purple)">FEEDBACK</div>
+        <div class="comp-card-name">Toast</div>
+        <div class="comp-card-desc">操作完了・エラー通知</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--purple)">FEEDBACK</div>
+        <div class="comp-card-name">Skeleton</div>
+        <div class="comp-card-desc">読込中の仮表示</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--purple)">FEEDBACK</div>
+        <div class="comp-card-name">EmptyState</div>
+        <div class="comp-card-desc">データなし時の案内表示</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--purple)">FEEDBACK</div>
+        <div class="comp-card-name">Modal</div>
+        <div class="comp-card-desc">確認ダイアログ等</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--purple)">FEEDBACK</div>
+        <div class="comp-card-name">Spinner</div>
+        <div class="comp-card-desc">インライン読込表示</div>
+      </div>
+    </div>
+
+    <h4 class="mt24">ナビゲーション</h4>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--yellow)">NAVIGATION</div>
+        <div class="comp-card-name">Header</div>
+        <div class="comp-card-desc">アプリ上部バー</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--yellow)">NAVIGATION</div>
+        <div class="comp-card-name">Tab</div>
+        <div class="comp-card-desc">タブ切替</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-cat" style="color:var(--yellow)">NAVIGATION</div>
+        <div class="comp-card-name">Sidebar</div>
+        <div class="comp-card-desc">サイドナビゲーション</div>
+      </div>
+    </div>
+
+    <p class="mt16" style="font-size:12px;color:var(--muted)">各コンポーネントはデザイントークンのみを参照し、ハードコード値を含みません。</p>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>L3 ドメインコンポーネント</h3>
+    <p class="mb16">配置先: <code>src/components/domain/</code> &#8212; このプロジェクトのビジネスドメインに固有の UI 部品です。</p>
+
+    <h4>カード関連</h4>
+    <table class="tbl">
+      <thead><tr><th>コンポーネント</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">ThankYouCard</td><td>感謝カード本体の表示。送信者・受信者・メッセージ・コンピテンシータグを含む</td></tr>
+        <tr><td class="t-label">CardComposer</td><td>カード作成フォーム。宛先選択 + メッセージ入力 + AI ラベルプレビュー</td></tr>
+        <tr><td class="t-label">CompetencyBadge</td><td>コンピテンシーの表示。対応するピクトグラム・色・ラベルを表示。色は <code>--ds-color-competency-*</code> トークンを使用</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">タイムライン関連</h4>
+    <table class="tbl">
+      <thead><tr><th>コンポーネント</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">CardTimeline</td><td>感謝カードのフィード表示</td></tr>
+        <tr><td class="t-label">TimelineFilter</td><td>期間・部署・コンピテンシーでの絞り込み</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">分析関連</h4>
+    <table class="tbl">
+      <thead><tr><th>コンポーネント</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">CompetencyRadarChart</td><td>コンピテンシー分布のレーダーチャート</td></tr>
+        <tr><td class="t-label">DepartmentHeatmap</td><td>部署間の交流量ヒートマップ</td></tr>
+        <tr><td class="t-label">MonthlyReportCard</td><td>月次サマリー表示</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">ユーザー関連</h4>
+    <table class="tbl">
+      <thead><tr><th>コンポーネント</th><th>役割</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">MemberPicker</td><td>送信先の社員を検索・選択する UI</td></tr>
+        <tr><td class="t-label">ProfileSummary</td><td>受け取ったカード数やコンピテンシー傾向の表示</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>配置先の判断基準</h3>
+    <table class="tbl">
+      <thead><tr><th>質問</th><th>はい</th><th>いいえ</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">他プロジェクトでも使えるか？</td><td><code>ui/</code>&#65288;L2&#65289;</td><td>次へ</td></tr>
+        <tr><td class="t-label">2 箇所以上で使われるか？</td><td><code>domain/</code>&#65288;L3&#65289;</td><td>ページ内にインラインで定義</td></tr>
+        <tr><td class="t-label">ビジネスロジックを含むか？</td><td><code>domain/</code>&#65288;L3&#65289;</td><td><code>ui/</code>&#65288;L2&#65289;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>命名規約</h3>
+    <div class="naming-row">
+      <span class="naming-target">コンポーネント名</span>
+      <span class="naming-convention">PascalCase</span>
+      <span class="naming-example">ThankYouCard, CompetencyBadge</span>
+    </div>
+    <div class="naming-row">
+      <span class="naming-target">ファイル名</span>
+      <span class="naming-convention">PascalCase</span>
+      <span class="naming-example">ThankYouCard.{ext}</span>
+    </div>
+    <div class="naming-row">
+      <span class="naming-target">ディレクトリ</span>
+      <span class="naming-convention">kebab-case</span>
+      <span class="naming-example">ui/, domain/</span>
+    </div>
+  </div>
+
+  <div class="agent-note">
+    <div class="agent-note-header">&#129302; Agent Instructions</div>
+    <ul>
+      <li>新しい UI を実装する前に既存コンポーネントを確認し、再利用せよ。</li>
+      <li>L2 の新規追加が必要な場合は、事前に確認を求めよ。</li>
+      <li>L3 は L2 の組み合わせで構築せよ。素の HTML 要素を直接スタイリングしない。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="subsection-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 04: PATTERNS -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="patterns"></span>
+<div class="section" data-section="patterns">
+  <div class="section-header">
+    <div class="section-num sn-purple"><span class="dot"></span> SECTION 04</div>
+    <h2>パターン・ガイドライン</h2>
+    <p class="lead">コンポーネントの使い方・レイアウトの組み合わせ方・文言のトーンを規定するルール。チーム全員と AI が同じ判断をするための「約束」です。</p>
+  </div>
+
+  <div class="callout co-yellow">
+    <div class="callout-icon">&#128221;</div>
+    <p>本セクションはデザインシステムの<strong>原則</strong>を定めます。各画面の具体的なフローや仕様は、要件定義・スプリントプランニングの中で別途確定します。</p>
+  </div>
+
+  <div class="subsection">
+    <h3>レイアウト</h3>
+    <h4>ページ構成</h4>
+    <p class="mb12">すべてのページは「Header（固定） &#8594; Main Content &#8594; Footer（任意）」の構成を基本とします。</p>
+
+    <h4>コンテンツエリアのバリエーション</h4>
+    <div class="g3 mb16">
+      <div class="card">
+        <div class="card-top ct-warm"></div>
+        <h4>シングルカラム</h4>
+        <p>フォーム、詳細表示など焦点を絞る画面</p>
+      </div>
+      <div class="card">
+        <div class="card-top ct-blue"></div>
+        <h4>サイドバー付き</h4>
+        <p>フィルタリングを伴う一覧画面</p>
+      </div>
+      <div class="card">
+        <div class="card-top ct-green"></div>
+        <h4>グリッド</h4>
+        <p>カードなど同型要素の繰り返し表示</p>
+      </div>
+    </div>
+
+    <h4>レスポンシブ方針</h4>
+    <p>モバイルファースト。PC ブラウザがメインだが、スマートフォン閲覧も想定。CSS Grid（<code>auto-fill</code> / <code>minmax</code> 等）を活用し、明示的なブレイクポイント分岐なしでレスポンシブにする設計を基本とします。</p>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>インタラクションの原則</h3>
+
+    <h4>状態表現</h4>
+    <p class="mb12">すべてのユーザー操作に対して、以下の状態を適切に表現します。</p>
+    <table class="tbl">
+      <thead><tr><th>状態</th><th>原則</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">待機中</td><td>操作可能であることが視覚的に明確</td></tr>
+        <tr><td class="t-label">処理中</td><td>Spinner 等で処理中であることを伝える。トリガーとなった操作は無効化し、二重実行を防ぐ</td></tr>
+        <tr><td class="t-label">完了</td><td>Toast 等で結果をフィードバックする</td></tr>
+        <tr><td class="t-label">エラー</td><td>何が起きたか・どうすればよいかを伝える。ユーザーの入力は保持する（消さない）</td></tr>
+        <tr><td class="t-label">データなし</td><td>EmptyState で次のアクションを案内する</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">ローディング</h4>
+    <table class="tbl">
+      <thead><tr><th>原則</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">形状を予約する</td><td>ページ初回読込時は Skeleton でコンテンツの形状を仮表示し、レイアウトシフトを防ぐ</td></tr>
+        <tr><td class="t-label">チラつきを防ぐ</td><td>体感 0.3 秒未満の処理ではローディング表示を出さない</td></tr>
+        <tr><td class="t-label">位置を近くする</td><td>処理中表示は、トリガーとなった操作の近くに配置する</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">エラー表示</h4>
+    <table class="tbl">
+      <thead><tr><th>原則</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">解決策を先に伝える</td><td>「何が起きたか」より「どうすればよいか」を優先して表示する</td></tr>
+        <tr><td class="t-label">表示位置を使い分ける</td><td>バリデーションエラーはフィールド直下にインライン表示。通信エラー等はグローバルな Toast</td></tr>
+        <tr><td class="t-label">入力を消さない</td><td>エラー発生時、フォームの入力内容は保持する</td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">モーダル</h4>
+    <ul class="bullet">
+      <li>確認が必要な操作にのみ使う。情報表示だけならページ遷移やインライン展開を優先する。</li>
+      <li>ネストしない。背景スクロールを無効化する。</li>
+    </ul>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>文言・トーンガイド</h3>
+    <p class="mb12">温かく、簡潔で、肯定的。カジュアルすぎず堅すぎない丁寧語。「そっと思い出させてくれる」存在として、押しつけがましさを排し、静かな温かさを基調とします。</p>
+
+    <table class="tbl">
+      <thead><tr><th>要素</th><th>ルール</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">ボタン</td><td>動詞で始める</td></tr>
+        <tr><td class="t-label">見出し</td><td>名詞 or 体言止め</td></tr>
+        <tr><td class="t-label">説明文</td><td>1&#12316;2 文で端的に</td></tr>
+        <tr><td class="t-label">プレースホルダー</td><td>入力例を示す</td></tr>
+        <tr><td class="t-label">エラーメッセージ</td><td>解決策を先に。否定表現を避ける</td></tr>
+        <tr><td class="t-label">空状態</td><td>メッセージ + 次のアクションへの案内をセットで</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>命名規約</h3>
+    <div class="naming-row">
+      <span class="naming-target">コンポーネント名</span>
+      <span class="naming-convention">PascalCase</span>
+      <span class="naming-example">ThankYouCard</span>
+    </div>
+    <div class="naming-row">
+      <span class="naming-target">CSS 変数</span>
+      <span class="naming-convention">--ds-{category}-{name}</span>
+      <span class="naming-example">--ds-color-primary-500</span>
+    </div>
+    <div class="naming-row">
+      <span class="naming-target">Pencil レイヤー名</span>
+      <span class="naming-convention">kebab-case</span>
+      <span class="naming-example">thank-you-card-container</span>
+    </div>
+    <div class="naming-row">
+      <span class="naming-target">定数</span>
+      <span class="naming-convention">UPPER_SNAKE_CASE</span>
+      <span class="naming-example">COMPETENCY_MAP</span>
+    </div>
+    <div class="naming-row">
+      <span class="naming-target">ディレクトリ</span>
+      <span class="naming-convention">kebab-case</span>
+      <span class="naming-example">ui/, domain/</span>
+    </div>
+
+    <div class="callout co-purple mt16">
+      <div class="callout-icon">&#9888;&#65039;</div>
+      <p>Pencil レイヤーの命名は AI がクラス名やコンポーネント構造を推測する材料になるため、特に重要です。<strong><code>Frame 42</code> のような自動命名は必ず書き換えてください。</strong></p>
+    </div>
+  </div>
+
+  <div class="agent-note">
+    <div class="agent-note-header">&#129302; Agent Instructions</div>
+    <ul>
+      <li>新しい画面を作成するときは、このドキュメントのレイアウトパターンと UI ルールに従え。</li>
+      <li>UI 文言はトーンガイドに沿って作成せよ。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="subsection-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 05: PENCIL INTEGRATION -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="pencil"></span>
+<div class="section" data-section="pencil">
+  <div class="section-header">
+    <div class="section-num sn-pink"><span class="dot"></span> SECTION 05</div>
+    <h2>Pencil MCP 連携</h2>
+    <p class="lead">Pencil MCP を使ったデザイン&#8596;コードの双方向ワークフローを定義します。</p>
+  </div>
+
+  <div class="callout co-blue">
+    <div class="callout-icon">&#128204;</div>
+    <p><strong>前提:</strong> デザインファイルは <code>.pen</code> 形式（JSON ベース、Git 管理）。AI エージェントは MCP 経由で <code>.pen</code> のベクターデータを読み取り、コードを生成します。<code>.pen</code> はデザインの「視覚的表現」であり、正（Single Source of Truth）はコード側です。</p>
+  </div>
+
+  <div class="subsection">
+    <h3>ワークフロー</h3>
+
+    <div class="code-block"><pre>  <span class="cv">.pen ファイル</span> &#9472;&#9472;&#9472;&#9472; <span class="ck">MCP (read)</span> &#9472;&#9472;&#9472;&#9472;&rarr; <span class="cv">AI エージェント</span>
+       &uarr;                                    &darr;
+       &boxv;            <span class="ck">tokens.css</span>              &boxv;
+       &boxv;            <span class="ck">components/</span>    &larr; 参照 &#9472;&#9496;
+       &boxv;                                    &boxv;
+       &boxul;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; <span class="ck">MCP (write)</span> &larr;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</pre></div>
+
+    <div class="flow mt24">
+      <div class="flow-step f-warm">
+        <h4>1. デザイン</h4>
+        <p>Pencil で<br>作成・編集</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-blue">
+        <h4>2. 指示</h4>
+        <p>AI エージェントに<br>指示する</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-green">
+        <h4>3. 読取</h4>
+        <p>MCP 経由で<br>.pen を読取</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-purple">
+        <h4>4. 生成</h4>
+        <p>トークン参照で<br>コード生成</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-pink">
+        <h4>5. 同期</h4>
+        <p>必要に応じ<br>.pen を更新</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>デザインファイル構成</h3>
+    <div class="code-block"><pre><span class="cv">design/</span>
+&#9500;&#9472;&#9472; <span class="ck">design-tokens.pen</span>      トークンの視覚カタログ
+&#9500;&#9472;&#9472; <span class="ck">components.pen</span>         基盤コンポーネント一覧（全 Variant &times; Size）
+&#9500;&#9472;&#9472; <span class="cv">screens/</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="ck">home.pen</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="ck">card-compose.pen</span>
+&#9474;   &#9500;&#9472;&#9472; <span class="ck">timeline.pen</span>
+&#9474;   &#9492;&#9472;&#9472; <span class="ck">analytics.pen</span>
+&#9492;&#9472;&#9472; <span class="ck">brand-kit.pen</span>          ロゴ・アイコン等</pre></div>
+
+    <h4 class="mt16">.pen ファイル作成ルール</h4>
+    <ol style="list-style:none;padding:0;counter-reset:step">
+      <li style="padding:8px 0 8px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;counter-increment:step;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--warm)">01</span>トークンで定義した値を使う。カラーピッカーで任意の色を使わない。</li>
+      <li style="padding:8px 0 8px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;counter-increment:step;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--warm)">02</span>レイヤー名をセマンティックに命名する&#65288;kebab-case&#65289;。自動命名のまま放置しない。</li>
+      <li style="padding:8px 0 8px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;counter-increment:step;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--warm)">03</span>共通化すべき要素は Pencil 上でもコンポーネント化する。</li>
+      <li style="padding:8px 0 8px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--warm)">04</span>モバイル&#65288;375px&#65289;とデスクトップ&#65288;1280px&#65289;の 2 パターンを用意する。</li>
+    </ol>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>プロンプト設計の原則</h3>
+    <p class="mb16">AI への指示で一貫して伝えるべきことを以下に定めます。具体的なプロンプト文は、採用するフレームワーク・エージェントに応じてチームで整備します。</p>
+
+    <h4>常に含めるべき制約</h4>
+    <ul class="bullet mb16">
+      <li><code>tokens.css</code> のトークンを使うこと&#65288;ハードコード禁止&#65289;</li>
+      <li>既存コンポーネントを確認し再利用すること</li>
+      <li>レスポンシブは CSS Grid ベースで実装し、コンテナクエリの使用は最小限に留めよ。メディアクエリは使用しない。</li>
+      <li>Pencil レイヤー名を参考にセマンティックな命名をすること</li>
+    </ul>
+
+    <h4>目的別の指示パターン</h4>
+    <table class="tbl">
+      <thead><tr><th>目的</th><th>AI に伝えること</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">画面のコード生成</td><td>対象の <code>.pen</code> ファイルパス + 上記の制約</td></tr>
+        <tr><td class="t-label">単一コンポーネント生成</td><td><code>components.pen</code> 内の対象レイヤー名 + Variant/Size の網羅</td></tr>
+        <tr><td class="t-label">デザインの更新</td><td>変更されたコードファイル + 反映すべき変更内容</td></tr>
+        <tr><td class="t-label">トークン乖離チェック</td><td><code>.pen</code> ファイル群をスキャンし、トークン外の値を一覧化</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>AI ルールファイル</h3>
+    <p class="mb12">各エージェントのルールファイルにデザインシステムの制約を記載し、エージェントが自動的に読み込むようにします。</p>
+
+    <table class="tbl">
+      <thead><tr><th>エージェント</th><th>ルールファイル</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">Claude Code</td><td><code>CLAUDE.md</code>&#65288;プロジェクトルート&#65289;</td></tr>
+        <tr><td class="t-label">GitHub Copilot</td><td><code>.github/copilot-instructions.md</code></td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt16">記載すべき項目</h4>
+    <ul class="bullet">
+      <li>プロダクトコンセプトへの参照</li>
+      <li>トークン使用の義務&#65288;ハードコード禁止&#65289;</li>
+      <li>既存コンポーネントの確認・再利用ルール</li>
+      <li>命名規約</li>
+      <li>Pencil 連携ルール&#65288;トークン外の値の丸め方、乖離の報告&#65289;</li>
+      <li>レスポンシブ方針&#65288;CSS Grid ベース、コンテナクエリは最小限、メディアクエリ不使用&#65289;</li>
+      <li>アクセシビリティの基本要件</li>
+      <li>デザインシステムドキュメントの参照先パス</li>
+    </ul>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>将来の移行パス</h3>
+    <p class="mb12">Pencil はまだ新しいツールであり、他ツールへの移行が必要になる可能性があります。以下の設計判断で移行コストを最小化しています。</p>
+    <table class="tbl">
+      <thead><tr><th>設計判断</th><th>移行を容易にする理由</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">トークンは CSS 変数で管理</td><td>ツール非依存。Figma Variables / Style Dictionary 等に変換可能</td></tr>
+        <tr><td class="t-label">コンポーネントはコードで実装</td><td>デザインツールに依存しない</td></tr>
+        <tr><td class="t-label">.pen は「視覚表現」であり「正」ではない</td><td><code>.pen</code> を破棄してもコードに影響なし</td></tr>
+        <tr><td class="t-label">命名規約が統一されている</td><td>別ツールでも同じ命名で再構築可能</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-green mt16">
+      <div class="callout-icon">&#128161;</div>
+      <p>保険として、トークンを <strong>DTCG&#65288;Design Tokens Community Group&#65289;形式の JSON</strong> でも管理しておくと、将来の変換が容易になります。</p>
+    </div>
+  </div>
+
+  <div class="agent-note">
+    <div class="agent-note-header">&#129302; Agent Instructions</div>
+    <ul>
+      <li><code>.pen</code> からコードを生成する際は <code>src/styles/tokens.css</code> のトークンと <code>src/components/ui/</code> の既存コンポーネントを参照・再利用せよ。</li>
+      <li><code>.pen</code> 上にトークン外の値があった場合は、最も近いトークン値に丸めよ。</li>
+      <li>Pencil レイヤーの命名をクラス名やコンポーネント構造のヒントとして活用せよ。</li>
+      <li>生成コードとデザインの間に乖離がある場合は報告せよ。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="subsection-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 06: MAINTENANCE -->
+<!-- ============================================================ -->
+<span class="section-anchor" id="maintenance"></span>
+<div class="section" data-section="maintenance">
+  <div class="section-header">
+    <div class="section-num sn-yellow"><span class="dot"></span> SECTION 06</div>
+    <h2>保守・運用</h2>
+    <p class="lead">デザインシステムはプロダクトとともに育てる生きたシステムです。AI 生成コードを多用する開発では、品質のドリフト&#65288;逸脱&#65289;を防ぐ仕組みが特に重要になります。</p>
+  </div>
+
+  <div class="subsection">
+    <h3>Git 管理</h3>
+
+    <h4>ブランチ命名</h4>
+    <table class="tbl">
+      <thead><tr><th>変更内容</th><th>ブランチ命名</th><th>理由</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">トークン変更</td><td><code>ds/token-{内容}</code></td><td>影響範囲が大きいため分離</td></tr>
+        <tr><td class="t-label">基盤コンポーネント変更</td><td><code>ds/component-{名前}</code></td><td></td></tr>
+        <tr><td class="t-label">ドメインコンポーネント変更</td><td><code>feature/{機能名}</code></td><td>通常の機能ブランチに含める</td></tr>
+        <tr><td class="t-label">.pen ファイルのみの変更</td><td><code>ds/design-{画面名}</code></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <h4 class="mt24">PR ルール</h4>
+    <ul class="bullet">
+      <li><code>.pen</code> ファイルの変更を含む PR にはスクリーンショットを添付する。</li>
+      <li><code>tokens.css</code> の変更を含む PR には影響を受けるコンポーネント・画面の一覧を本文に記載する。</li>
+      <li>基盤コンポーネント&#65288;L2&#65289;の追加時は <code>02-components.md</code> の更新をセットで行う。</li>
+    </ul>
+
+    <h4 class="mt24">コードレビューの DS チェックポイント</h4>
+    <ul class="checklist">
+      <li>ハードコードされた色値が含まれていないか</li>
+      <li>トークンに定義されていない余白値が使われていないか</li>
+      <li>既存コンポーネントで代替できるのに新規作成していないか</li>
+      <li>命名規約に従っているか</li>
+      <li>Pencil レイヤー名がセマンティックか&#65288;自動命名のまま残っていないか&#65289;</li>
+      <li>レスポンシブが CSS Grid ベースになっているか&#65288;不要なコンテナクエリやメディアクエリがないか&#65289;</li>
+    </ul>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>スプリント棚卸し</h3>
+    <p class="mb12">2 週間スプリントの振り返りで DS 健全性チェックを実施します&#65288;10&#12316;15 分&#65289;。</p>
+
+    <h4>チェックリスト</h4>
+    <ul class="checklist">
+      <li>ハードコード値が新規コードに混入していないか</li>
+      <li>新しく作った共通パーツが <code>components/ui/</code> に切り出されているか</li>
+      <li><code>.pen</code> ファイルが最新のコードと同期しているか</li>
+      <li>AI ルールファイルに追記すべきルールがないか</li>
+      <li>未使用のトークンやコンポーネントがないか</li>
+      <li>AI 生成コードの品質傾向に変化はないか</li>
+    </ul>
+
+    <h4 class="mt24">判断基準</h4>
+    <table class="tbl">
+      <thead><tr><th>発見事項</th><th>アクション</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">あるパターンが 2 箇所以上</td><td>L2 or L3 コンポーネントへの昇格を検討</td></tr>
+        <tr><td class="t-label">トークンにない値がハードコード</td><td>トークン追加 or 既存トークンへの丸め</td></tr>
+        <tr><td class="t-label">1 箇所でしか使われないコンポーネント</td><td>ページ内インライン定義のまま。<code>components/</code> に入れない</td></tr>
+        <tr><td class="t-label">使われなくなったトークン / コンポーネント</td><td>影響範囲を確認の上、削除を検討</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>AI 精度の改善サイクル</h3>
+
+    <h4>評価</h4>
+    <p class="mb12">AI 生成コードを 3 段階で評価し、スプリントごとに傾向を記録します。</p>
+
+    <div class="g3 mb16">
+      <div class="card" style="border-top:4px solid var(--green)">
+        <div class="card-label" style="color:var(--green)">GRADE A</div>
+        <h4>そのまま使える</h4>
+        <p>目標割合: <strong style="color:var(--green)">60% 以上</strong></p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--yellow)">
+        <div class="card-label" style="color:var(--yellow)">GRADE B</div>
+        <h4>微調整で使える</h4>
+        <p>目標割合: <strong style="color:var(--yellow)">30% 以下</strong></p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--pink)">
+        <div class="card-label" style="color:var(--pink)">GRADE C</div>
+        <h4>書き直しが必要</h4>
+        <p>目標割合: <strong style="color:var(--pink)">10% 以下</strong></p>
+      </div>
+    </div>
+
+    <h4>改善アクション</h4>
+    <table class="tbl">
+      <thead><tr><th>AI の問題パターン</th><th>対処</th></tr></thead>
+      <tbody>
+        <tr><td class="t-label">特定の値をハードコードしがち</td><td>AI ルールファイルに禁止ルールを追記</td></tr>
+        <tr><td class="t-label">既存コンポーネントを使わず新規作成</td><td>ルールファイルにコンポーネント一覧を追記</td></tr>
+        <tr><td class="t-label">命名が規約に合わない</td><td>具体例をルールファイルに追記</td></tr>
+        <tr><td class="t-label">レスポンシブが不十分</td><td>Grid ベースの設計とコンテナクエリの使い方をルールファイルに追記</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-warm mt16">
+      <div class="callout-icon">&#11088;</div>
+      <p>AI ルールファイルの品質が以後<strong>すべての AI 生成コードの品質を決定する</strong>ため、改善サイクルの中で最も重要な成果物として扱います。</p>
+    </div>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>トークン・コンポーネントの変更手順</h3>
+
+    <h4>トークン追加</h4>
+    <div class="flow mb24">
+      <div class="flow-step f-warm">
+        <h4>1</h4>
+        <p><code>tokens.css</code> に<br>CSS 変数を追加</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-blue">
+        <h4>2</h4>
+        <p><code>01-tokens.md</code> に<br>定義を追記</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-green">
+        <h4>3</h4>
+        <p><code>design-tokens.pen</code><br>を更新</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step f-purple">
+        <h4>4</h4>
+        <p>PR で<br>レビュー</p>
+      </div>
+    </div>
+
+    <h4>トークン変更</h4>
+    <ol style="list-style:none;padding:0">
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--blue)">01</span>影響を受けるコンポーネント・画面を検索で洗い出す</li>
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--blue)">02</span><code>ds/token-*</code> ブランチで変更</li>
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--blue)">03</span>影響箇所の見た目を確認</li>
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--blue)">04</span>ドキュメントと <code>.pen</code> を更新</li>
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--blue)">05</span>PR にスクリーンショット&#65288;変更前後&#65289;を添付</li>
+    </ol>
+
+    <h4 class="mt24">トークン削除</h4>
+    <ol style="list-style:none;padding:0">
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--pink)">01</span>使用箇所がゼロであることを確認</li>
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8;border-bottom:1px solid rgba(0,0,0,.04)"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--pink)">02</span>使用箇所がある場合は代替トークンへの移行を先に実施</li>
+      <li style="padding:6px 0 6px 32px;position:relative;font-size:13px;color:var(--sub);line-height:1.8"><span style="position:absolute;left:0;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--pink)">03</span><code>tokens.css</code>・ドキュメント・<code>.pen</code> から削除</li>
+    </ol>
+
+    <h4 class="mt24">基盤コンポーネント&#65288;L2&#65289;の変更</h4>
+    <div class="callout co-warm">
+      <div class="callout-icon">&#9888;&#65039;</div>
+      <p>破壊的変更がある場合はチームに事前共有する。使用箇所を洗い出し、すべての画面で見た目が崩れないことを確認する。<strong><code>02-components.md</code> と <code>components.pen</code> の更新を忘れないこと。</strong></p>
+    </div>
+  </div>
+
+  <div class="subsection-divider"></div>
+
+  <div class="subsection">
+    <h3>スケール戦略</h3>
+    <div class="g3">
+      <div class="card">
+        <div class="card-top ct-purple"></div>
+        <div class="card-label" style="color:var(--purple)">FUTURE</div>
+        <h4>ダークモード</h4>
+        <p>Semantic カラーと Primitive カラーを分離しているため、Semantic 層の参照先を切り替えるだけで対応可能。コンポーネント側の変更は不要。</p>
+      </div>
+      <div class="card">
+        <div class="card-top ct-blue"></div>
+        <div class="card-label" style="color:var(--blue)">FUTURE</div>
+        <h4>多言語対応</h4>
+        <p>UI 文言をコンポーネントにハードコードせず、外部から渡す設計にしておくと i18n 対応が容易になる。</p>
+      </div>
+      <div class="card">
+        <div class="card-top ct-warm"></div>
+        <div class="card-label" style="color:var(--warm)">FUTURE</div>
+        <h4>Pencil からの移行</h4>
+        <p><code>tokens.css</code> とコンポーネントコードはツール非依存のため、<code>.pen</code> を破棄してもプロダクトに影響しない。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="agent-note">
+    <div class="agent-note-header">&#129302; Agent Instructions</div>
+    <ul>
+      <li>トークンやコンポーネントを変更・追加した場合は、対応するドキュメント&#65288;01-tokens.md, 02-components.md&#65289;の更新も行え。</li>
+      <li>既存トークンやコンポーネントの削除は、影響範囲を報告してから行え。</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- .content-inner -->
+</div><!-- .content -->
+
+<script>
+(function(){
+  // Sidebar toggle (mobile)
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('sbToggle');
+  const overlay = document.getElementById('sbOverlay');
+  const nav = document.getElementById('sbNav');
+
+  function openSidebar(){ sidebar.classList.add('open'); sidebar.classList.remove('closed'); overlay.classList.add('show'); }
+  function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+
+  toggle.addEventListener('click', function(){
+    if(sidebar.classList.contains('open')) closeSidebar(); else openSidebar();
+  });
+  overlay.addEventListener('click', closeSidebar);
+
+  // Sidebar nav click
+  const items = document.querySelectorAll('.sb-item');
+  items.forEach(function(item){
+    item.addEventListener('click', function(e){
+      // Close sidebar on mobile
+      if(window.innerWidth <= 800) closeSidebar();
+    });
+  });
+
+  // Scroll spy
+  const sections = document.querySelectorAll('.section[data-section]');
+  const heroEl = document.getElementById('overview');
+
+  function updateActive(){
+    let current = 'overview';
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+
+    if(scrollY < 300){
+      current = 'overview';
+    } else {
+      sections.forEach(function(sec){
+        const rect = sec.getBoundingClientRect();
+        if(rect.top <= 120){
+          current = sec.getAttribute('data-section');
+        }
+      });
+    }
+
+    items.forEach(function(item){
+      const target = item.getAttribute('data-target');
+      if(target === current){
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
+
+  // Section reveal on scroll
+  const allSections = document.querySelectorAll('.section');
+  function revealSections(){
+    allSections.forEach(function(sec){
+      const rect = sec.getBoundingClientRect();
+      if(rect.top < window.innerHeight - 80){
+        sec.classList.add('visible');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', function(){
+    updateActive();
+    revealSections();
+  }, {passive:true});
+
+  // Initial
+  updateActive();
+  revealSections();
+
+  // Handle mobile resize
+  function handleResize(){
+    if(window.innerWidth > 800){
+      sidebar.classList.remove('open','closed');
+      overlay.classList.remove('show');
+    }
+  }
+  window.addEventListener('resize', handleResize);
+})();
+</script>
+
+</body>
+</html>
