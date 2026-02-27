@@ -8,15 +8,16 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 
 ## Repository Structure
 
-- `index.html` — Landing page / document portal linking to all docs
-- `docs/` — Presentation-style HTML documents:
-  - `kickoff.html` — Full-page scroll-snap presentation (7 sections with IntersectionObserver navigation)
-  - `dev-guide.html` — Slide-based presentation (horizontal slide transitions with sidebar navigation, 12 main slides + 5 appendices)
-  - `team.html` — Timeline-style project team structure page (dark theme with scroll-driven background color changes)
-- `references/` — Reference materials in Markdown:
-  - `requirements.md` — Project charter / requirements document (MVP scope, feature list, constraints)
-  - `lighthouse.md` — Company philosophy (Lighthouse principles)
-  - `ideal-candidate-profile.md` — Core competency definitions with Do/Don't examples
+- `index.html` — **自動生成** ドキュメントポータル（`deno task build` で生成、直接編集しない）
+- `documents.json` — ドキュメントのメタデータ定義（グループ・カード情報の単一ソース）
+- `scripts/` — ビルドスクリプト:
+  - `build-index.ts` — `documents.json` + テンプレートから `index.html` を生成する Deno スクリプト
+  - `index.template.html` — `index.html` の HTML/CSS テンプレート（`{{SECTIONS}}` / `{{ANIMATION_DELAYS}}` プレースホルダ）
+- `deno.json` — Deno タスク設定
+- `docs/` — プレゼン・ガイド形式のHTMLドキュメント
+- `work/` — ワークシート・ワークショップ形式の資料
+- `references/` — 補足資料・リファレンス（Markdown / HTML）
+- `.github/workflows/deploy.yml` — GitHub Pages 自動デプロイ（push to main → build → deploy）
 - `.claude-plugin/` — Plugin manifest (Agent Skills standard)
 - `skills/thanks-card-overview/` — AI agent skill (Agent Skills open standard, 40+ tools compatible):
   - `SKILL.md` — スキル定義（ドキュメントカタログ + 制約サマリ）
@@ -24,8 +25,10 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 
 ## Technical Details
 
-- **No build system** — All files are plain HTML/CSS/JS with no bundler, no package.json, no dependencies to install
+- **Build system:** Deno — `deno task build` で `index.html` を自動生成（`documents.json` + `scripts/index.template.html` → `index.html`）
+- **CI/CD:** GitHub Actions — main push 時に自動ビルド＋GitHub Pages デプロイ
 - **No tests or linting** — Static documentation only
+- `index.html` は `.gitignore` に含まれる（生成物のため直接コミットしない）
 - Each HTML page is fully self-contained (inline `<style>` and `<script>` blocks, no shared CSS/JS files)
 - All content is in **Japanese (lang="ja")**
 - Google Fonts are loaded via CDN: Zen Maru Gothic, Noto Sans JP, Montserrat, DM Sans
@@ -38,22 +41,38 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 - Responsive breakpoints at 640px–800px depending on the page
 - Animations use `cubic-bezier(0.22, 1, 0.36, 1)` easing consistently
 
-## Document Grouping (index.html)
+## Document Management (documents.json)
 
-`index.html` のドキュメントカードはグループ（セクション）単位で分類する。新しいドキュメントを追加する際は、既存グループに合うものがあればそこに入れ、なければ新しいグループを作成する。
+ドキュメントの追加・変更は `documents.json` を編集し、`deno task build` で `index.html` を再生成する。`index.html` を直接編集しない。
 
-現在のグループと分類方針:
+### ドキュメントの追加手順
 
-| グループ | data-theme | 方針 |
-|----------|------------|------|
+1. HTMLファイルを適切なディレクトリに作成する（`docs/`, `work/`, `references/`）
+2. `documents.json` の `documents` 配列にエントリを追加する
+3. `deno task build` を実行して `index.html` を再生成する
+
+### documents.json のスキーマ
+
+**グループ（`groups`）:**
+- `id` — グループID（ドキュメントの `group` フィールドと対応）
+- `theme` — CSSテーマ（`project` / `dev` / `reference`）。新テーマの場合は `scripts/index.template.html` にCSSも追加する
+- `label` — セクションラベル（英語大文字: `PROJECT`, `SPRINT 1` など）
+- `title` — セクションタイトル（日本語）
+- `description` — セクションの説明文
+- `order` — 表示順
+
+**ドキュメント（`documents`）:**
+- `title`, `path`, `group`, `icon`, `badge`, `color`, `description`, `meta`, `order`
+- `comingSoon: true` — 未公開カード（グレーアウト表示）
+- `color` の選択肢: `coral` / `sky` / `mint` / `purple` / `orange`
+
+### グループの分類方針
+
+| グループ | theme | 方針 |
+|----------|-------|------|
 | **プロジェクト概要** (PROJECT) | `project` | プロジェクトの「今」を表すドキュメント（体制図、インセプションデッキなど） |
 | **開発ガイド** (DEVELOPMENT) | `dev` | 開発プロセス・手法に関するガイドやテンプレート |
 | **Sprint N** | `reference` | 各スプリントフェーズで作成・使用した資料。Sprint単位でグループを作る |
-
-新しいグループを作る場合:
-- `data-theme` は既存の `project` / `dev` / `reference` から選ぶか、必要に応じて新しいテーマを追加する（その場合 `.section[data-theme="..."] .section-label` のCSSも追加する）
-- セクションラベルは英語大文字（`SPRINT 1` など）、セクションタイトルは日本語
-- アニメーション遅延は `.section:nth-child(N)` で設定されている（現在3つ分）。グループが増えたら追加する
 
 ## Skill References (skills/thanks-card-overview/)
 
@@ -70,7 +89,7 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 - 一般的な手法解説（インセプションデッキの作り方、デザインスプリントの進め方など）
 
 ### 更新タイミング
-- `index.html` に新しいドキュメントを追加したとき → 上記の基準に照らしてスキル参照への追加を検討する
+- `documents.json` に新しいドキュメントを追加したとき → 上記の基準に照らしてスキル参照への追加を検討する
 - プロジェクトの方針・体制に変更があったとき → 既存の参照ドキュメントを更新する
 - `SKILL.md` のドキュメント一覧テーブルも参照ファイルの追加・削除に合わせて更新する
 

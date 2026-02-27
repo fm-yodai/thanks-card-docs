@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ありがとうカード — アーキテクチャ設計・技術スタック（叩き台）</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --dark-sub: #2d2d4a;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.8;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--dark);
+    color: #fff;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(255,107,107,0.15), transparent),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(255,165,82,0.12), transparent);
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .draft-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--coral), var(--orange));
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 30px;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, #ffd6d6 50%, #ffe8c2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .meta-label {
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .to-fill {
+    color: rgba(0,0,0,0.25);
+    font-style: italic;
+  }
+
+  .header .to-fill {
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* ===== MAIN ===== */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 80px 80px;
+  }
+
+  /* ===== SECTIONS ===== */
+  .doc-section {
+    margin-bottom: 56px;
+  }
+
+  .doc-section h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-icon { font-size: 28px; }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    line-height: 1.8;
+  }
+
+  /* ===== DIAGRAM PLACEHOLDER ===== */
+  .diagram-placeholder {
+    background: #fff;
+    border: 2px dashed rgba(0,0,0,0.1);
+    border-radius: 16px;
+    padding: 48px 40px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+  }
+
+  .placeholder-tag {
+    display: inline-block;
+    background: rgba(77,150,255,0.1);
+    color: var(--sky);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 12px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+
+  .diagram-placeholder p {
+    line-height: 1.7;
+  }
+
+  .diagram-placeholder small {
+    color: rgba(0,0,0,0.25);
+    font-size: 12px;
+  }
+
+  /* ===== TECH TABLE ===== */
+  .tech-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+
+  .tech-table th {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 14px 18px;
+    text-align: left;
+  }
+
+  .tech-table td {
+    background: #fff;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--text-light);
+  }
+
+  .tech-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .tech-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .tech-table .to-fill {
+    color: rgba(0,0,0,0.2);
+  }
+
+  /* ===== NFR RANKING ===== */
+  .nfr-ranking {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nfr-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  }
+
+  .rank-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 32px;
+  }
+
+  .nfr-rank-item:nth-child(1) .rank-num { color: var(--coral); }
+  .nfr-rank-item:nth-child(2) .rank-num { color: var(--orange); }
+  .nfr-rank-item:nth-child(3) .rank-num { color: var(--yellow); }
+  .nfr-rank-item:nth-child(4) .rank-num { color: var(--sky); }
+  .nfr-rank-item:nth-child(5) .rank-num { color: var(--purple); }
+  .nfr-rank-item:nth-child(6) .rank-num { color: var(--mint); }
+
+  .nfr-rank-label {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 140px;
+  }
+
+  .nfr-rank-note {
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  /* ===== OPEN ITEMS ===== */
+  .open-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .open-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(255,107,107,0.04);
+    border: 1px solid rgba(255,107,107,0.1);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .open-item-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .open-item p {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== NOTES ===== */
+  .notes-area {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+  }
+
+  .note-block {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .note-block:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .note-block h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .note-block p {
+    font-size: 13.5px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== FOOTER ===== */
+  .doc-footer {
+    text-align: center;
+    padding-top: 40px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .doc-footer p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+
+  .doc-footer strong {
+    color: var(--text);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .header { padding: 40px 24px; }
+    .main { padding: 32px 24px 60px; }
+    .header-meta { flex-direction: column; gap: 8px; }
+    .nfr-rank-label { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <span class="draft-badge">DRAFT — 叩き台</span>
+    <h1>アーキテクチャ設計・<br>技術スタック</h1>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-label">📅 作成日：</span><span class="to-fill">YYYY/MM/DD</span></div>
+      <div class="meta-item"><span class="meta-label">👥 参加者：</span><span class="to-fill">（ワークショップ参加メンバー5名）</span></div>
+      <div class="meta-item"><span class="meta-label">📌 ステータス：</span><span>叩き台 → フィードバック待ち</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 1. システム構成図 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">🖼️</span> システム構成図</h2>
+    <p class="section-desc">全体のアーキテクチャを俯瞰できる構成図。draw.io で作成し、画像として埋め込む。</p>
+    <div class="diagram-placeholder">
+      <span class="placeholder-tag">📐 DIAGRAM</span>
+      <p>
+        draw.io で作成したシステム構成図をここに配置<br>
+        <small>（draw.io → ファイル → 形式を指定してエクスポート → SVG/PNG → img タグで埋め込み）</small>
+      </p>
+      <!-- <img src="architecture.svg" alt="システム構成図" style="max-width:100%;"> -->
+    </div>
+  </section>
+
+  <!-- 2. 技術スタック -->
+  <section class="doc-section">
+    <h2><span class="section-icon">🔧</span> 技術スタック</h2>
+    <p class="section-desc">各レイヤーで選定した技術と、その理由。「なぜこれを選んだか」を説明できることが重要。</p>
+    <table class="tech-table">
+      <thead>
+        <tr>
+          <th>カテゴリ</th>
+          <th>選定技術</th>
+          <th>比較した候補</th>
+          <th>選定理由（WHY）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🖥️ フロントエンド</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>🎨 UIライブラリ / CSS</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>⚙️ バックエンド</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>🗄️ データベース</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>🤖 AI（LLM）</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>🔐 認証</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>☁️ ホスティング</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+        <tr>
+          <td>🚀 CI/CD</td>
+          <td class="to-fill">（選定技術）</td>
+          <td class="to-fill">（候補A / 候補B）</td>
+          <td class="to-fill">（理由）</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3. 非機能要件の優先順位 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">⚖️</span> 非機能要件の優先順位</h2>
+    <p class="section-desc">このプロダクトで何を優先するか。上から重要度順に並べる。全部を最高にはできないので、意識的にトレードオフを決める。</p>
+    <div class="nfr-ranking">
+      <div class="nfr-rank-item">
+        <span class="rank-num">1</span>
+        <span class="nfr-rank-label to-fill">（例：保守性）</span>
+        <span class="nfr-rank-note to-fill">（理由メモ）</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">2</span>
+        <span class="nfr-rank-label to-fill">（例：コスト）</span>
+        <span class="nfr-rank-note to-fill">（理由メモ）</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">3</span>
+        <span class="nfr-rank-label to-fill">（例：デプロイ容易性）</span>
+        <span class="nfr-rank-note to-fill">（理由メモ）</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">4</span>
+        <span class="nfr-rank-label to-fill">（例：パフォーマンス）</span>
+        <span class="nfr-rank-note to-fill">（理由メモ）</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">5</span>
+        <span class="nfr-rank-label to-fill">（例：セキュリティ）</span>
+        <span class="nfr-rank-note to-fill">（理由メモ）</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">6</span>
+        <span class="nfr-rank-label to-fill">（例：スケーラビリティ）</span>
+        <span class="nfr-rank-note to-fill">（理由メモ）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 未決定事項 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">⚠️</span> 未決定事項</h2>
+    <p class="section-desc">ワークショップ中に結論が出なかった項目。メンバーへの共有時に「ここの意見がほしい」と伝えるためのリスト。</p>
+    <div class="open-items">
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p class="to-fill">（未決定事項を記入 — 例：認証方式は社内SSO連携 or 独自認証？）</p>
+      </div>
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p class="to-fill">（未決定事項を記入）</p>
+      </div>
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p class="to-fill">（未決定事項を記入）</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 議事メモ -->
+  <section class="doc-section">
+    <h2><span class="section-icon">📝</span> 議事メモ</h2>
+    <p class="section-desc">議論の過程と判断の背景を記録。あとから「なぜこう決めたか」を振り返れるように。</p>
+    <div class="notes-area">
+      <div class="note-block">
+        <h3>前提確認で合意したこと</h3>
+        <p class="to-fill">（ユーザー規模、認証、AI API、予算、利用環境について確認した内容）</p>
+      </div>
+      <div class="note-block">
+        <h3>フロントエンドの議論</h3>
+        <p class="to-fill">（どのような選択肢が出たか、何が決め手になったか）</p>
+      </div>
+      <div class="note-block">
+        <h3>バックエンド・AI連携の議論</h3>
+        <p class="to-fill">（AIラベリングのタイミング、API設計の方針など）</p>
+      </div>
+      <div class="note-block">
+        <h3>インフラ・データベースの議論</h3>
+        <p class="to-fill">（ホスティング先の制約、コスト面の考慮など）</p>
+      </div>
+      <div class="note-block">
+        <h3>その他のメモ</h3>
+        <p class="to-fill">（気づき、今後調査が必要なことなど）</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="doc-footer">
+    <p>
+      この資料は叩き台です。メンバーからフィードバックをもらい、最終版に磨き上げます。<br>
+      <strong>フィードバック期限：</strong><span class="to-fill">YYYY/MM/DD</span>
+    </p>
+  </section>
+
+</main>
+
+</body>
+</html>

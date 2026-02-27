@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アーキテクチャ設計と技術選定 — 一般論</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --dark-sub: #2d2d4a;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.8;
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  nav a {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--text);
+    opacity: 0.2;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: block;
+    position: relative;
+  }
+
+  nav a.active {
+    opacity: 1;
+    transform: scale(1.4);
+    background: var(--coral);
+  }
+
+  nav a::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  nav a:hover::after { opacity: 1; }
+
+  /* ===== SECTIONS ===== */
+  section {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .section-inner.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--dark);
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(77,150,255,0.15), transparent),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(155,114,207,0.12), transparent),
+      radial-gradient(ellipse 400px 300px at 50% 50%, rgba(107,203,119,0.1), transparent);
+  }
+
+  .hero .section-inner { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--sky), var(--purple));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 30px;
+    letter-spacing: 0.08em;
+    margin-bottom: 32px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .hero h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, #c8d6ff 50%, #e0d6ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    margin-bottom: 40px;
+    line-height: 1.9;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .hero-meta-item span { font-size: 18px; }
+
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    animation: fadeInUp 1s 1.2s both;
+  }
+
+  .scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid rgba(255,255,255,0.35);
+    border-bottom: 2px solid rgba(255,255,255,0.35);
+    transform: rotate(45deg);
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: rotate(45deg) translateY(0); }
+    30% { transform: rotate(45deg) translateY(6px); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 120px;
+    line-height: 1;
+    opacity: 0.06;
+    position: absolute;
+    top: 40px;
+    left: 60px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 3.5vw, 40px);
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
+  .lead {
+    font-size: 15px;
+    color: var(--text-light);
+    max-width: 800px;
+    margin-bottom: 36px;
+    line-height: 1.9;
+  }
+
+  /* ===== LIGHT SECTIONS ===== */
+  .light-section { background: var(--cream); }
+  .light-section .section-tag { background: rgba(77,150,255,0.1); color: var(--sky); }
+
+  .alt-section { background: linear-gradient(180deg, #eef6ff, #f0f0ff); }
+  .alt-section .section-tag { background: rgba(155,114,207,0.12); color: var(--purple); }
+
+  .green-section { background: var(--cream); }
+  .green-section .section-tag { background: rgba(107,203,119,0.12); color: var(--mint); }
+
+  /* ===== DARK SECTIONS ===== */
+  .dark-section {
+    background: var(--dark);
+    color: #fff;
+  }
+  .dark-section .section-num { color: #fff; opacity: 0.04; }
+  .dark-section .section-tag { background: rgba(255,217,61,0.15); color: var(--yellow); }
+  .dark-section .lead { color: rgba(255,255,255,0.55); }
+  .dark-section h2 { color: #fff; }
+
+  /* ===== CARD SYSTEMS ===== */
+  .cards-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .cards-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+
+  .card.sky::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .card.coral::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .card.mint::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .card.purple::before { background: linear-gradient(90deg, var(--purple), var(--coral)); }
+  .card.orange::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+  .card.yellow::before { background: linear-gradient(90deg, var(--yellow), var(--mint)); }
+
+  .card-icon {
+    font-size: 36px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 10px;
+  }
+
+  .card p {
+    font-size: 13.5px;
+    color: var(--text-light);
+    line-height: 1.75;
+  }
+
+  /* Dark cards */
+  .dark-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px 24px;
+    transition: transform 0.3s, background 0.3s;
+  }
+
+  .dark-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.1);
+  }
+
+  .dark-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .dark-card p {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.75;
+  }
+
+  .dark-card .card-icon {
+    font-size: 36px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  /* ===== DIAGRAM BOX ===== */
+  .diagram-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 8px;
+  }
+
+  .diagram-box.light {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+
+  .diagram-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .diagram-node {
+    background: rgba(77,150,255,0.12);
+    border: 1px solid rgba(77,150,255,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 120px;
+  }
+
+  .dark-section .diagram-node {
+    background: rgba(77,150,255,0.15);
+    border: 1px solid rgba(77,150,255,0.25);
+    color: #fff;
+  }
+
+  .diagram-arrow {
+    font-size: 20px;
+    color: var(--sky);
+    opacity: 0.5;
+  }
+
+  .diagram-node.highlight {
+    background: rgba(255,107,107,0.15);
+    border-color: rgba(255,107,107,0.25);
+    color: var(--coral);
+    font-weight: 700;
+  }
+
+  .dark-section .diagram-node.highlight {
+    background: rgba(255,107,107,0.2);
+    border-color: rgba(255,107,107,0.3);
+    color: var(--coral);
+  }
+
+  /* ===== INSIGHT BOX ===== */
+  .insight-box {
+    margin-top: 28px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--sky);
+    position: relative;
+  }
+
+  .dark-section .insight-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 4px solid var(--yellow);
+  }
+
+  .insight-box p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .dark-section .insight-box p {
+    color: rgba(255,255,255,0.65);
+  }
+
+  .insight-box strong {
+    color: var(--text);
+  }
+
+  .dark-section .insight-box strong {
+    color: #fff;
+  }
+
+  /* ===== COMPARE TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 8px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+
+  .compare-table th {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 16px 20px;
+    text-align: left;
+  }
+
+  .compare-table td {
+    background: #fff;
+    padding: 14px 20px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--text-light);
+  }
+
+  .compare-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .compare-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* ===== NUMBERED LIST ===== */
+  .numbered-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .numbered-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+    transition: transform 0.3s;
+  }
+
+  .numbered-item:hover { transform: translateX(4px); }
+
+  .num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .numbered-item:nth-child(1) .num { color: var(--sky); }
+  .numbered-item:nth-child(2) .num { color: var(--purple); }
+  .numbered-item:nth-child(3) .num { color: var(--coral); }
+  .numbered-item:nth-child(4) .num { color: var(--mint); }
+  .numbered-item:nth-child(5) .num { color: var(--orange); }
+
+  .numbered-item h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .numbered-item p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== LAYER DIAGRAM ===== */
+  .layer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .layer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.3s;
+  }
+
+  .layer:hover { transform: scale(1.02); }
+
+  .layer-icon { font-size: 24px; flex-shrink: 0; }
+  .layer-label { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; min-width: 140px; }
+  .layer-desc { font-size: 13px; opacity: 0.7; }
+
+  .layer.l1 { background: rgba(77,150,255,0.12); color: var(--sky); }
+  .layer.l2 { background: rgba(155,114,207,0.12); color: var(--purple); }
+  .layer.l3 { background: rgba(255,107,107,0.12); color: var(--coral); }
+  .layer.l4 { background: rgba(255,165,82,0.12); color: var(--orange); }
+  .layer.l5 { background: rgba(107,203,119,0.12); color: var(--mint); }
+
+  /* ===== CTA SECTION ===== */
+  .cta-section {
+    background: var(--dark);
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 500px 400px at 30% 60%, rgba(77,150,255,0.12), transparent),
+      radial-gradient(ellipse 600px 400px at 70% 40%, rgba(155,114,207,0.1), transparent);
+  }
+
+  .cta-section .section-inner { position: relative; z-index: 1; }
+
+  .cta-section h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff, #c8d6ff, #e0d6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cta-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+  }
+
+  /* ===== PAGE COUNTER ===== */
+  .page-counter {
+    position: fixed;
+    bottom: 24px;
+    left: 32px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0.3;
+    z-index: 100;
+    transition: color 0.4s;
+  }
+
+  .page-counter.light { color: #fff; }
+
+  /* ===== NFR GRID ===== */
+  .nfr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .nfr-item {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .nfr-item:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+  }
+
+  .nfr-icon { font-size: 32px; margin-bottom: 10px; }
+  .nfr-label {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .nfr-desc {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+  }
+
+  /* ===== ANTI-PATTERN ===== */
+  .anti-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .anti-card {
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+  }
+
+  .anti-card.bad {
+    background: rgba(255,107,107,0.06);
+    border: 1px solid rgba(255,107,107,0.12);
+  }
+
+  .anti-card.good {
+    background: rgba(107,203,119,0.06);
+    border: 1px solid rgba(107,203,119,0.12);
+  }
+
+  .anti-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .anti-card.bad .anti-label { background: rgba(255,107,107,0.15); color: var(--coral); }
+  .anti-card.good .anti-label { background: rgba(107,203,119,0.15); color: var(--mint); }
+
+  .anti-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .anti-card p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    section { padding: 40px 24px; }
+    .section-num { font-size: 72px; top: 20px; left: 20px; }
+    .cards-2col, .cards-3col, .nfr-grid, .anti-grid { grid-template-columns: 1fr; }
+    nav { right: 12px; }
+    .hero-meta { flex-direction: column; align-items: center; gap: 12px; }
+    .diagram-flow { flex-direction: column; }
+    .diagram-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#hero" data-label="Top" class="active"></a>
+  <a href="#what" data-label="解決案を描く"></a>
+  <a href="#arch" data-label="アーキテクチャ設計"></a>
+  <a href="#layers" data-label="レイヤー構造"></a>
+  <a href="#nfr" data-label="非機能要件"></a>
+  <a href="#tech" data-label="技術選定"></a>
+  <a href="#criteria" data-label="選定基準"></a>
+  <a href="#antipattern" data-label="アンチパターン"></a>
+  <a href="#summary" data-label="まとめ"></a>
+</nav>
+
+<div class="page-counter"><span id="currentPage">1</span> / 9</div>
+
+<!-- ===== 1. HERO ===== -->
+<section class="hero" id="hero">
+  <div class="section-inner visible">
+    <div class="hero-badge">📐 一般論編</div>
+    <h1>アーキテクチャ設計と<br>技術選定</h1>
+    <p class="hero-sub">
+      プロダクトの「設計図」と「道具選び」の考え方を整理します。<br>
+      これから叩き台を作るための、共通の知識ベースとして。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span>📄</span> 全9スライド</div>
+      <div class="hero-meta-item"><span>⏱</span> 約10分</div>
+      <div class="hero-meta-item"><span>🎯</span> エンジニア5名向け</div>
+    </div>
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2. WHAT: 解決案を描く ===== -->
+<section class="light-section" id="what">
+  <div class="section-num">01</div>
+  <div class="section-inner">
+    <span class="section-tag">INCEPTION DECK</span>
+    <h2>「解決案を描く」とは？</h2>
+    <p class="lead">
+      インセプションデッキの項目のひとつ。「課題に対して、どんなシステムで解決するか」を
+      チーム全員が同じ絵を見れるレベルで描き出すこと。コードの前に、構造を合意する。
+    </p>
+    <div class="cards-3col">
+      <div class="card sky">
+        <span class="card-icon">🖼️</span>
+        <h3>全体像を俯瞰する</h3>
+        <p>ユーザーが触る画面、裏側のサーバー、データの流れ。システム全体を一枚の絵にする。</p>
+      </div>
+      <div class="card coral">
+        <span class="card-icon">🧭</span>
+        <h3>判断の軸を持つ</h3>
+        <p>「なぜこの構成か？」を説明できること。技術選定のWHYが明確になっていることが重要。</p>
+      </div>
+      <div class="card mint">
+        <span class="card-icon">🤝</span>
+        <h3>チームの認識を揃える</h3>
+        <p>同じ図を見て議論できる状態にする。認識がズレたまま開発に入ると手戻りが大きい。</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>解決案 = アーキテクチャ設計 + 技術選定。</strong>この2つは密接に絡み合っています。「何を使うか」は「どう構成するか」に影響し、逆もまた然り。次のスライドからそれぞれを掘り下げます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3. ARCHITECTURE ===== -->
+<section class="dark-section" id="arch">
+  <div class="section-num">02</div>
+  <div class="section-inner">
+    <span class="section-tag">ARCHITECTURE DESIGN</span>
+    <h2>アーキテクチャ設計とは？</h2>
+    <p class="lead">
+      「プロダクトの構造をどう組み立てるか」を決めること。<br>
+      家を建てるときの設計図にあたります。間取りが決まらないと、配管も電気工事もできない。
+    </p>
+    <div class="diagram-box">
+      <div class="diagram-flow">
+        <div class="diagram-node">👤 ユーザー</div>
+        <div class="diagram-arrow">→</div>
+        <div class="diagram-node highlight">🖥️ フロントエンド</div>
+        <div class="diagram-arrow">→</div>
+        <div class="diagram-node highlight">⚙️ バックエンド</div>
+        <div class="diagram-arrow">→</div>
+        <div class="diagram-node">🗄️ データベース</div>
+      </div>
+      <div style="text-align:center; margin-top:16px;">
+        <div class="diagram-arrow" style="font-size:14px;">↕️</div>
+      </div>
+      <div class="diagram-flow" style="margin-top:8px;">
+        <div class="diagram-node">🤖 外部API（AI）</div>
+        <div class="diagram-node">🔐 認証</div>
+        <div class="diagram-node">📊 分析基盤</div>
+      </div>
+    </div>
+    <div class="insight-box" style="margin-top:28px;">
+      <p>💡 <strong>アーキテクチャ設計で決めるのは「何を・どこに・どう配置するか」。</strong>具体的なフレームワーク名やライブラリは技術選定で決めます。まず構造、次に道具。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4. LAYERS ===== -->
+<section class="alt-section" id="layers">
+  <div class="section-num">03</div>
+  <div class="section-inner">
+    <span class="section-tag">LAYER STRUCTURE</span>
+    <h2>典型的なレイヤー構造</h2>
+    <p class="lead">
+      Webアプリのアーキテクチャは、役割ごとにレイヤーに分けて考えるのが基本。<br>
+      それぞれの層が「何に責任を持つか」を明確にします。
+    </p>
+    <div class="layer-stack">
+      <div class="layer l1">
+        <span class="layer-icon">🖥️</span>
+        <span class="layer-label">プレゼンテーション層</span>
+        <span class="layer-desc">ユーザーが目にする画面。UI/UXの表現を担う。</span>
+      </div>
+      <div class="layer l2">
+        <span class="layer-icon">🔀</span>
+        <span class="layer-label">API / ルーティング層</span>
+        <span class="layer-desc">フロントとバックの橋渡し。リクエストの受け口。</span>
+      </div>
+      <div class="layer l3">
+        <span class="layer-icon">⚙️</span>
+        <span class="layer-label">ビジネスロジック層</span>
+        <span class="layer-desc">「ありがとうカードを送る」などの業務ルールの実装。</span>
+      </div>
+      <div class="layer l4">
+        <span class="layer-icon">🗄️</span>
+        <span class="layer-label">データアクセス層</span>
+        <span class="layer-desc">データベースとのやり取り。保存・取得・更新。</span>
+      </div>
+      <div class="layer l5">
+        <span class="layer-icon">🔌</span>
+        <span class="layer-label">外部連携層</span>
+        <span class="layer-desc">AIのAPI、認証サービス、通知サービスなどとの接続。</span>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>レイヤーを意識する理由：</strong>層ごとに責任を分けることで、変更の影響範囲が局所化される。たとえば「AIのAPIを変えたい」となったとき、外部連携層だけ修正すればビジネスロジック層は無傷で済む。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5. NON-FUNCTIONAL REQUIREMENTS ===== -->
+<section class="dark-section" id="nfr">
+  <div class="section-num">04</div>
+  <div class="section-inner">
+    <span class="section-tag">NON-FUNCTIONAL REQUIREMENTS</span>
+    <h2>非機能要件を忘れない</h2>
+    <p class="lead">
+      「何ができるか」は機能要件。「どのくらいの品質で動くか」が非機能要件。<br>
+      見落とすとリリース後に痛い目に遭う。アーキテクチャ設計はこれに大きく影響される。
+    </p>
+    <div class="nfr-grid">
+      <div class="nfr-item">
+        <div class="nfr-icon">⚡</div>
+        <div class="nfr-label">パフォーマンス</div>
+        <div class="nfr-desc">画面の応答速度。AIラベリングにかかる時間の許容範囲は？</div>
+      </div>
+      <div class="nfr-item">
+        <div class="nfr-icon">📈</div>
+        <div class="nfr-label">スケーラビリティ</div>
+        <div class="nfr-desc">同時に何人が使う？60名規模の今と、将来の拡張は？</div>
+      </div>
+      <div class="nfr-item">
+        <div class="nfr-icon">🔐</div>
+        <div class="nfr-label">セキュリティ</div>
+        <div class="nfr-desc">認証方式は？感謝メッセージの閲覧権限は？</div>
+      </div>
+      <div class="nfr-item">
+        <div class="nfr-icon">🔧</div>
+        <div class="nfr-label">保守性</div>
+        <div class="nfr-desc">若手メンバーが今後も保守していけるか？学習コストは？</div>
+      </div>
+      <div class="nfr-item">
+        <div class="nfr-icon">🚀</div>
+        <div class="nfr-label">デプロイ容易性</div>
+        <div class="nfr-desc">どこにホスティングする？CI/CDはどこまでやる？</div>
+      </div>
+      <div class="nfr-item">
+        <div class="nfr-icon">💰</div>
+        <div class="nfr-label">コスト</div>
+        <div class="nfr-desc">AIのAPI利用料、ホスティング費用。ランニングコストの上限は？</div>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>全部を最高にはできない。</strong>パフォーマンスを極限まで追求すればコストが上がり、保守性が落ちる。大事なのは「このプロダクトで何を優先するか」のバランスを意識的に決めること。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6. TECH SELECTION ===== -->
+<section class="light-section" id="tech">
+  <div class="section-num">05</div>
+  <div class="section-inner">
+    <span class="section-tag">TECHNOLOGY SELECTION</span>
+    <h2>技術選定とは？</h2>
+    <p class="lead">
+      アーキテクチャで決めた構造を、具体的にどの技術で実現するかを選ぶこと。<br>
+      フレームワーク、言語、データベース、ホスティング先、外部サービスなど。
+    </p>
+    <div class="cards-2col">
+      <div class="card sky">
+        <span class="card-icon">🖥️</span>
+        <h3>フロントエンド</h3>
+        <p>React? Next.js? Vue? Svelte? — UIフレームワーク、状態管理、CSSの方針。ユーザー体験に直結する。</p>
+      </div>
+      <div class="card purple">
+        <span class="card-icon">⚙️</span>
+        <h3>バックエンド</h3>
+        <p>Node.js? Python? Go? — API設計、ビジネスロジックの実装言語。チームの得意分野が大きく影響。</p>
+      </div>
+      <div class="card coral">
+        <span class="card-icon">🗄️</span>
+        <h3>データベース</h3>
+        <p>PostgreSQL? MySQL? MongoDB? — データ構造に合ったDB選び。RDBかNoSQLか。</p>
+      </div>
+      <div class="card mint">
+        <span class="card-icon">☁️</span>
+        <h3>インフラ・ホスティング</h3>
+        <p>Vercel? AWS? GCP? — デプロイ先、サーバーレスかコンテナか。運用コストにも直結。</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>技術選定に「正解」はない。</strong>あるのは「このプロジェクト・このチームにとってのベストな選択」。選んだ理由を説明できることが、正しい技術選定の証拠です。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7. CRITERIA ===== -->
+<section class="alt-section" id="criteria">
+  <div class="section-num">06</div>
+  <div class="section-inner">
+    <span class="section-tag">DECISION CRITERIA</span>
+    <h2>技術選定の判断基準</h2>
+    <p class="lead">
+      「なんとなく流行っているから」ではなく、明確な基準で選ぶ。<br>
+      以下の5つの観点を天秤にかけて意思決定します。
+    </p>
+    <div class="numbered-list">
+      <div class="numbered-item">
+        <div class="num">01</div>
+        <div>
+          <h3>チームのスキルセット</h3>
+          <p>今のメンバーが書ける言語・触れるフレームワークは何か。学習コストが高すぎると開発が止まる。ただし「学びたい」も大事な判断材料。</p>
+        </div>
+      </div>
+      <div class="numbered-item">
+        <div class="num">02</div>
+        <div>
+          <h3>プロダクトの要件適合性</h3>
+          <p>リアルタイム通知が必要ならWebSocket対応、AIを使うならAPIクライアントの使いやすさ。要件から逆算して技術を選ぶ。</p>
+        </div>
+      </div>
+      <div class="numbered-item">
+        <div class="num">03</div>
+        <div>
+          <h3>エコシステムとコミュニティ</h3>
+          <p>ドキュメントの充実度、困ったときに調べられるか、ライブラリの豊富さ。小さいチームほどコミュニティの力が重要。</p>
+        </div>
+      </div>
+      <div class="numbered-item">
+        <div class="num">04</div>
+        <div>
+          <h3>運用・保守のしやすさ</h3>
+          <p>デプロイのしやすさ、ログの見やすさ、エラー対応の容易さ。リリースして終わりではない。運用まで見据えて選ぶ。</p>
+        </div>
+      </div>
+      <div class="numbered-item">
+        <div class="num">05</div>
+        <div>
+          <h3>コストと時間の制約</h3>
+          <p>無料枠はあるか、半年でMVPに間に合うか。理想の技術スタックと現実的な制約のバランスを取る。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8. ANTI-PATTERNS ===== -->
+<section class="green-section" id="antipattern">
+  <div class="section-num">07</div>
+  <div class="section-inner">
+    <span class="section-tag">ANTI-PATTERNS</span>
+    <h2>よくある失敗パターン</h2>
+    <p class="lead">
+      技術選定でありがちな落とし穴。事前に知っておけば避けられる。
+    </p>
+    <div class="anti-grid">
+      <div class="anti-card bad">
+        <span class="anti-label">❌ ANTI-PATTERN</span>
+        <h3>🔥 Hype Driven Development</h3>
+        <p>「最近バズっているから」という理由だけで選ぶ。流行りの技術が自分たちのプロジェクトに合うとは限らない。</p>
+      </div>
+      <div class="anti-card good">
+        <span class="anti-label">✅ BETTER</span>
+        <h3>要件ドリブンで選ぶ</h3>
+        <p>「この要件を満たすにはどの技術が最適か」から考える。トレンドは参考情報の一つに過ぎない。</p>
+      </div>
+      <div class="anti-card bad">
+        <span class="anti-label">❌ ANTI-PATTERN</span>
+        <h3>🏗️ オーバーエンジニアリング</h3>
+        <p>60名の社内アプリにマイクロサービス。将来のスケールを見越しすぎて、今の開発スピードを犠牲にする。</p>
+      </div>
+      <div class="anti-card good">
+        <span class="anti-label">✅ BETTER</span>
+        <h3>YAGNI を意識する</h3>
+        <p>「You Aren't Gonna Need It」— 今必要なものだけ作る。拡張性は意識しつつ、実装は最小限に。</p>
+      </div>
+      <div class="anti-card bad">
+        <span class="anti-label">❌ ANTI-PATTERN</span>
+        <h3>🔒 ベンダーロックイン</h3>
+        <p>特定サービスに依存しすぎて、後から乗り換えられなくなる。コストが上がっても逃げ場がない。</p>
+      </div>
+      <div class="anti-card good">
+        <span class="anti-label">✅ BETTER</span>
+        <h3>抽象化レイヤーを挟む</h3>
+        <p>外部サービスとの接続部分を抽象化しておく。AIのAPI変更にも、DB移行にも柔軟に対応できる。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9. SUMMARY ===== -->
+<section class="cta-section" id="summary">
+  <div class="section-inner">
+    <h2>まとめ</h2>
+    <p class="cta-sub">
+      アーキテクチャ設計と技術選定は「正解を当てる」ゲームではない。<br>
+      チームの状況とプロダクトの要件から「最善の判断」を導くプロセス。
+    </p>
+    <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-bottom:40px;">
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px 24px; text-align:center; min-width:140px;">
+        <div style="font-size:28px; margin-bottom:8px;">🖼️</div>
+        <div style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.7);">全体像を<br>一枚の絵に</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px 24px; text-align:center; min-width:140px;">
+        <div style="font-size:28px; margin-bottom:8px;">⚖️</div>
+        <div style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.7);">トレードオフを<br>意識的に選ぶ</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px 24px; text-align:center; min-width:140px;">
+        <div style="font-size:28px; margin-bottom:8px;">🗣️</div>
+        <div style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.7);">WHYを<br>説明できる</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px 24px; text-align:center; min-width:140px;">
+        <div style="font-size:28px; margin-bottom:8px;">🔄</div>
+        <div style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.7);">あとから<br>変えてもOK</div>
+      </div>
+    </div>
+    <p style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:18px; color:rgba(255,255,255,0.85);">
+      次は、ワークショップで<br>「ありがとうカード」の解決案を描こう 🚀
+    </p>
+    <a href="../work/workshop_facilitation.html" style="display:inline-block; margin-top:20px; padding:12px 32px; background:linear-gradient(135deg, var(--coral), var(--orange)); color:#fff; text-decoration:none; border-radius:30px; font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:15px; transition:transform 0.3s;">
+      ワークショップ資料へ →
+    </a>
+  </div>
+</section>
+
+<script>
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('nav a');
+  const pageCounter = document.querySelector('.page-counter');
+  const currentPageEl = document.getElementById('currentPage');
+  const darkSections = new Set(['hero', 'arch', 'nfr', 'summary']);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const inner = entry.target.querySelector('.section-inner');
+        if (inner) inner.classList.add('visible');
+        const id = entry.target.id;
+        const index = [...sections].indexOf(entry.target);
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`nav a[href="#${id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+        currentPageEl.textContent = index + 1;
+        if (darkSections.has(id)) {
+          pageCounter.classList.add('light');
+        } else {
+          pageCounter.classList.remove('light');
+        }
+      }
+    });
+  }, { threshold: 0.45 });
+
+  sections.forEach(section => observer.observe(section));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -29,7 +29,7 @@ FREEMIND社の社内感謝カードWebアプリ「ありがとうカード」プ
 2. 質問で明確化    → AIに不明点を質問させ、要件を固める
 3. 生成           → 要件が固まったらページを生成させる
 4. レビュー・修正  → 出力を確認し、フィードバックで調整する
-5. 仕上げ         → index.htmlへのカード追加・スキル参照の検討
+5. 仕上げ         → documents.jsonへの追加・ビルド・スキル参照の検討
 ```
 
 ### プロンプトのコツ
@@ -82,13 +82,14 @@ docs/kickoff.html のようなプレゼン形式で作成してください。
 
 ページが完成したら、以下を忘れずに行います。これもAIに依頼できます。
 
-1. **index.html にカードを追加する**（[手動での追加方法](#2-indexhtml-にカードを追加する)も参照）
-2. **スキル参照への追加を検討する**（[判断基準](#4-スキル参照への追加を検討する)を参照）
+1. **documents.json にエントリを追加する**（[追加方法](#2-documentsjson-にエントリを追加する)も参照）
+2. **`deno task build` で index.html を再生成する**
+3. **スキル参照への追加を検討する**（[判断基準](#4-スキル参照への追加を検討する)を参照）
 
 Claude Code で作業している場合は、以下のように一括で依頼できます:
 
 ```
-作成したページを index.html に追加し、スキル参照への追加が必要か判断してください。
+作成したページを documents.json に追加し、index.html を再生成してください。スキル参照への追加が必要かも判断してください。
 ```
 
 ---
@@ -96,41 +97,42 @@ Claude Code で作業している場合は、以下のように一括で依頼�
 ## リポジトリ構成
 
 ```
-├── index.html                  # ドキュメントポータル（トップページ）
+├── index.html                  # ドキュメントポータル（自動生成・直接編集しない）
+├── documents.json              # ドキュメントメタデータ（グループ・カード情報）
+├── deno.json                   # Deno タスク設定
+├── scripts/
+│   ├── build-index.ts          # index.html 生成スクリプト
+│   └── index.template.html     # index.html の HTML/CSS テンプレート
 ├── docs/                       # プレゼン・ガイド形式のHTMLドキュメント
-│   ├── kickoff.html
-│   ├── dev-guide.html
-│   ├── team.html
-│   ├── inception-deck.html
-│   ├── design-guideline.html
-│   ├── design-system-intro.html
-│   └── agent-skills-guide.html
+├── work/                       # ワークシート・ワークショップ形式の資料
 ├── references/                 # 補足資料・リファレンス
-├── work/                       # ワークシート形式の資料
+├── .github/workflows/
+│   └── deploy.yml              # GitHub Pages 自動デプロイ
 ├── skills/thanks-card-overview/ # AIエージェント向けスキル定義
 │   ├── SKILL.md
-│   └── references/             # スキルが参照するMarkdownドキュメント
+│   └── references/
 └── CLAUDE.md                   # Claude Code向けプロジェクト設定
 ```
 
 ## 技術スタック
 
-- **ビルドシステムなし** — HTML / CSS / JS のみ。bundler・package manager 不要
+- **Deno** — `deno task build` で `documents.json` + テンプレートから `index.html` を自動生成
+- **GitHub Actions** — main push 時に自動ビルド＋GitHub Pages デプロイ
 - 各HTMLページは **自己完結**（`<style>` `<script>` をインライン記述、共有CSS/JSなし）
 - フォント: Google Fonts CDN — Zen Maru Gothic, Noto Sans JP, Montserrat, DM Sans
 - 言語: すべて日本語 (`lang="ja"`)
 
-## ドキュメントの手動追加
-
-AIを使わずに手動で追加する場合の手順です。
+## ドキュメントの追加
 
 ### 1. HTMLファイルを作成する
 
-`docs/` ディレクトリに新しいHTMLファイルを作成します。
+適切なディレクトリに新しいHTMLファイルを作成します。
 
-```
-docs/my-new-doc.html
-```
+| ディレクトリ | 用途 |
+|-------------|------|
+| `docs/` | プレゼン・ガイド形式のドキュメント |
+| `work/` | ワークシート・ワークショップ資料 |
+| `references/` | 補足資料・リファレンス |
 
 **基本ルール:**
 
@@ -154,54 +156,35 @@ docs/my-new-doc.html
 - フォント: 見出し `Zen Maru Gothic`、本文 `Noto Sans JP`、英字ラベル `Montserrat`
 - アニメーション easing: `cubic-bezier(0.22, 1, 0.36, 1)`
 
-### 2. index.html にカードを追加する
+### 2. documents.json にエントリを追加する
 
-`index.html` を開き、該当するセクションの `.doc-grid` 内にカードを追加します。
+`documents.json` の `documents` 配列に新しいエントリを追加します。`index.html` は直接編集しません。
 
-**カードのテンプレート:**
-
-```html
-<a class="doc-card" data-color="sky" href="./docs/my-new-doc.html">
-  <span class="doc-card-icon">📄</span>
-  <span class="doc-card-badge">BADGE</span>
-  <h3>ドキュメントタイトル</h3>
-  <p>ドキュメントの概要説明。</p>
-  <div class="doc-card-meta">
-    <span>📄 補足情報</span>
-    <div class="doc-card-arrow">→</div>
-  </div>
-</a>
+```json
+{
+  "title": "ドキュメントタイトル",
+  "path": "./docs/my-new-doc.html",
+  "group": "dev",
+  "icon": "📄",
+  "badge": "BADGE",
+  "color": "sky",
+  "description": "ドキュメントの概要説明。",
+  "meta": ["📄 補足情報"],
+  "order": 1
+}
 ```
 
-**`data-color` の選択肢:** `coral` / `sky` / `mint` / `purple` / `orange`
+- **`group`**: 既存グループの `id`（`project` / `dev` / `sprint0` など）から選ぶ
+- **`color`**: `coral` / `sky` / `mint` / `purple` / `orange`
+- **`comingSoon: true`**: 未公開カード（グレーアウト表示）
 
-### 3. 配置するセクション（グループ）を選ぶ
+新しいグループが必要な場合は `groups` 配列にも追加します。
 
-| グループ | ラベル | 用途 |
-|---------|--------|------|
-| プロジェクト概要 | `PROJECT` | プロジェクトの「今」を表すドキュメント（体制図、インセプションデッキなど） |
-| 開発ガイド | `DEVELOPMENT` | 開発プロセス・手法に関するガイドやテンプレート |
-| Sprint N | `SPRINT N` | 各スプリントで作成・使用した資料 |
+### 3. index.html を再生成する
 
-既存グループに合わない場合は新しいセクションを追加できます。
-
-**新しいセクションのテンプレート:**
-
-```html
-<div class="section" data-theme="reference">
-  <div class="section-header">
-    <span class="section-label">LABEL</span>
-    <span class="section-title">セクションタイトル</span>
-  </div>
-  <p class="section-desc">セクションの説明文。</p>
-  <div class="doc-grid">
-    <!-- ここにカードを配置 -->
-  </div>
-</div>
+```bash
+deno task build
 ```
-
-- `data-theme`: `project` / `dev` / `reference` から選択（新テーマの場合は `.section[data-theme="..."] .section-label` のCSSも追加）
-- セクションが増えた場合、`.section:nth-child(N)` のアニメーション遅延CSSを追加する
 
 ### 4. スキル参照への追加を検討する
 
@@ -220,17 +203,19 @@ docs/my-new-doc.html
 
 ## ローカルでの確認
 
-ビルド不要です。HTMLファイルをブラウザで直接開くか、簡易サーバーを起動して確認します。
-
 ```bash
-# Python
-python3 -m http.server 8000
+# index.html を生成（初回 or documents.json 変更時）
+deno task build
 
-# Node.js (npx)
+# 簡易サーバーで確認
+python3 -m http.server 8000
+# または
 npx serve .
 ```
 
 `http://localhost:8000` にアクセスすると `index.html` が表示されます。
+
+個別のHTMLページ（`docs/`, `work/` 内のファイル）はビルド不要でブラウザで直接開けます。
 
 ## ライセンス
 

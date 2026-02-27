@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ありがとうカード — 解決案を描く ワークショップ</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --dark-sub: #2d2d4a;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.8;
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  nav a {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--text);
+    opacity: 0.2;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: block;
+    position: relative;
+  }
+
+  nav a.active {
+    opacity: 1;
+    transform: scale(1.4);
+    background: var(--coral);
+  }
+
+  nav a::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  nav a:hover::after { opacity: 1; }
+
+  /* ===== SECTIONS ===== */
+  section {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .section-inner.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--dark);
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(255,107,107,0.15), transparent),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(255,165,82,0.12), transparent),
+      radial-gradient(ellipse 400px 300px at 50% 50%, rgba(255,217,61,0.08), transparent);
+  }
+
+  .hero .section-inner { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--coral), var(--orange));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 30px;
+    letter-spacing: 0.08em;
+    margin-bottom: 32px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .hero h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, #ffd6d6 50%, #ffe8c2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    margin-bottom: 40px;
+    line-height: 1.9;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .hero-meta-item span { font-size: 18px; }
+
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    animation: fadeInUp 1s 1.2s both;
+  }
+
+  .scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid rgba(255,255,255,0.35);
+    border-bottom: 2px solid rgba(255,255,255,0.35);
+    transform: rotate(45deg);
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: rotate(45deg) translateY(0); }
+    30% { transform: rotate(45deg) translateY(6px); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 120px;
+    line-height: 1;
+    opacity: 0.06;
+    position: absolute;
+    top: 40px;
+    left: 60px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 3.5vw, 40px);
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
+  .lead {
+    font-size: 15px;
+    color: var(--text-light);
+    max-width: 800px;
+    margin-bottom: 36px;
+    line-height: 1.9;
+  }
+
+  /* ===== SECTION THEMES ===== */
+  .light-section { background: var(--cream); }
+  .light-section .section-tag { background: rgba(77,150,255,0.1); color: var(--sky); }
+
+  .alt-section { background: linear-gradient(180deg, #eef6ff, #f0f0ff); }
+  .alt-section .section-tag { background: rgba(155,114,207,0.12); color: var(--purple); }
+
+  .warm-section { background: linear-gradient(180deg, #fff8f0, #fff0e6); }
+  .warm-section .section-tag { background: rgba(255,165,82,0.12); color: var(--orange); }
+
+  .green-section { background: var(--cream); }
+  .green-section .section-tag { background: rgba(107,203,119,0.12); color: var(--mint); }
+
+  .dark-section {
+    background: var(--dark);
+    color: #fff;
+  }
+  .dark-section .section-num { color: #fff; opacity: 0.04; }
+  .dark-section .section-tag { background: rgba(255,217,61,0.15); color: var(--yellow); }
+  .dark-section .lead { color: rgba(255,255,255,0.55); }
+  .dark-section h2 { color: #fff; }
+
+  .coral-dark-section {
+    background: var(--dark);
+    color: #fff;
+  }
+  .coral-dark-section .section-num { color: #fff; opacity: 0.04; }
+  .coral-dark-section .section-tag { background: rgba(255,107,107,0.15); color: var(--coral); }
+  .coral-dark-section .lead { color: rgba(255,255,255,0.55); }
+  .coral-dark-section h2 { color: #fff; }
+
+  /* ===== AGENDA ===== */
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .agenda-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    text-align: center;
+    transition: transform 0.3s;
+    position: relative;
+  }
+
+  .agenda-item:hover { transform: translateY(-4px); }
+
+  .agenda-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .agenda-item:nth-child(1)::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .agenda-item:nth-child(2)::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .agenda-item:nth-child(3)::before { background: linear-gradient(90deg, var(--purple), var(--coral)); }
+  .agenda-item:nth-child(4)::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+
+  .agenda-time {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+
+  .agenda-item:nth-child(1) .agenda-time { color: var(--sky); }
+  .agenda-item:nth-child(2) .agenda-time { color: var(--coral); }
+  .agenda-item:nth-child(3) .agenda-time { color: var(--purple); }
+  .agenda-item:nth-child(4) .agenda-time { color: var(--mint); }
+
+  .agenda-icon { font-size: 32px; margin-bottom: 10px; }
+
+  .agenda-item h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .agenda-item p {
+    font-size: 12px;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  /* ===== DISCUSS PROMPT ===== */
+  .discuss-prompt {
+    background: linear-gradient(135deg, var(--dark), #2a2a50);
+    border-radius: 20px;
+    padding: 36px 40px;
+    color: #fff;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .discuss-prompt::before {
+    content: '💬';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    font-size: 80px;
+    opacity: 0.06;
+  }
+
+  .discuss-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    background: rgba(255,107,107,0.2);
+    color: var(--coral);
+  }
+
+  .discuss-prompt h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .discuss-prompt p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.8;
+  }
+
+  .discuss-questions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .discuss-q {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    transition: background 0.3s;
+  }
+
+  .discuss-q:hover { background: rgba(255,255,255,0.1); }
+
+  .discuss-q-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== OPTION CARDS ===== */
+  .option-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .option-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s;
+    cursor: default;
+  }
+
+  .option-card:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-3px);
+  }
+
+  .option-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .option-card:nth-child(1) .option-label { background: rgba(77,150,255,0.2); color: var(--sky); }
+  .option-card:nth-child(2) .option-label { background: rgba(155,114,207,0.2); color: var(--purple); }
+  .option-card:nth-child(3) .option-label { background: rgba(255,107,107,0.2); color: var(--coral); }
+  .option-card:nth-child(4) .option-label { background: rgba(107,203,119,0.2); color: var(--mint); }
+
+  .option-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .option-card p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+  }
+
+  .option-card .pros-cons {
+    margin-top: 12px;
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .option-card .pro { color: var(--mint); }
+  .option-card .con { color: var(--coral); }
+
+  /* ===== CHECKLIST ===== */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .check-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+    transition: transform 0.3s;
+  }
+
+  .check-item:hover { transform: translateX(4px); }
+
+  .check-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .check-item:nth-child(1) .check-icon { background: rgba(77,150,255,0.12); }
+  .check-item:nth-child(2) .check-icon { background: rgba(255,107,107,0.12); }
+  .check-item:nth-child(3) .check-icon { background: rgba(155,114,207,0.12); }
+  .check-item:nth-child(4) .check-icon { background: rgba(107,203,119,0.12); }
+  .check-item:nth-child(5) .check-icon { background: rgba(255,165,82,0.12); }
+  .check-item:nth-child(6) .check-icon { background: rgba(255,217,61,0.12); }
+
+  .check-item h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .check-item p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== SYSTEM DIAGRAM ===== */
+  .system-diagram {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 36px;
+    margin-top: 8px;
+  }
+
+  .sys-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sys-node {
+    border-radius: 12px;
+    padding: 14px 22px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 130px;
+    transition: transform 0.3s;
+  }
+
+  .sys-node:hover { transform: scale(1.05); }
+
+  .sys-node.user { background: rgba(255,217,61,0.15); border: 1px solid rgba(255,217,61,0.25); color: var(--yellow); }
+  .sys-node.front { background: rgba(77,150,255,0.15); border: 1px solid rgba(77,150,255,0.25); color: var(--sky); }
+  .sys-node.back { background: rgba(155,114,207,0.15); border: 1px solid rgba(155,114,207,0.25); color: var(--purple); }
+  .sys-node.db { background: rgba(255,165,82,0.15); border: 1px solid rgba(255,165,82,0.25); color: var(--orange); }
+  .sys-node.ai { background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.25); color: var(--coral); }
+  .sys-node.auth { background: rgba(107,203,119,0.15); border: 1px solid rgba(107,203,119,0.25); color: var(--mint); }
+
+  .sys-arrow {
+    font-size: 18px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  .sys-label {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* ===== DECISION MATRIX ===== */
+  .decision-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    margin-top: 8px;
+  }
+
+  .decision-table th {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .decision-table th:first-child { text-align: left; }
+
+  .decision-table td {
+    background: #fff;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    text-align: center;
+    color: var(--text-light);
+  }
+
+  .decision-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+  }
+
+  .decision-table tr:last-child td { border-bottom: none; }
+
+  .cell-highlight {
+    background: rgba(107,203,119,0.08) !important;
+    color: var(--mint) !important;
+    font-weight: 600;
+  }
+
+  /* ===== INSIGHT BOX ===== */
+  .insight-box {
+    margin-top: 28px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--sky);
+  }
+
+  .dark-section .insight-box,
+  .coral-dark-section .insight-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 4px solid var(--yellow);
+  }
+
+  .insight-box p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .dark-section .insight-box p,
+  .coral-dark-section .insight-box p {
+    color: rgba(255,255,255,0.65);
+  }
+
+  .insight-box strong { color: var(--text); }
+  .dark-section .insight-box strong,
+  .coral-dark-section .insight-box strong { color: #fff; }
+
+  /* ===== TIMER BANNER ===== */
+  .timer-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,107,107,0.1);
+    border: 1px solid rgba(255,107,107,0.15);
+    border-radius: 30px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--coral);
+    margin-bottom: 20px;
+  }
+
+  .dark-section .timer-banner,
+  .coral-dark-section .timer-banner {
+    background: rgba(255,107,107,0.15);
+    border-color: rgba(255,107,107,0.2);
+  }
+
+  /* ===== CTA SECTION ===== */
+  .cta-section {
+    background: var(--dark);
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 500px 400px at 30% 60%, rgba(107,203,119,0.12), transparent),
+      radial-gradient(ellipse 600px 400px at 70% 40%, rgba(255,107,107,0.1), transparent);
+  }
+
+  .cta-section .section-inner { position: relative; z-index: 1; }
+
+  .cta-section h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff, #ffd6d6, #ffe8c2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cta-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+  }
+
+  .next-steps {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .next-step {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 18px 24px;
+    text-align: center;
+    min-width: 150px;
+  }
+
+  .next-step-icon { font-size: 28px; margin-bottom: 8px; }
+  .next-step-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ===== CARDS ===== */
+  .cards-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+
+  .card.sky::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .card.coral::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .card.mint::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .card.purple::before { background: linear-gradient(90deg, var(--purple), var(--coral)); }
+
+  .card-icon { font-size: 36px; margin-bottom: 14px; display: block; }
+
+  .card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 10px;
+  }
+
+  .card p {
+    font-size: 13.5px;
+    color: var(--text-light);
+    line-height: 1.75;
+  }
+
+  /* ===== PAGE COUNTER ===== */
+  .page-counter {
+    position: fixed;
+    bottom: 24px;
+    left: 32px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0.3;
+    z-index: 100;
+    transition: color 0.4s;
+  }
+
+  .page-counter.light { color: #fff; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    section { padding: 40px 24px; }
+    .section-num { font-size: 72px; top: 20px; left: 20px; }
+    .agenda-grid, .option-grid, .cards-2col { grid-template-columns: 1fr; }
+    nav { right: 12px; }
+    .hero-meta { flex-direction: column; align-items: center; gap: 12px; }
+    .sys-row { flex-direction: column; }
+    .sys-arrow { transform: rotate(90deg); }
+    .next-steps { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#hero" data-label="Top" class="active"></a>
+  <a href="#agenda" data-label="アジェンダ"></a>
+  <a href="#confirm" data-label="前提確認"></a>
+  <a href="#diagram" data-label="全体像を描く"></a>
+  <a href="#frontend" data-label="フロントエンド"></a>
+  <a href="#backend" data-label="バックエンド"></a>
+  <a href="#infra" data-label="インフラ・DB"></a>
+  <a href="#matrix" data-label="意思決定マトリクス"></a>
+  <a href="#output" data-label="アウトプット確認"></a>
+  <a href="#next" data-label="ネクストステップ"></a>
+</nav>
+
+<div class="page-counter"><span id="currentPage">1</span> / 10</div>
+
+<!-- ===== 1. HERO ===== -->
+<section class="hero" id="hero">
+  <div class="section-inner visible">
+    <div class="hero-badge">🔧 ワークショップ編</div>
+    <h1>解決案を描く</h1>
+    <p class="hero-sub">
+      ありがとうカードの「設計図」と「技術スタック」を<br>
+      オーナーシップを持つ4人で叩き台にまとめるワークショップ。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span>⏱</span> 75分</div>
+      <div class="hero-meta-item"><span>👥</span> エンジニア5名</div>
+      <div class="hero-meta-item"><span>🎯</span> 叩き台完成</div>
+      <div class="hero-meta-item"><span>🎙️</span> ファシリテーター: PO</div>
+    </div>
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2. AGENDA ===== -->
+<section class="light-section" id="agenda">
+  <div class="section-num">01</div>
+  <div class="section-inner">
+    <span class="section-tag">AGENDA</span>
+    <h2>今日の流れ</h2>
+    <p class="lead">
+      75分で叩き台を作り、その後メンバーに共有してフィードバックをもらいます。
+    </p>
+    <div class="agenda-grid">
+      <div class="agenda-item">
+        <div class="agenda-time">0:00–0:10</div>
+        <div class="agenda-icon">🧭</div>
+        <h3>前提確認</h3>
+        <p>要件・制約の<br>認識合わせ</p>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">0:10–0:30</div>
+        <div class="agenda-icon">🖼️</div>
+        <h3>全体像を描く</h3>
+        <p>システム構成図の<br>ドラフト作成</p>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">0:30–1:05</div>
+        <div class="agenda-icon">🔧</div>
+        <h3>技術選定</h3>
+        <p>各レイヤーの<br>技術を議論・決定</p>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">1:05–1:15</div>
+        <div class="agenda-icon">📋</div>
+        <h3>まとめ</h3>
+        <p>決定事項と<br>ネクストアクション</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>今日のゴール：</strong>メンバー全体に見せられる「アーキテクチャ設計図 + 技術スタック」の叩き台を作ること。完璧じゃなくていい。フィードバックをもらって磨くための出発点。</p>
+      <p style="margin-top:12px; font-size:13px; color:var(--text-light);">🎙️ <strong style="color:var(--text);">ファシリテーター：PO</strong> — 議論が分かれた場合の最終判断はPOが行います。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3. CONFIRM ===== -->
+<section class="dark-section" id="confirm">
+  <div class="section-num">02</div>
+  <div class="section-inner">
+    <span class="section-tag">CONFIRM</span>
+    <h2>前提を揃える</h2>
+    <p class="lead">
+      技術選定に入る前に、全員で確認しておくべきこと。<br>
+      ここがズレていると、あとの議論が空中戦になる。
+    </p>
+    <div class="timer-banner">⏱ 10分</div>
+    <div class="discuss-prompt">
+      <span class="discuss-label">🔍 CONFIRM</span>
+      <h3>まず、認識を合わせよう</h3>
+      <p>以下の項目について、チームの認識にズレがないか確認します。</p>
+      <div class="discuss-questions">
+        <div class="discuss-q">
+          <span class="discuss-q-icon">👤</span>
+          <span><strong>ユーザー規模：</strong>全社60名が対象。同時アクセスは最大どのくらいを想定する？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🔐</span>
+          <span><strong>認証：</strong>社内アプリの認証方式は？既存の社内認証基盤はある？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🤖</span>
+          <span><strong>AIのAPI：</strong>利用するLLM（Claude, GPTなど）と、APIの制約（レート制限・コスト）は？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">💰</span>
+          <span><strong>予算・インフラ制約：</strong>月額のランニングコスト上限は？社内サーバーの利用可否は？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">📱</span>
+          <span><strong>利用環境：</strong>PC only？スマホ対応は必要？社内ネットワーク限定？</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4. SYSTEM DIAGRAM ===== -->
+<section class="coral-dark-section" id="diagram">
+  <div class="section-num">03</div>
+  <div class="section-inner">
+    <span class="section-tag">SYSTEM OVERVIEW</span>
+    <h2>全体像を描こう</h2>
+    <p class="lead">
+      ありがとうカードのシステム全体をざっくり図にする。<br>
+      細かい技術名はまだ入れない。まず「何がどこにあるか」を決める。
+    </p>
+    <div class="timer-banner">⏱ 20分</div>
+    <div class="system-diagram">
+      <div class="sys-label">— ユーザー —</div>
+      <div class="sys-row">
+        <div class="sys-node user">👤 ブラウザ</div>
+      </div>
+      <div class="sys-row"><div class="sys-arrow">↕️</div></div>
+      <div class="sys-label">— プレゼンテーション層 —</div>
+      <div class="sys-row">
+        <div class="sys-node front">🖥️ フロントエンド<br><small>UI / SPA</small></div>
+      </div>
+      <div class="sys-row"><div class="sys-arrow">↕️</div></div>
+      <div class="sys-label">— ビジネスロジック層 —</div>
+      <div class="sys-row">
+        <div class="sys-node back">⚙️ APIサーバー<br><small>REST / GraphQL</small></div>
+        <div class="sys-arrow">↔️</div>
+        <div class="sys-node ai">🤖 LLM API<br><small>コンピテンシー判定</small></div>
+      </div>
+      <div class="sys-row"><div class="sys-arrow">↕️</div></div>
+      <div class="sys-label">— データ層 —</div>
+      <div class="sys-row">
+        <div class="sys-node db">🗄️ データベース<br><small>カード・ユーザー</small></div>
+        <div class="sys-arrow">↔️</div>
+        <div class="sys-node auth">🔐 認証<br><small>ユーザー管理</small></div>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>これは叩き台の叩き台です。</strong>Figmaやdraw.ioを開いて、この構成をベースにチームで手を動かしながら描きましょう。「ここにもう1つ必要では？」「これは分けなくていい？」を議論しながら。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5. FRONTEND ===== -->
+<section class="light-section" id="frontend">
+  <div class="section-num">04</div>
+  <div class="section-inner">
+    <span class="section-tag">FRONTEND</span>
+    <h2>フロントエンドの選択</h2>
+    <p class="lead">
+      ユーザーが直接触る部分。UIの表現力・開発体験・学習コストのバランスで選ぶ。
+    </p>
+    <div class="timer-banner">⏱ 10分</div>
+    <div class="discuss-prompt">
+      <span class="discuss-label">💬 DISCUSSION</span>
+      <h3>フロントエンド、何を使う？</h3>
+      <p>以下の観点で議論しましょう。</p>
+      <div class="discuss-questions">
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🎓</span>
+          <span>チームで一番触れる人が多いフレームワークは？ 全く未経験のものは避けるべき？それとも学びの機会と捉える？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">📱</span>
+          <span>SPAでいくか、SSRが必要か？ 社内アプリなのでSEOは不要。パフォーマンスとUXの観点で判断。</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🎨</span>
+          <span>UIライブラリ / CSSフレームワークはどうする？ Tailwind? MUI? shadcn/ui? 自前？</span>
+        </div>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>判断の軸：</strong>「半年後のMVPに間に合うか」と「メンバー全員が触れるか」。理想の技術スタックと、現実的に動かせるスタックのバランスを取ろう。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6. BACKEND ===== -->
+<section class="dark-section" id="backend">
+  <div class="section-num">05</div>
+  <div class="section-inner">
+    <span class="section-tag">BACKEND</span>
+    <h2>バックエンドとAI連携の選択</h2>
+    <p class="lead">
+      ビジネスロジックの心臓部。特に「AIラベリング」の実装方法がこのプロダクトの肝。
+    </p>
+    <div class="timer-banner">⏱ 15分</div>
+    <div class="discuss-prompt">
+      <span class="discuss-label">💬 DISCUSSION</span>
+      <h3>バックエンドとAI、どう組む？</h3>
+      <p>以下の観点で議論しましょう。</p>
+      <div class="discuss-questions">
+        <div class="discuss-q">
+          <span class="discuss-q-icon">⚙️</span>
+          <span><strong>言語とフレームワーク：</strong>Node.js (Express/Hono)? Python (FastAPI)? フロントと言語を揃えるメリット vs Pythonの生成AIライブラリの充実度</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🤖</span>
+          <span><strong>AIラベリングのタイミング：</strong>送信時にリアルタイムで判定？ 送信後に非同期で処理？ UXとコストのトレードオフ</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">📡</span>
+          <span><strong>API設計：</strong>REST? GraphQL? 社内アプリでGraphQLは過剰？ シンプルなRESTで十分？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🔀</span>
+          <span><strong>フルスタックフレームワーク：</strong>Next.js API Routes / Nuxt Server Routes のように、フロントと一体化する選択肢もある。分けるか、まとめるか？</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7. INFRA & DB ===== -->
+<section class="alt-section" id="infra">
+  <div class="section-num">06</div>
+  <div class="section-inner">
+    <span class="section-tag">INFRASTRUCTURE & DATABASE</span>
+    <h2>インフラとデータベースの選択</h2>
+    <p class="lead">
+      どこに置くか、データをどう保存するか。運用コストと管理の手軽さがカギ。
+    </p>
+    <div class="timer-banner">⏱ 10分</div>
+    <div class="cards-2col">
+      <div class="card sky">
+        <span class="card-icon">🗄️</span>
+        <h3>データベース</h3>
+        <p>カード、ユーザー、コンピテンシーの関係を考えると、RDB（PostgreSQL/MySQL）が素直。NoSQLにする理由はあるか？</p>
+      </div>
+      <div class="card coral">
+        <span class="card-icon">☁️</span>
+        <h3>ホスティング</h3>
+        <p>Vercel, Render, Railway, AWS, GCP, 社内サーバー… 無料枠・デプロイの容易さ・チームの経験値で選ぶ。</p>
+      </div>
+      <div class="card purple">
+        <span class="card-icon">🔐</span>
+        <h3>認証</h3>
+        <p>社内認証（SSO/LDAP）があるなら連携。なければ Auth0, Clerk, Firebase Auth, 自前実装？</p>
+      </div>
+      <div class="card mint">
+        <span class="card-icon">🚀</span>
+        <h3>CI/CD</h3>
+        <p>GitHub Actions? Vercelの自動デプロイ? MVPとしてどこまで自動化する？</p>
+      </div>
+    </div>
+    <div class="discuss-prompt" style="margin-top:24px;">
+      <span class="discuss-label">💬 DISCUSSION</span>
+      <h3>「運用できるか」で選ぼう</h3>
+      <div class="discuss-questions">
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🏢</span>
+          <span>社内のインフラ制約は？ VPNの中でしか使えない？ 外部サービスへの接続制限は？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">💰</span>
+          <span>ランニングコストの上限を踏まえて、現実的な選択肢はどれ？</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8. DECISION MATRIX ===== -->
+<section class="warm-section" id="matrix">
+  <div class="section-num">07</div>
+  <div class="section-inner">
+    <span class="section-tag">DECISION MATRIX</span>
+    <h2>意思決定マトリクス</h2>
+    <p class="lead">
+      議論した内容を整理するためのフレーム。<br>
+      候補を並べて、判断基準ごとに◎○△で評価すると合意形成しやすい。
+    </p>
+    <table class="decision-table">
+      <thead>
+        <tr>
+          <th>カテゴリ</th>
+          <th>候補A</th>
+          <th>候補B</th>
+          <th>候補C</th>
+          <th>決定</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🖥️ フロントエンド</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td class="cell-highlight">→</td>
+        </tr>
+        <tr>
+          <td>⚙️ バックエンド</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td class="cell-highlight">→</td>
+        </tr>
+        <tr>
+          <td>🗄️ データベース</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td>—</td>
+          <td class="cell-highlight">→</td>
+        </tr>
+        <tr>
+          <td>☁️ ホスティング</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td class="cell-highlight">→</td>
+        </tr>
+        <tr>
+          <td>🔐 認証</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td>—</td>
+          <td class="cell-highlight">→</td>
+        </tr>
+        <tr>
+          <td>🤖 AI（LLM）</td>
+          <td>（候補を入れる）</td>
+          <td>（候補を入れる）</td>
+          <td>—</td>
+          <td class="cell-highlight">→</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="insight-box">
+      <p>💡 <strong>評価基準の例：</strong>チームの経験値・学習コスト・要件適合性・コスト・エコシステム。全部◎は存在しない。「何を優先するか」を明示して選ぶこと。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9. OUTPUT CHECK ===== -->
+<section class="green-section" id="output">
+  <div class="section-num">08</div>
+  <div class="section-inner">
+    <span class="section-tag">OUTPUT CHECK</span>
+    <h2>叩き台の完成チェック</h2>
+    <p class="lead">
+      75分が終わったとき、以下が手元にあるか確認しましょう。<br>
+      全部揃っていなくてもOK。「何が決まっていないか」がわかっていれば十分。
+    </p>
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-icon">🖼️</div>
+        <div>
+          <h3>システム構成図（ラフ）</h3>
+          <p>draw.io で描いたアーキテクチャの全体像。ユーザー → フロント → バックエンド → DB → AI の流れが見えること。</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">🔧</div>
+        <div>
+          <h3>技術スタック一覧</h3>
+          <p>各レイヤーで選んだ技術と、その選定理由（WHY）。テンプレートHTMLに記入して共有資料化する。</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">⚠️</div>
+        <div>
+          <h3>未決定事項リスト</h3>
+          <p>「ここはまだ決められなかった」をリストアップ。メンバーへの共有時に「ここの意見がほしい」と伝えるため。</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">📝</div>
+        <div>
+          <h3>議事録</h3>
+          <p>議論の過程と判断の理由を記録。あとから「なぜこの判断をしたか」を振り返れるようにしておく。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 10. NEXT STEPS ===== -->
+<section class="cta-section" id="next">
+  <div class="section-inner">
+    <h2>ネクストステップ</h2>
+    <p class="cta-sub">
+      叩き台ができたら、メンバー全体に共有してフィードバックをもらう。<br>
+      そして最終決定へ。
+    </p>
+    <div class="next-steps">
+      <div class="next-step">
+        <div class="next-step-icon">📤</div>
+        <div class="next-step-text">叩き台を<br>HTML資料化</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-icon">👥</div>
+        <div class="next-step-text">メンバーに<br>共有・FB</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-icon">🔄</div>
+        <div class="next-step-text">FBを反映<br>最終決定</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-icon">🚀</div>
+        <div class="next-step-text">Sprint 0<br>開始</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px 32px; max-width:700px; margin:0 auto 32px; text-align:left;">
+      <p style="font-size:14px; color:rgba(255,255,255,0.6); line-height:1.8;">
+        💡 <strong style="color:#fff;">メンバーへの共有では：</strong><br>
+        「なぜこの構成にしたか」のWHYを伝えること。技術名の羅列ではなく、判断の過程を見せることで、メンバーからのフィードバックの質が上がります。
+      </p>
+    </div>
+    <p style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:20px; color:rgba(255,255,255,0.85);">
+      さあ、描こう 🎉
+    </p>
+  </div>
+</section>
+
+<script>
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('nav a');
+  const pageCounter = document.querySelector('.page-counter');
+  const currentPageEl = document.getElementById('currentPage');
+  const darkSections = new Set(['hero', 'confirm', 'diagram', 'backend', 'next']);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const inner = entry.target.querySelector('.section-inner');
+        if (inner) inner.classList.add('visible');
+        const id = entry.target.id;
+        const index = [...sections].indexOf(entry.target);
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`nav a[href="#${id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+        currentPageEl.textContent = index + 1;
+        if (darkSections.has(id)) {
+          pageCounter.classList.add('light');
+        } else {
+          pageCounter.classList.remove('light');
+        }
+      }
+    });
+  }, { threshold: 0.45 });
+
+  sections.forEach(section => observer.observe(section));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

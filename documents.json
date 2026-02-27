@@ -1,0 +1,173 @@
+{
+  "groups": [
+    {
+      "id": "project",
+      "theme": "project",
+      "label": "PROJECT",
+      "title": "プロジェクト概要",
+      "description": "プロジェクトの現在の姿を表すドキュメントです。変更があれば随時更新されます。",
+      "order": 1
+    },
+    {
+      "id": "dev",
+      "theme": "dev",
+      "label": "DEVELOPMENT",
+      "title": "開発ガイド",
+      "description": "開発プロセスを通して繰り返し参照するガイド・テンプレートです。",
+      "order": 2
+    },
+    {
+      "id": "sprint0",
+      "theme": "reference",
+      "label": "SPRINT 0",
+      "title": "Sprint 0",
+      "description": "Sprint 0 で作成・使用した資料です。当時の内容がそのまま残っています。",
+      "order": 3
+    }
+  ],
+  "documents": [
+    {
+      "title": "プロジェクト体制図",
+      "path": "./docs/team.html",
+      "group": "project",
+      "icon": "👥",
+      "badge": "TEAM",
+      "color": "mint",
+      "description": "チーム構成・役割分担・コミュニケーションラインを図示した体制資料です。",
+      "meta": ["📄 体制図"],
+      "order": 1
+    },
+    {
+      "title": "インセプションデッキ",
+      "path": "./docs/inception-deck.html",
+      "group": "project",
+      "icon": "🎯",
+      "badge": "DECK",
+      "color": "coral",
+      "description": "プロジェクトの全体像・目的・トレードオフなどをまとめたインセプションデッキです。",
+      "meta": ["📄"],
+      "order": 2
+    },
+    {
+      "title": "開発の進め方ガイド",
+      "path": "./docs/dev-guide.html",
+      "group": "dev",
+      "icon": "📘",
+      "badge": "GUIDE",
+      "color": "sky",
+      "description": "アジャイル開発の進め方、スプリントの回し方、プロジェクト全体の流れを解説しています。",
+      "meta": ["📄 全10スライド＋補足", "⏱ 約10分"],
+      "order": 1
+    },
+    {
+      "title": "Agent Skills 導入ガイド",
+      "path": "./docs/agent-skills-guide.html",
+      "group": "dev",
+      "icon": "🤖",
+      "badge": "SETUP",
+      "color": "purple",
+      "description": "AIエージェントにプロジェクト知識を持たせるための導入・更新手順をまとめたガイドです。",
+      "meta": ["📄 セットアップ手順"],
+      "order": 2
+    },
+    {
+      "title": "デザインシステム入門",
+      "path": "./docs/design-system-intro.html",
+      "group": "dev",
+      "icon": "📖",
+      "badge": "INTRO",
+      "color": "orange",
+      "description": "「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。",
+      "meta": ["📄 入門ガイド"],
+      "order": 3
+    },
+    {
+      "title": "デザインガイドライン",
+      "path": "./docs/design-guideline.html",
+      "group": "dev",
+      "icon": "🎨",
+      "badge": "DESIGN",
+      "color": "purple",
+      "description": "カラー・タイポグラフィ・コンポーネント・パターン・保守ルールをまとめたデザインシステム仕様書。",
+      "meta": ["📄 全6セクション"],
+      "order": 4
+    },
+    {
+      "title": "アーキテクチャ設計と技術選定",
+      "path": "./docs/architecture_and_tech_selection.html",
+      "group": "dev",
+      "icon": "📐",
+      "badge": "GUIDE",
+      "color": "sky",
+      "description": "プロダクトの「設計図」と「道具選び」の考え方を整理した一般論ガイドです。",
+      "meta": ["📄 全9スライド", "⏱ 約10分"],
+      "order": 5
+    },
+    {
+      "title": "議事録テンプレート",
+      "path": "",
+      "group": "dev",
+      "icon": "📝",
+      "badge": "TEMPLATE",
+      "color": "orange",
+      "description": "スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。",
+      "order": 99,
+      "comingSoon": true
+    },
+    {
+      "title": "ありがとうカード キックオフ",
+      "path": "./docs/kickoff.html",
+      "group": "sprint0",
+      "icon": "🚀",
+      "badge": "KICKOFF",
+      "color": "coral",
+      "description": "プロジェクトの背景・ビジョン・つくるもの・進め方をまとめたキックオフ資料です。",
+      "meta": ["📄 全7セクション", "⏱ 約5分"],
+      "order": 1
+    },
+    {
+      "title": "Sprint0前半 補足資料",
+      "path": "./references/sprint0-first-half.html",
+      "group": "sprint0",
+      "icon": "📘",
+      "badge": "INFO",
+      "color": "purple",
+      "description": "Sprint0前半で行われる、インセプションデッキ作成やデザインスプリントに関する補足資料です。",
+      "meta": ["📄"],
+      "order": 2
+    },
+    {
+      "title": "インセプションデッキ ワーク",
+      "path": "./work/create-inceptiondeck.html",
+      "group": "sprint0",
+      "icon": "✏️",
+      "badge": "WORK",
+      "color": "orange",
+      "description": "インセプションデッキを作成するためのワークシート形式の資料です。",
+      "meta": ["📄"],
+      "order": 3
+    },
+    {
+      "title": "解決案を描く ワークショップ",
+      "path": "./work/workshop_facilitation.html",
+      "group": "sprint0",
+      "icon": "🔧",
+      "badge": "WORK",
+      "color": "coral",
+      "description": "アーキテクチャ設計と技術スタックの叩き台を5名で作るワークショップ資料です。",
+      "meta": ["📄 全10スライド", "⏱ 75分"],
+      "order": 4
+    },
+    {
+      "title": "アーキテクチャ設計・技術スタック（叩き台）",
+      "path": "./docs/architecture_decision_draft.html",
+      "group": "sprint0",
+      "icon": "📋",
+      "badge": "TEMPLATE",
+      "color": "mint",
+      "description": "ワークショップの成果を記録するためのテンプレート。技術選定の理由と未決定事項を整理します。",
+      "meta": ["📄 テンプレート"],
+      "order": 5
+    }
+  ]
+}
