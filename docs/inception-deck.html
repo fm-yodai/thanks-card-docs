@@ -128,6 +128,7 @@
   .not-item p { font-size: 12px; color: var(--text-sub); line-height: 1.6; }
   .not-item.later { border-color: rgba(77,150,255,0.2); background: rgba(77,150,255,0.04); }
   .not-item.never { border-color: rgba(255,107,107,0.2); background: rgba(255,107,107,0.04); }
+  .not-item.do { border-color: rgba(107,203,119,0.2); background: rgba(107,203,119,0.04); }
 
   /* ── NEIGHBOR MAP ── */
   .nb { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px 24px; }
@@ -505,24 +506,102 @@
   <h2>やらないことリスト</h2>
   <p class="lead">スコープを守るために「やらないこと」を明確にする。境界線を引くことで、チームが迷わず進める。</p>
 
-  <div class="co co-yellow mb20">
-    <svg class="icon-sm co-i" style="color:var(--yellow)"><use href="#i-message"/></svg>
-    <p><strong>TBD</strong> — チームワークで議論して決定します。</p>
+  <div class="co co-mint mb24" style="border-color:rgba(107,203,119,0.2);background:rgba(107,203,119,0.05);">
+    <svg class="icon-sm co-i" style="color:var(--mint)"><use href="#i-check"/></svg>
+    <p><strong>暫定決定</strong> — チーム議論の結果、以下の通り暫定。</p>
   </div>
 
-  <div class="discuss">
-    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
-    <p>
-      <strong>Q1.</strong> 「これは絶対にやらない」と言い切れるものは何？ その理由は？<br>
-      <strong>Q2.</strong> 「今はやらないが、将来は検討したい」ものはある？ なぜ今ではないのか？<br>
-      <strong>Q3.</strong> ユーザーから「この機能がほしい」と言われたとき、断る基準は何だろう？<br>
-      <strong>Q4.</strong> やらないことを決めるとき、プロジェクトの目的（感謝の文化づくり・若手の成長）に照らして判断できている？
-    </p>
-  </div>
+  <h3 class="mb12">やること（MVPに含める）</h3>
+  <table class="tbl mb24">
+    <thead>
+      <tr><th style="width:28%">機能</th><th>詳細・備考</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="t-label">ログイン</td><td>@freemind.co.jp のGoogleアカウントで認証。ユーザーマスタ自動同期はしない（手動管理）</td></tr>
+      <tr><td class="t-label">宛先選択</td><td>1名 / 複数名 / 未選択（任意）。複数名は1通が全員に届く。未選択＝全体向け投稿（公開必須）</td></tr>
+      <tr><td class="t-label">カード送信</td><td>ありがとうの内容をテキスト入力・送信</td></tr>
+      <tr><td class="t-label">AIバッジ自動付与</td><td>5つのコアコンピテンシーをAIが判定しラベリング。宛先未選択でも付与</td></tr>
+      <tr><td class="t-label">送受信一覧</td><td>自分が送ったカード / 自分に送られたカードを一覧表示</td></tr>
+      <tr><td class="t-label">全体タイムライン</td><td>自分以外のカードも閲覧可能（公開カードのみ）</td></tr>
+      <tr><td class="t-label">メール通知</td><td>カード受信時 + 月1集計通知。批判者層を刺激しない控えめな通知手段として選定</td></tr>
+      <tr><td class="t-label">匿名送信</td><td>受信者には匿名、管理者は確認可能。匿名 × 宛先未選択の組み合わせは禁止（UIガード）</td></tr>
+      <tr><td class="t-label">公開 / 非公開</td><td>非公開＝全体タイムラインに非表示（送受信者のみ閲覧可）。宛先未選択は公開必須（UIガード）</td></tr>
+      <tr><td class="t-label">ゲーミフィケーション</td><td>ありがとうゲージ + 花が咲く演出（連動機能）。内発的動機付けのコア体験</td></tr>
+      <tr><td class="t-label">自己分析</td><td>コンピテンシー集計・自分の強み表示・ありがとうゲージ・月1集計通知</td></tr>
+      <tr><td class="t-label">開封演出</td><td>カード開封時にパッケージデザインに沿ったアニメーション（嬉しくなる演出）</td></tr>
+      <tr><td class="t-label">送信時アニメーション</td><td>カード送信時にパッケージデザインに沿った演出</td></tr>
+    </tbody>
+  </table>
 
-  <!--
-  <h3 class="mb12">やらないこと（MVP以降も対象外）</h3>
+  <h3 class="mb12">後でやること（MVPリリース後に順次追加）</h3>
   <div style="display:flex;flex-direction:column;gap:10px" class="mb24">
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>リアクション（多様な絵文字反応）</h4>
+        <p>他人のありがとうカードに絵文字等で反応できる。MVPではテキスト+AIラベルに集中。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>チームごとのありがとう数の把握・視覚化</h4>
+        <p>データ蓄積後に本格化。何かのサイズが変わるなど視覚的な表現も検討。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>便乗（「私も！」投稿）</h4>
+        <p>他のカードに乗っかって感謝を追加できる機能。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>通知ON/OFF</h4>
+        <p>MVPではメール通知のみ。アプリ内の細かなON/OFFはv2以降。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>お返し機能</h4>
+        <p>カードを送り返す /「カードありがとう♡」など、受信者から送信者へのリアクション。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>リッチな検索</h4>
+        <p>発信者・受信者・カテゴリ・キーワード等による検索。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>AI文章生成</h4>
+        <p>文章を考えるのが苦手な人向けに、AIがありがとうの文面を提案。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>送信者への報酬</h4>
+        <p>いっぱい送った人にいいことがある（物理的な報酬は×）。定着率を見ながら検討。</p>
+      </div>
+    </div>
+    <div class="not-item later">
+      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+      <div>
+        <h4>AIラベリングカスタマイズ</h4>
+        <p>管理者がコンピテンシー定義やラベリングルールを変更できる機能。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mb12">やらないこと（当面対応しない）</h3>
+  <div style="display:flex;flex-direction:column;gap:10px" class="mb20">
     <div class="not-item never">
       <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
@@ -534,46 +613,42 @@
       <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
         <h4>人事評価との連動</h4>
-        <p>気軽に使ってもらうことが最優先。評価と紐づくと、送る側も受け取る側も身構えてしまう。</p>
+        <p>気軽に使ってもらうことが最優先。評価と紐づくと送る側も受け取る側も身構えてしまう。</p>
       </div>
     </div>
-  </div>
-
-  <h3 class="mb12">今はやらないこと（v2以降で検討）</h3>
-  <div style="display:flex;flex-direction:column;gap:10px" class="mb20">
-    <div class="not-item later">
-      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
-        <h4>スタンプ・画像添付 / 複数リアクション</h4>
-        <p>MVPではテキスト+AIラベルに集中。表現の幅はv2以降で段階的に拡充。</p>
+        <h4>スタンプ・イラスト送信 / テンプレート固定</h4>
+        <p>気軽なスタンプや定型テンプレートではなく、自分の言葉で感謝を伝えることを重視。</p>
       </div>
     </div>
-    <div class="not-item later">
-      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
-        <h4>ゲーミフィケーション</h4>
-        <p>利用モチベーション施策は、定着率を見ながら検討する。</p>
+        <h4>いいね♡ / いいね♡ランキング表示</h4>
+        <p>SNS的な「いいね」は人気投票化のリスクがある。多様なリアクションはv2以降で別途検討。</p>
       </div>
     </div>
-    <div class="not-item later">
-      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
-        <h4>部署別月次レポート</h4>
-        <p>データ蓄積後に本格化。MVP段階では送受信とAIラベリングに集中。</p>
+        <h4>通知カスタマイズ（時間帯制御 / ランダム通知）</h4>
+        <p>通知の高度な制御は複雑度が高い。MVPはメール通知のみで十分。</p>
       </div>
     </div>
-    <div class="not-item later">
-      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
-        <h4>個人のコンピテンシー累計表示</h4>
-        <p>個人の評価や比較につながるリスクがある。感謝のハードルを上げてしまう。</p>
+        <h4>案件紐づけ / 多面評価の材料 / 管理者機能</h4>
+        <p>業務管理・人事評価系の機能は本プロジェクトのスコープ外。感謝の文化づくりに集中。</p>
       </div>
     </div>
-    <div class="not-item later">
-      <svg class="icon-not" style="color:var(--sky)"><use href="#i-hourglass"/></svg>
+    <div class="not-item never">
+      <svg class="icon-not" style="color:var(--coral)"><use href="#i-ban"/></svg>
       <div>
-        <h4>ユーザー自動同期（Google Workspace連携）</h4>
-        <p>60名規模なのでMVPでは手動管理。運用負荷が高ければv2で自動化。</p>
+        <h4>アカウント自動同期（Google Workspace連携）</h4>
+        <p>60名規模なので手動管理で対応。認証はGoogleログインを利用するが、ユーザーマスタ同期はしない。</p>
       </div>
     </div>
   </div>
@@ -582,7 +657,6 @@
     <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
     <p>他に「やらない」と明確にしておきたいことはありますか？ 境界が曖昧なものがあれば議論しましょう。</p>
   </div>
-  -->
 </div>
 </div>
 
