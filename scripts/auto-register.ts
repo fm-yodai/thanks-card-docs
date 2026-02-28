@@ -26,7 +26,7 @@ interface Document {
   path: string;
   group: string;
   icon: string;
-  badge: string;
+  badges: string[];
   color: string;
   description: string;
   meta?: string[];
@@ -40,10 +40,10 @@ interface Manifest {
 }
 
 /** ディレクトリごとのデフォルト設定 */
-const DIR_DEFAULTS: Record<string, { badge: string; groupFallback: string }> = {
-  docs: { badge: "DOC", groupFallback: "dev" },
-  work: { badge: "WORK", groupFallback: "" }, // 最新スプリントを動的に決定
-  references: { badge: "INFO", groupFallback: "" },
+const DIR_DEFAULTS: Record<string, { badges: string[]; groupFallback: string }> = {
+  docs: { badges: ["DOC"], groupFallback: "dev" },
+  work: { badges: ["WORK"], groupFallback: "" }, // 最新スプリントを動的に決定
+  references: { badges: ["INFO"], groupFallback: "" },
 };
 
 const SCAN_DIRS = ["docs", "work", "references"];
@@ -145,7 +145,7 @@ try {
           path: relativePath,
           group: groupId,
           icon: "📄",
-          badge: defaults.badge,
+          badges: defaults.badges,
           color: "sky",
           description,
           meta: ["📄"],

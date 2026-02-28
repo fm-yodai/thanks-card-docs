@@ -31,7 +31,7 @@
       "path": "./docs/team.html",
       "group": "project",
       "icon": "👥",
-      "badge": "TEAM",
+      "badges": ["TEAM"],
       "color": "mint",
       "description": "チーム構成・役割分担・コミュニケーションラインを図示した体制資料です。",
       "meta": [
@@ -44,7 +44,7 @@
       "path": "./docs/inception-deck.html",
       "group": "project",
       "icon": "🎯",
-      "badge": "DECK",
+      "badges": ["DECK"],
       "color": "coral",
       "description": "プロジェクトの全体像・目的・トレードオフなどをまとめたインセプションデッキです。",
       "meta": [
@@ -57,7 +57,7 @@
       "path": "./docs/ペルソナ&ユーザージャーニーマップ.html",
       "group": "project",
       "icon": "👤",
-      "badge": "UX",
+      "badges": ["UX", "DESIGN"],
       "color": "orange",
       "description": "ターゲットユーザーのペルソナ像と、カード送受信体験のユーザージャーニーマップです。",
       "meta": [
@@ -70,7 +70,7 @@
       "path": "./docs/dev-guide.html",
       "group": "dev",
       "icon": "📘",
-      "badge": "GUIDE",
+      "badges": ["GUIDE", "AGILE"],
       "color": "sky",
       "description": "アジャイル開発の進め方、スプリントの回し方、プロジェクト全体の流れを解説しています。",
       "meta": [
@@ -84,7 +84,7 @@
       "path": "./docs/agent-skills-guide.html",
       "group": "dev",
       "icon": "🤖",
-      "badge": "SETUP",
+      "badges": ["SETUP", "GUIDE"],
       "color": "purple",
       "description": "AIエージェントにプロジェクト知識を持たせるための導入・更新手順をまとめたガイドです。",
       "meta": [
@@ -97,7 +97,7 @@
       "path": "./docs/design-system-intro.html",
       "group": "dev",
       "icon": "📖",
-      "badge": "INTRO",
+      "badges": ["DESIGN", "GUIDE"],
       "color": "orange",
       "description": "「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。",
       "meta": [
@@ -110,7 +110,7 @@
       "path": "./docs/design-guideline.html",
       "group": "dev",
       "icon": "🎨",
-      "badge": "DESIGN",
+      "badges": ["DESIGN", "GUIDE"],
       "color": "purple",
       "description": "カラー・タイポグラフィ・コンポーネント・パターン・保守ルールをまとめたデザインシステム仕様書。",
       "meta": [
@@ -123,7 +123,7 @@
       "path": "./docs/architecture_and_tech_selection.html",
       "group": "dev",
       "icon": "📐",
-      "badge": "GUIDE",
+      "badges": ["GUIDE", "ARCH"],
       "color": "sky",
       "description": "プロダクトの「設計図」と「道具選び」の考え方を整理した一般論ガイドです。",
       "meta": [
@@ -137,7 +137,7 @@
       "path": "",
       "group": "dev",
       "icon": "📝",
-      "badge": "TEMPLATE",
+      "badges": ["TEMPLATE", "AGILE"],
       "color": "orange",
       "description": "スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。",
       "order": 99,
@@ -148,7 +148,7 @@
       "path": "./docs/kickoff.html",
       "group": "sprint0",
       "icon": "🚀",
-      "badge": "KICKOFF",
+      "badges": ["KICKOFF"],
       "color": "coral",
       "description": "プロジェクトの背景・ビジョン・つくるもの・進め方をまとめたキックオフ資料です。",
       "meta": [
@@ -162,7 +162,7 @@
       "path": "./references/sprint0-first-half.html",
       "group": "sprint0",
       "icon": "📘",
-      "badge": "INFO",
+      "badges": ["INFO"],
       "color": "purple",
       "description": "Sprint0前半で行われる、インセプションデッキ作成やデザインスプリントに関する補足資料です。",
       "meta": [
@@ -175,7 +175,7 @@
       "path": "./work/create-inceptiondeck.html",
       "group": "sprint0",
       "icon": "✏️",
-      "badge": "WORK",
+      "badges": ["WORK", "DECK"],
       "color": "orange",
       "description": "インセプションデッキを作成するためのワークシート形式の資料です。",
       "meta": [
@@ -188,7 +188,7 @@
       "path": "./work/workshop_facilitation.html",
       "group": "sprint0",
       "icon": "🔧",
-      "badge": "WORK",
+      "badges": ["WORK", "ARCH"],
       "color": "coral",
       "description": "アーキテクチャ設計と技術スタックの叩き台を5名で作るワークショップ資料です。",
       "meta": [
@@ -202,14 +202,26 @@
       "path": "./docs/architecture_decision_draft.html",
       "group": "sprint0",
       "icon": "📋",
-      "badge": "TEMPLATE",
+      "badges": ["TEMPLATE", "ARCH"],
       "color": "mint",
       "description": "ワークショップの成果を記録するためのテンプレート。技術選定の理由と未決定事項を整理します。",
       "meta": [
         "📄 テンプレート"
       ],
       "order": 5
+    },
+    {
+      "title": "プロトタイプ",
+      "path": "https://www.figma.com/make/A6s3aCmn1G6Glatzlv2Y1e/%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86%E3%82%AB%E3%83%BC%E3%83%89_%E3%83%97%E3%83%AD%E3%83%88%E3%82%BF%E3%82%A4%E3%83%97?t=p4qdhPU3HsJSAuY9-20&fullscreen=1&preview-route=%2Fmy",
+      "group": "sprint0",
+      "icon": "🖥️",
+      "badges": ["PROTOTYPE", "UX", "DESIGN"],
+      "color": "coral",
+      "description": "Figma Make で作成したありがとうカードのインタラクティブプロトタイプです。",
+      "meta": [
+        "🔗 Figma Make"
+      ],
+      "order": 6
     }
   ]
 }
-

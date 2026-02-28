@@ -66,7 +66,7 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 - `order` — 表示順
 
 **ドキュメント（`documents`）:**
-- `title`, `path`, `group`, `icon`, `badge`, `color`, `description`, `meta`, `order`
+- `title`, `path`, `group`, `icon`, `badges` (配列), `color`, `description`, `meta`, `order`
 - `comingSoon: true` — 未公開カード（グレーアウト表示）
 - `color` の選択肢: `coral` / `sky` / `mint` / `purple` / `orange`
 

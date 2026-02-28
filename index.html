@@ -223,6 +223,13 @@
     display: block;
   }
 
+  .doc-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
   .doc-card-badge {
     display: inline-block;
     font-size: 10px;
@@ -231,7 +238,6 @@
     letter-spacing: 0.08em;
     padding: 3px 10px;
     border-radius: 4px;
-    margin-bottom: 10px;
     width: fit-content;
   }
 
@@ -343,6 +349,40 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* ===== FILTER BAR ===== */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 36px;
+    padding: 0;
+  }
+
+  .filter-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(0,0,0,0.08);
+    background: #fff;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .filter-btn:hover {
+    border-color: var(--sky);
+    color: var(--sky);
+  }
+
+  .filter-btn.active {
+    background: var(--dark);
+    color: #fff;
+    border-color: var(--dark);
+  }
+
   /* ===== FOOTER ===== */
   .footer {
     text-align: center;
@@ -383,6 +423,23 @@
 <!-- ===== MAIN ===== -->
 <main class="main">
 
+<div class="filter-bar">
+    <button class="filter-btn active" data-badge="ALL">すべて</button>
+    <button class="filter-btn" data-badge="AGILE">AGILE</button>
+    <button class="filter-btn" data-badge="ARCH">ARCH</button>
+    <button class="filter-btn" data-badge="DECK">DECK</button>
+    <button class="filter-btn" data-badge="DESIGN">DESIGN</button>
+    <button class="filter-btn" data-badge="GUIDE">GUIDE</button>
+    <button class="filter-btn" data-badge="INFO">INFO</button>
+    <button class="filter-btn" data-badge="KICKOFF">KICKOFF</button>
+    <button class="filter-btn" data-badge="PROTOTYPE">PROTOTYPE</button>
+    <button class="filter-btn" data-badge="SETUP">SETUP</button>
+    <button class="filter-btn" data-badge="TEAM">TEAM</button>
+    <button class="filter-btn" data-badge="TEMPLATE">TEMPLATE</button>
+    <button class="filter-btn" data-badge="UX">UX</button>
+    <button class="filter-btn" data-badge="WORK">WORK</button>
+  </div>
+
   <!-- プロジェクト概要 -->
   <div class="section" data-theme="project">
     <div class="section-header">
@@ -392,9 +449,9 @@
     <p class="section-desc">プロジェクトの現在の姿を表すドキュメントです。変更があれば随時更新されます。</p>
     <div class="doc-grid">
 
-      <a class="doc-card" data-color="mint" href="./docs/team.html">
+      <a class="doc-card" data-color="mint" data-badges="TEAM" href="./docs/team.html">
         <span class="doc-card-icon">👥</span>
-        <span class="doc-card-badge">TEAM</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">TEAM</span></div>
         <h3>プロジェクト体制図</h3>
         <p>チーム構成・役割分担・コミュニケーションラインを図示した体制資料です。</p>
         <div class="doc-card-meta">
@@ -403,9 +460,9 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="coral" href="./docs/inception-deck.html">
+      <a class="doc-card" data-color="coral" data-badges="DECK" href="./docs/inception-deck.html">
         <span class="doc-card-icon">🎯</span>
-        <span class="doc-card-badge">DECK</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">DECK</span></div>
         <h3>インセプションデッキ</h3>
         <p>プロジェクトの全体像・目的・トレードオフなどをまとめたインセプションデッキです。</p>
         <div class="doc-card-meta">
@@ -414,9 +471,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="orange" href="./docs/ペルソナ&ユーザージャーニーマップ.html">
+      <a class="doc-card" data-color="orange" data-badges="UX,DESIGN" href="./docs/ペルソナ&ユーザージャーニーマップ.html">
         <span class="doc-card-icon">👤</span>
-        <span class="doc-card-badge">UX</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">UX</span>
+        <span class="doc-card-badge">DESIGN</span></div>
         <h3>ペルソナ & ユーザージャーニーマップ</h3>
         <p>ターゲットユーザーのペルソナ像と、カード送受信体験のユーザージャーニーマップです。</p>
         <div class="doc-card-meta">
@@ -437,9 +495,10 @@
     <p class="section-desc">開発プロセスを通して繰り返し参照するガイド・テンプレートです。</p>
     <div class="doc-grid">
 
-      <a class="doc-card" data-color="sky" href="./docs/dev-guide.html">
+      <a class="doc-card" data-color="sky" data-badges="GUIDE,AGILE" href="./docs/dev-guide.html">
         <span class="doc-card-icon">📘</span>
-        <span class="doc-card-badge">GUIDE</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">GUIDE</span>
+        <span class="doc-card-badge">AGILE</span></div>
         <h3>開発の進め方ガイド</h3>
         <p>アジャイル開発の進め方、スプリントの回し方、プロジェクト全体の流れを解説しています。</p>
         <div class="doc-card-meta">
@@ -449,9 +508,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="purple" href="./docs/agent-skills-guide.html">
+      <a class="doc-card" data-color="purple" data-badges="SETUP,GUIDE" href="./docs/agent-skills-guide.html">
         <span class="doc-card-icon">🤖</span>
-        <span class="doc-card-badge">SETUP</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">SETUP</span>
+        <span class="doc-card-badge">GUIDE</span></div>
         <h3>Agent Skills 導入ガイド</h3>
         <p>AIエージェントにプロジェクト知識を持たせるための導入・更新手順をまとめたガイドです。</p>
         <div class="doc-card-meta">
@@ -460,9 +520,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="orange" href="./docs/design-system-intro.html">
+      <a class="doc-card" data-color="orange" data-badges="DESIGN,GUIDE" href="./docs/design-system-intro.html">
         <span class="doc-card-icon">📖</span>
-        <span class="doc-card-badge">INTRO</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">DESIGN</span>
+        <span class="doc-card-badge">GUIDE</span></div>
         <h3>デザインシステム入門</h3>
         <p>「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。</p>
         <div class="doc-card-meta">
@@ -471,9 +532,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="purple" href="./docs/design-guideline.html">
+      <a class="doc-card" data-color="purple" data-badges="DESIGN,GUIDE" href="./docs/design-guideline.html">
         <span class="doc-card-icon">🎨</span>
-        <span class="doc-card-badge">DESIGN</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">DESIGN</span>
+        <span class="doc-card-badge">GUIDE</span></div>
         <h3>デザインガイドライン</h3>
         <p>カラー・タイポグラフィ・コンポーネント・パターン・保守ルールをまとめたデザインシステム仕様書。</p>
         <div class="doc-card-meta">
@@ -482,9 +544,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="sky" href="./docs/architecture_and_tech_selection.html">
+      <a class="doc-card" data-color="sky" data-badges="GUIDE,ARCH" href="./docs/architecture_and_tech_selection.html">
         <span class="doc-card-icon">📐</span>
-        <span class="doc-card-badge">GUIDE</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">GUIDE</span>
+        <span class="doc-card-badge">ARCH</span></div>
         <h3>アーキテクチャ設計と技術選定</h3>
         <p>プロダクトの「設計図」と「道具選び」の考え方を整理した一般論ガイドです。</p>
         <div class="doc-card-meta">
@@ -494,9 +557,10 @@
         </div>
       </a>
 
-      <div class="doc-card coming-soon" data-color="orange">
+      <div class="doc-card coming-soon" data-color="orange" data-badges="TEMPLATE,AGILE">
         <span class="doc-card-icon">📝</span>
-        <span class="doc-card-badge">TEMPLATE</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">TEMPLATE</span>
+        <span class="doc-card-badge">AGILE</span></div>
         <h3>議事録テンプレート</h3>
         <p>スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。</p>
         <span class="coming-soon-tag">COMING SOON</span>
@@ -514,9 +578,9 @@
     <p class="section-desc">Sprint 0 で作成・使用した資料です。当時の内容がそのまま残っています。</p>
     <div class="doc-grid">
 
-      <a class="doc-card" data-color="coral" href="./docs/kickoff.html">
+      <a class="doc-card" data-color="coral" data-badges="KICKOFF" href="./docs/kickoff.html">
         <span class="doc-card-icon">🚀</span>
-        <span class="doc-card-badge">KICKOFF</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">KICKOFF</span></div>
         <h3>ありがとうカード キックオフ</h3>
         <p>プロジェクトの背景・ビジョン・つくるもの・進め方をまとめたキックオフ資料です。</p>
         <div class="doc-card-meta">
@@ -526,9 +590,9 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="purple" href="./references/sprint0-first-half.html">
+      <a class="doc-card" data-color="purple" data-badges="INFO" href="./references/sprint0-first-half.html">
         <span class="doc-card-icon">📘</span>
-        <span class="doc-card-badge">INFO</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">INFO</span></div>
         <h3>Sprint0前半 補足資料</h3>
         <p>Sprint0前半で行われる、インセプションデッキ作成やデザインスプリントに関する補足資料です。</p>
         <div class="doc-card-meta">
@@ -537,9 +601,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="orange" href="./work/create-inceptiondeck.html">
+      <a class="doc-card" data-color="orange" data-badges="WORK,DECK" href="./work/create-inceptiondeck.html">
         <span class="doc-card-icon">✏️</span>
-        <span class="doc-card-badge">WORK</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">WORK</span>
+        <span class="doc-card-badge">DECK</span></div>
         <h3>インセプションデッキ ワーク</h3>
         <p>インセプションデッキを作成するためのワークシート形式の資料です。</p>
         <div class="doc-card-meta">
@@ -548,9 +613,10 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="coral" href="./work/workshop_facilitation.html">
+      <a class="doc-card" data-color="coral" data-badges="WORK,ARCH" href="./work/workshop_facilitation.html">
         <span class="doc-card-icon">🔧</span>
-        <span class="doc-card-badge">WORK</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">WORK</span>
+        <span class="doc-card-badge">ARCH</span></div>
         <h3>解決案を描く ワークショップ</h3>
         <p>アーキテクチャ設計と技術スタックの叩き台を5名で作るワークショップ資料です。</p>
         <div class="doc-card-meta">
@@ -560,13 +626,27 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="mint" href="./docs/architecture_decision_draft.html">
+      <a class="doc-card" data-color="mint" data-badges="TEMPLATE,ARCH" href="./docs/architecture_decision_draft.html">
         <span class="doc-card-icon">📋</span>
-        <span class="doc-card-badge">TEMPLATE</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">TEMPLATE</span>
+        <span class="doc-card-badge">ARCH</span></div>
         <h3>アーキテクチャ設計・技術スタック（叩き台）</h3>
         <p>ワークショップの成果を記録するためのテンプレート。技術選定の理由と未決定事項を整理します。</p>
         <div class="doc-card-meta">
           <span>📄 テンプレート</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
+
+      <a class="doc-card" data-color="coral" data-badges="PROTOTYPE,UX,DESIGN" href="https://www.figma.com/make/A6s3aCmn1G6Glatzlv2Y1e/%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86%E3%82%AB%E3%83%BC%E3%83%89_%E3%83%97%E3%83%AD%E3%83%88%E3%82%BF%E3%82%A4%E3%83%97?t=p4qdhPU3HsJSAuY9-20&fullscreen=1&preview-route=%2Fmy">
+        <span class="doc-card-icon">🖥️</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">PROTOTYPE</span>
+        <span class="doc-card-badge">UX</span>
+        <span class="doc-card-badge">DESIGN</span></div>
+        <h3>プロトタイプ</h3>
+        <p>Figma Make で作成したありがとうカードのインタラクティブプロトタイプです。</p>
+        <div class="doc-card-meta">
+          <span>🔗 Figma Make</span>
           <div class="doc-card-arrow">→</div>
         </div>
       </a>
@@ -582,5 +662,36 @@
   <p>若手メンバー主導で、感謝が循環する社内Webアプリをつくります。</p>
 </footer>
 
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.doc-card');
+  const sections = document.querySelectorAll('.section');
+
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      buttons.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var badge = btn.getAttribute('data-badge');
+      var isAll = badge === 'ALL';
+
+      cards.forEach(function(card) {
+        if (isAll) {
+          card.style.display = '';
+        } else {
+          var cardBadges = (card.getAttribute('data-badges') || '').split(',');
+          card.style.display = cardBadges.indexOf(badge) !== -1 ? '' : 'none';
+        }
+      });
+
+      sections.forEach(function(sec) {
+        var visibleCards = sec.querySelectorAll('.doc-card:not([style*="display: none"])');
+        sec.style.display = visibleCards.length > 0 ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
 </body>
 </html>

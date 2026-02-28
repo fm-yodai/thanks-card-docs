@@ -223,6 +223,13 @@
     display: block;
   }
 
+  .doc-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
   .doc-card-badge {
     display: inline-block;
     font-size: 10px;
@@ -231,7 +238,6 @@
     letter-spacing: 0.08em;
     padding: 3px 10px;
     border-radius: 4px;
-    margin-bottom: 10px;
     width: fit-content;
   }
 
@@ -341,6 +347,40 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* ===== FILTER BAR ===== */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 36px;
+    padding: 0;
+  }
+
+  .filter-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(0,0,0,0.08);
+    background: #fff;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .filter-btn:hover {
+    border-color: var(--sky);
+    color: var(--sky);
+  }
+
+  .filter-btn.active {
+    background: var(--dark);
+    color: #fff;
+    border-color: var(--dark);
+  }
+
   /* ===== FOOTER ===== */
   .footer {
     text-align: center;
@@ -381,6 +421,8 @@
 <!-- ===== MAIN ===== -->
 <main class="main">
 
+{{FILTERS}}
+
 {{SECTIONS}}
 
 </main>
@@ -391,5 +433,36 @@
   <p>若手メンバー主導で、感謝が循環する社内Webアプリをつくります。</p>
 </footer>
 
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.doc-card');
+  const sections = document.querySelectorAll('.section');
+
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      buttons.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var badge = btn.getAttribute('data-badge');
+      var isAll = badge === 'ALL';
+
+      cards.forEach(function(card) {
+        if (isAll) {
+          card.style.display = '';
+        } else {
+          var cardBadges = (card.getAttribute('data-badges') || '').split(',');
+          card.style.display = cardBadges.indexOf(badge) !== -1 ? '' : 'none';
+        }
+      });
+
+      sections.forEach(function(sec) {
+        var visibleCards = sec.querySelectorAll('.doc-card:not([style*="display: none"])');
+        sec.style.display = visibleCards.length > 0 ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
 </body>
 </html>

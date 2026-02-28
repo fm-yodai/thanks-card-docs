@@ -22,7 +22,7 @@ interface Document {
   path: string;
   group: string;
   icon: string;
-  badge: string;
+  badges: string[];
   color: string;
   description: string;
   meta?: string[];
@@ -35,11 +35,19 @@ interface Manifest {
   documents: Document[];
 }
 
+function renderBadges(badges: string[]): string {
+  return badges
+    .map((b) => `<span class="doc-card-badge">${b}</span>`)
+    .join("\n        ");
+}
+
 function renderCard(doc: Document): string {
+  const badgesAttr = doc.badges.join(",");
+
   if (doc.comingSoon) {
-    return `      <div class="doc-card coming-soon" data-color="${doc.color}">
+    return `      <div class="doc-card coming-soon" data-color="${doc.color}" data-badges="${badgesAttr}">
         <span class="doc-card-icon">${doc.icon}</span>
-        <span class="doc-card-badge">${doc.badge}</span>
+        <div class="doc-card-badges">${renderBadges(doc.badges)}</div>
         <h3>${doc.title}</h3>
         <p>${doc.description}</p>
         <span class="coming-soon-tag">COMING SOON</span>
@@ -50,9 +58,9 @@ function renderCard(doc: Document): string {
     .map((m) => `          <span>${m}</span>`)
     .join("\n");
 
-  return `      <a class="doc-card" data-color="${doc.color}" href="${doc.path}">
+  return `      <a class="doc-card" data-color="${doc.color}" data-badges="${badgesAttr}" href="${doc.path}">
         <span class="doc-card-icon">${doc.icon}</span>
-        <span class="doc-card-badge">${doc.badge}</span>
+        <div class="doc-card-badges">${renderBadges(doc.badges)}</div>
         <h3>${doc.title}</h3>
         <p>${doc.description}</p>
         <div class="doc-card-meta">
@@ -81,6 +89,30 @@ ${cards}
   </div>`;
 }
 
+function collectUniqueBadges(documents: Document[]): string[] {
+  const set = new Set<string>();
+  for (const doc of documents) {
+    for (const b of doc.badges) {
+      set.add(b);
+    }
+  }
+  return [...set].sort();
+}
+
+function renderFilters(badges: string[]): string {
+  const buttons = badges
+    .map(
+      (b) =>
+        `    <button class="filter-btn" data-badge="${b}">${b}</button>`,
+    )
+    .join("\n");
+
+  return `<div class="filter-bar">
+    <button class="filter-btn active" data-badge="ALL">すべて</button>
+${buttons}
+  </div>`;
+}
+
 // --- Main ---
 
 const manifest: Manifest = JSON.parse(
@@ -105,14 +137,18 @@ const animationDelays = sortedGroups
   )
   .join("\n");
 
+const uniqueBadges = collectUniqueBadges(manifest.documents);
+const filtersHtml = renderFilters(uniqueBadges);
+
 const output = template
   .replace("{{SECTIONS}}", sectionsHtml)
-  .replace("{{ANIMATION_DELAYS}}", animationDelays);
+  .replace("{{ANIMATION_DELAYS}}", animationDelays)
+  .replace("{{FILTERS}}", filtersHtml);
 
 await Deno.writeTextFile("index.html", output);
 
 const docCount = manifest.documents.length;
 const groupCount = manifest.groups.length;
 console.log(
-  `✅ index.html を生成しました（${groupCount} グループ、${docCount} ドキュメント）`,
+  `✅ index.html を生成しました（${groupCount} グループ、${docCount} ドキュメント、${uniqueBadges.length} バッジ）`,
 );
