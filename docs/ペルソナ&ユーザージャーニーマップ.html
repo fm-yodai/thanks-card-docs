@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ペルソナ & ユーザージャーニーマップ — ありがとうカード</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-sub: #f5f5f7;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --text: #1a1a2e;
+    --text-sub: #555568;
+    --text-muted: #9999aa;
+    --coral: #E8524F;
+    --orange: #E8873A;
+    --yellow: #D4A017;
+    --mint: #3DA06D;
+    --sky: #3578E5;
+    --purple: #7E57C2;
+    --pink: #D64D8A;
+    --r: 14px;
+    --rs: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-hover: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.8; }
+  .container { max-width: 860px; margin: 0 auto; padding: 60px 32px 120px; }
+  section { margin-bottom: 72px; }
+  section:last-child { margin-bottom: 0; }
+  .section-num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: .1em; color: var(--text-muted); margin-bottom: 6px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px; padding: 5px 14px; border-radius: 6px; }
+  .tag.t-coral { background: rgba(232,82,79,0.08); color: var(--coral); }
+  .tag.t-orange { background: rgba(232,135,58,0.08); color: var(--orange); }
+  .tag.t-yellow { background: rgba(212,160,23,0.08); color: var(--yellow); }
+  .tag.t-mint { background: rgba(61,160,109,0.08); color: var(--mint); }
+  .tag.t-sky { background: rgba(53,120,229,0.08); color: var(--sky); }
+  .tag.t-purple { background: rgba(126,87,194,0.08); color: var(--purple); }
+  .tag.t-pink { background: rgba(214,77,138,0.08); color: var(--pink); }
+  h1 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: clamp(28px, 4.5vw, 42px); line-height: 1.4; margin-bottom: 12px; }
+  h2 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: clamp(22px, 3vw, 30px); line-height: 1.45; margin-bottom: 10px; }
+  h3 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+  h4 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 14.5px; margin-bottom: 4px; }
+  .lead { font-size: 14.5px; color: var(--text-sub); line-height: 1.95; margin-bottom: 28px; }
+  .hero { text-align: center; padding: 80px 0 40px; position: relative; }
+  .hero::before { content: ''; position: absolute; top: 0; left: -200px; right: -200px; bottom: -40px; background: radial-gradient(ellipse 600px 300px at 30% 50%, rgba(232,82,79,0.05), transparent), radial-gradient(ellipse 500px 300px at 70% 60%, rgba(53,120,229,0.04), transparent), radial-gradient(ellipse 400px 250px at 50% 80%, rgba(61,160,109,0.03), transparent); z-index: -1; }
+  .hero-icon { width: 72px; height: 72px; border-radius: 20px; background: linear-gradient(135deg, rgba(232,82,79,0.1), rgba(232,135,58,0.06)); border: 1px solid rgba(232,82,79,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+  .hero-icon svg { width: 36px; height: 36px; color: var(--coral); }
+  .hero h1 { background: linear-gradient(135deg, var(--text) 0%, var(--coral) 50%, var(--orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero .lead { max-width: 560px; margin: 0 auto 28px; }
+  .hero-meta { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .hero-meta-item { font-size: 12.5px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .hero-meta-item svg { width: 15px; height: 15px; }
+  .divider { height: 1px; background: var(--border); margin: 48px 0; }
+  .divider-strong { height: 2px; background: linear-gradient(90deg, var(--coral), var(--orange), var(--yellow), var(--mint), var(--sky)); margin: 64px 0; border-radius: 2px; }
+  .cd { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; box-shadow: var(--shadow); transition: box-shadow .3s, transform .2s; }
+  .cd:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+  .cd h3 { font-size: 15px; margin-bottom: 6px; }
+  .cd p { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+  .persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 32px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+  .persona-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .persona-card.pc-coral::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .persona-card.pc-sky::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .persona-card.pc-mint::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .persona-header { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 24px; }
+  .persona-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 28px; }
+  .persona-avatar.pa-coral { background: linear-gradient(135deg, rgba(232,82,79,0.12), rgba(232,135,58,0.08)); border: 2px solid rgba(232,82,79,0.2); }
+  .persona-avatar.pa-sky { background: linear-gradient(135deg, rgba(53,120,229,0.12), rgba(126,87,194,0.08)); border: 2px solid rgba(53,120,229,0.2); }
+  .persona-avatar.pa-mint { background: linear-gradient(135deg, rgba(61,160,109,0.12), rgba(53,120,229,0.08)); border: 2px solid rgba(61,160,109,0.2); }
+  .persona-name { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 900; font-size: 22px; margin-bottom: 2px; }
+  .persona-type { font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; margin-bottom: 6px; }
+  .persona-type.pt-coral { color: var(--coral); }
+  .persona-type.pt-sky { color: var(--sky); }
+  .persona-type.pt-mint { color: var(--mint); }
+  .persona-bio { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .persona-table { width: 100%; font-size: 13px; margin-bottom: 20px; }
+  .persona-table td { padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .persona-table tr:last-child td { border-bottom: none; }
+  .persona-table .pt-label { font-weight: 700; color: var(--text); width: 110px; white-space: nowrap; }
+  .persona-table .pt-val { color: var(--text-sub); }
+  .persona-section { margin-top: 20px; }
+  .persona-section h4 { font-size: 13.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .persona-section h4 svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .persona-section p, .persona-section li { font-size: 13px; color: var(--text-sub); line-height: 1.85; }
+  .persona-section ul { list-style: none; padding: 0; }
+  .persona-section ul li { padding: 4px 0 4px 20px; position: relative; }
+  .persona-section ul li::before { content: ''; position: absolute; left: 0; top: 13px; width: 6px; height: 6px; border-radius: 50%; }
+  .persona-card.pc-coral .persona-section ul li::before { background: var(--coral); opacity: .4; }
+  .persona-card.pc-sky .persona-section ul li::before { background: var(--sky); opacity: .4; }
+  .persona-card.pc-mint .persona-section ul li::before { background: var(--mint); opacity: .4; }
+  .persona-key { margin-top: 24px; padding: 18px 22px; border-radius: var(--rs); }
+  .persona-key.pk-coral { background: rgba(232,82,79,0.04); border: 1px solid rgba(232,82,79,0.12); }
+  .persona-key.pk-sky { background: rgba(53,120,229,0.04); border: 1px solid rgba(53,120,229,0.12); }
+  .persona-key.pk-mint { background: rgba(61,160,109,0.04); border: 1px solid rgba(61,160,109,0.12); }
+  .persona-key h4 { margin-bottom: 6px; }
+  .persona-key p { font-size: 13px; color: var(--text-sub); line-height: 1.85; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; box-shadow: var(--shadow); position: relative; overflow: hidden; text-align: center; }
+  .compare-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .compare-card.cc-coral::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .compare-card.cc-sky::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .compare-card.cc-mint::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .compare-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 22px; }
+  .compare-avatar.ca-coral { background: linear-gradient(135deg, rgba(232,82,79,0.12), rgba(232,135,58,0.08)); border: 2px solid rgba(232,82,79,0.2); }
+  .compare-avatar.ca-sky { background: linear-gradient(135deg, rgba(53,120,229,0.12), rgba(126,87,194,0.08)); border: 2px solid rgba(53,120,229,0.2); }
+  .compare-avatar.ca-mint { background: linear-gradient(135deg, rgba(61,160,109,0.12), rgba(53,120,229,0.08)); border: 2px solid rgba(61,160,109,0.2); }
+  .compare-name { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 2px; }
+  .compare-type { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .08em; margin-bottom: 10px; }
+  .compare-type.ct-coral { color: var(--coral); }
+  .compare-type.ct-sky { color: var(--sky); }
+  .compare-type.ct-mint { color: var(--mint); }
+  .compare-desc { font-size: 12.5px; color: var(--text-sub); line-height: 1.75; text-align: left; }
+  .journey { position: relative; padding-left: 40px; }
+  .journey::before { content: ''; position: absolute; left: 13px; top: 12px; bottom: 12px; width: 2px; border-radius: 2px; }
+  .journey.j-coral::before { background: linear-gradient(180deg, var(--coral), var(--orange), var(--yellow), var(--mint), var(--sky), var(--purple), var(--pink), var(--mint)); }
+  .journey.j-mint::before { background: linear-gradient(180deg, var(--mint), var(--sky), var(--purple), var(--coral), var(--orange), var(--yellow), var(--pink), var(--mint)); }
+  .journey.j-sky::before { background: linear-gradient(180deg, var(--sky), var(--purple), var(--coral), var(--orange), var(--yellow), var(--mint), var(--pink), var(--sky)); }
+  .j-phase { position: relative; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--shadow); transition: box-shadow .3s, transform .2s; }
+  .j-phase:hover { box-shadow: var(--shadow-hover); transform: translateX(3px); }
+  .j-phase:last-child { margin-bottom: 0; }
+  .j-phase::before { content: ''; position: absolute; left: -33px; top: 28px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--bg); }
+  .journey .j-phase:nth-child(1)::before { background: var(--coral); box-shadow: 0 0 0 2px var(--coral); }
+  .journey .j-phase:nth-child(2)::before { background: var(--orange); box-shadow: 0 0 0 2px var(--orange); }
+  .journey .j-phase:nth-child(3)::before { background: var(--yellow); box-shadow: 0 0 0 2px var(--yellow); }
+  .journey .j-phase:nth-child(4)::before { background: var(--mint); box-shadow: 0 0 0 2px var(--mint); }
+  .journey .j-phase:nth-child(5)::before { background: var(--sky); box-shadow: 0 0 0 2px var(--sky); }
+  .journey .j-phase:nth-child(6)::before { background: var(--purple); box-shadow: 0 0 0 2px var(--purple); }
+  .journey .j-phase:nth-child(7)::before { background: var(--pink); box-shadow: 0 0 0 2px var(--pink); }
+  .journey .j-phase:nth-child(8)::before { background: var(--mint); box-shadow: 0 0 0 2px var(--mint); }
+  .j-phase-num { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+  .j-phase h3 { font-size: 16px; margin-bottom: 12px; }
+  .j-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .j-item { padding: 12px 16px; background: var(--surface-sub); border-radius: var(--rs); }
+  .j-item-label { font-family: 'Montserrat', sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+  .j-item p { font-size: 12.5px; color: var(--text-sub); line-height: 1.75; }
+  .j-item.j-full { grid-column: 1 / -1; }
+  .j-emotion { font-size: 20px; margin-right: 6px; vertical-align: middle; }
+  .j-item.j-issue { background: rgba(232,82,79,0.04); border: 1px solid rgba(232,82,79,0.1); }
+  .j-item.j-issue .j-item-label { color: var(--coral); }
+  .insight { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 28px 32px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+  .insight::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .insight.in-coral::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .insight.in-sky::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .insight.in-mint::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .insight.in-rainbow::before { background: linear-gradient(90deg, var(--coral), var(--orange), var(--yellow), var(--mint), var(--sky)); }
+  .insight h3 { margin-bottom: 12px; }
+  .insight ul { list-style: none; padding: 0; }
+  .insight ul li { font-size: 13.5px; color: var(--text-sub); line-height: 1.85; padding: 6px 0 6px 22px; position: relative; border-bottom: 1px solid var(--border); }
+  .insight ul li:last-child { border-bottom: none; }
+  .insight ul li::before { content: '→'; position: absolute; left: 0; color: var(--text-muted); font-size: 12px; }
+  .insight ul li strong { color: var(--text); }
+  .co { display: flex; gap: 12px; align-items: flex-start; padding: 18px 22px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); box-shadow: var(--shadow); }
+  .co.co-coral { background: rgba(232,82,79,0.03); border-color: rgba(232,82,79,0.15); }
+  .co.co-yellow { background: rgba(212,160,23,0.03); border-color: rgba(212,160,23,0.15); }
+  .co.co-sky { background: rgba(53,120,229,0.03); border-color: rgba(53,120,229,0.15); }
+  .co.co-mint { background: rgba(61,160,109,0.03); border-color: rgba(61,160,109,0.15); }
+  .co.co-purple { background: rgba(126,87,194,0.03); border-color: rgba(126,87,194,0.15); }
+  .co.co-orange { background: rgba(232,135,58,0.03); border-color: rgba(232,135,58,0.15); }
+  .co-i { flex-shrink: 0; margin-top: 2px; width: 18px; height: 18px; }
+  .co p { font-size: 13px; color: var(--text-sub); line-height: 1.85; }
+  .co strong { color: var(--text); }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--shadow); }
+  .toc h3 { font-size: 14px; margin-bottom: 12px; color: var(--text-muted); }
+  .toc-list { list-style: none; padding: 0; }
+  .toc-list li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .toc-list li:last-child { border-bottom: none; }
+  .toc-list a { font-size: 13.5px; color: var(--text-sub); text-decoration: none; transition: color .2s; display: flex; align-items: center; gap: 10px; }
+  .toc-list a:hover { color: var(--coral); }
+  .toc-num { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 24px; }
+  .eco { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 28px 0; }
+  .eco-node { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 22px; text-align: center; box-shadow: var(--shadow); min-width: 180px; }
+  .eco-node-emoji { font-size: 24px; margin-bottom: 6px; }
+  .eco-node-name { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+  .eco-node-role { font-size: 11.5px; color: var(--text-muted); }
+  .eco-arrow { padding: 0 12px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.3; }
+  .eco-arrow span { font-size: 10px; }
+  .changelog { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--shadow); }
+  .changelog-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .changelog-item:last-child { border-bottom: none; }
+  .changelog-badge { font-family: 'Montserrat', sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; padding: 3px 10px; border-radius: 4px; white-space: nowrap; margin-top: 2px; }
+  .changelog-badge.cb-add { background: rgba(61,160,109,0.1); color: var(--mint); }
+  .changelog-badge.cb-move { background: rgba(53,120,229,0.1); color: var(--sky); }
+  .changelog-item p { font-size: 13px; color: var(--text-sub); line-height: 1.7; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}.mb28{margin-bottom:28px}.mb32{margin-bottom:32px}.mb40{margin-bottom:40px}.mb48{margin-bottom:48px}.mb64{margin-bottom:64px}
+  @media (max-width: 700px) {
+    .container { padding: 40px 18px 80px; }
+    .compare, .g2, .g3, .j-grid { grid-template-columns: 1fr; }
+    .persona-header { flex-direction: column; align-items: center; text-align: center; }
+    .journey { padding-left: 32px; }
+    .j-phase { padding: 20px; }
+    .eco { flex-direction: column; }
+    .eco-arrow { transform: rotate(90deg); padding: 8px 0; }
+  }
+</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-7"/><path d="M17 8H7l5-6 5 6Z"/><path d="M19 14H5l7-8 7 8Z"/></symbol>
+</svg>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-icon"><svg><use href="#i-heart"/></svg></div>
+    <h1>ペルソナ &<br>ユーザージャーニーマップ</h1>
+    <p class="lead">ありがとうカード プロジェクトのユーザー像と体験の流れを可視化する。<br>3人のペルソナが描くエコシステムの全体像。</p>
+    <div class="hero-meta">
+      <span class="hero-meta-item"><svg><use href="#i-user"/></svg> ペルソナ 3名</span>
+      <span class="hero-meta-item"><svg><use href="#i-map"/></svg> ジャーニーマップ 3本</span>
+      <span class="hero-meta-item"><svg><use href="#i-wrench"/></svg> 設計示唆つき</span>
+    </div>
+  </div>
+
+  <div class="divider-strong"></div>
+
+  <!-- TOC -->
+  <section>
+    <div class="toc">
+      <h3>目次</h3>
+      <ul class="toc-list">
+        <li><a href="#overview"><span class="toc-num">01</span>ペルソナ概要 — 3人の比較とエコシステム</a></li>
+        <li><a href="#persona-a"><span class="toc-num">02</span>ペルソナA：森山 隆志（プライマリ — 受動的タイプ）</a></li>
+        <li><a href="#persona-c"><span class="toc-num">03</span>ペルソナB：中西 康弘（セカンダリ — 積極利用タイプ）</a></li>
+        <li><a href="#persona-b"><span class="toc-num">04</span>ペルソナC：河野 真一（サポーティング — 懐疑的タイプ）</a></li>
+        <li><a href="#journey-a"><span class="toc-num">05</span>ジャーニーマップ：森山 隆志</a></li>
+        <li><a href="#journey-c"><span class="toc-num">06</span>ジャーニーマップ：中西 康弘</a></li>
+        <li><a href="#journey-b"><span class="toc-num">07</span>ジャーニーマップ：河野 真一</a></li>
+        <li><a href="#insights"><span class="toc-num">08</span>設計示唆まとめ</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 01 OVERVIEW -->
+  <section id="overview">
+    <div class="section-num">01</div>
+    <div class="tag t-coral">PERSONA OVERVIEW</div>
+    <h2>3人のペルソナとエコシステム</h2>
+    <p class="lead">このプロダクトは、3つのタイプのユーザーが循環をつくることで成り立つ。</p>
+
+    <div class="compare mb24">
+      <div class="compare-card cc-coral">
+        <div class="compare-avatar ca-coral">🌿</div>
+        <div class="compare-name">森山 隆志</div>
+        <div class="compare-type ct-coral">PRIMARY — 受動的</div>
+        <p class="compare-desc">もらったら嬉しいけど、自分からは送らない。「気恥ずかしさ」と「何を書けばいいかわからない」が壁。設計の丁寧さが最も効く相手。</p>
+      </div>
+      <div class="compare-card cc-mint">
+        <div class="compare-avatar ca-mint">☀️</div>
+        <div class="compare-name">中西 康弘</div>
+        <div class="compare-type ct-mint">SECONDARY — 積極的</div>
+        <p class="compare-desc">「面白そうじゃん」で動く。楽しいかどうかが基準。放っておいても使うが、楽しさが枯れると止まる。エコシステムの起点。</p>
+      </div>
+      <div class="compare-card cc-sky">
+        <div class="compare-avatar ca-sky">⚡</div>
+        <div class="compare-name">河野 真一</div>
+        <div class="compare-type ct-sky">SUPPORTING — 懐疑的</div>
+        <p class="compare-desc">「また横断組織の施策か」で心のシャッターが下りる。能動的には動かない。受け取る体験を壊さなければいい。</p>
+      </div>
+    </div>
+
+    <h3 class="mb12">エコシステムの循環</h3>
+    <div class="eco mb24">
+      <div class="eco-node">
+        <div class="eco-node-emoji">☀️</div>
+        <div class="eco-node-name">中西さん</div>
+        <div class="eco-node-role">積極的に送る</div>
+      </div>
+      <div class="eco-arrow">→<span>カードを送る</span></div>
+      <div class="eco-node">
+        <div class="eco-node-emoji">🌿</div>
+        <div class="eco-node-name">森山さん</div>
+        <div class="eco-node-role">受け取り、たまに送る</div>
+      </div>
+      <div class="eco-arrow">→<span>カードを送る</span></div>
+      <div class="eco-node">
+        <div class="eco-node-emoji">⚡</div>
+        <div class="eco-node-name">河野さん</div>
+        <div class="eco-node-role">受け取る</div>
+      </div>
+    </div>
+
+    <div class="co co-yellow mb20">
+      <svg class="co-i" style="color:var(--yellow)"><use href="#i-lightbulb"/></svg>
+      <p><strong>設計の焦点：</strong>森山さんには「送る体験」のハードルを下げる。中西さんには「楽しさを枯らさない」。河野さんには「受け取る体験を壊さない」。3人へのアプローチはそれぞれ異なる。</p>
+    </div>
+
+    <div class="co co-mint">
+      <svg class="co-i" style="color:var(--mint)"><use href="#i-refresh"/></svg>
+      <p><strong>循環を維持するために：</strong>中西さんが送る → 森山さん・河野さんが受け取る → 森山さんがリアクション or カードを送り返す → 中西さんに反応が返る。この循環が回り続けることが、プロダクトの生命線。</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- 02 PERSONA A -->
+  <section id="persona-a">
+    <div class="section-num">02</div>
+    <div class="tag t-coral">PRIMARY PERSONA</div>
+    <h2>森山 隆志（もりやま たかし）</h2>
+    <p class="lead">穏やかで面倒見がいい。でも、感謝を言葉にするのは気恥ずかしい。</p>
+
+    <div class="persona-card pc-coral">
+      <div class="persona-header">
+        <div class="persona-avatar pa-coral">🌿</div>
+        <div>
+          <div class="persona-type pt-coral">PRIMARY — 受動的タイプ</div>
+          <div class="persona-name">森山 隆志</div>
+          <p class="persona-bio">口下手だけど、後輩の面倒見はいい。心の中では「ありがたいな」と思っているが、それを文章にして送るのは気恥ずかしい。</p>
+        </div>
+      </div>
+      <table class="persona-table">
+        <tr><td class="pt-label">年齢</td><td class="pt-val">46歳</td></tr>
+        <tr><td class="pt-label">部署</td><td class="pt-val">開発部（バックエンド）</td></tr>
+        <tr><td class="pt-label">経験年数</td><td class="pt-val">20年以上（FREEMIND在籍12年）</td></tr>
+        <tr><td class="pt-label">家族構成</td><td class="pt-val">妻、中学生の息子、小学生の娘</td></tr>
+        <tr><td class="pt-label">性格</td><td class="pt-val">穏やか、職人気質、口下手だが面倒見はいい</td></tr>
+      </table>
+      <div class="persona-section">
+        <h4><svg style="color:var(--coral)"><use href="#i-user"/></svg> 普段の働き方</h4>
+        <p>自社内で受託開発案件を担当。朝9時に出社して淡々とコードを書き、18時には退社して家族との時間を大切にしている。Chatworkは業務連絡中心に使うが、雑談チャンネルでスタンプを押すくらいの参加はしている。自分から雑談を投稿することはほぼない。</p>
+      </div>
+      <div class="persona-section">
+        <h4><svg style="color:var(--coral)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
+        <p>後輩が助けてくれたとき、心の中では「ありがたいな」と思っている。ただ、それをわざわざ文章にして送るのは気恥ずかしい。対面で「お、サンキュー」と軽く言うか、Chatworkでスタンプを押す程度。「言わなくても伝わっているだろう」という感覚がある。</p>
+      </div>
+      <div class="persona-section">
+        <h4><svg style="color:var(--coral)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
+        <ul>
+          <li>もらったら素直に嬉しい。が、自分からは「何を書けばいいかわからない」</li>
+          <li>100文字のメッセージを考えるのが地味にプレッシャー</li>
+          <li>「コンピテンシー」という言葉に堅さを感じる。自分の言葉で「助かった」と言いたいだけなのに、大げさにされると引く</li>
+          <li>仕事が忙しいときにわざわざアプリを開く動機がない</li>
+        </ul>
+      </div>
+      <div class="persona-key pk-coral">
+        <h4><svg style="color:var(--coral);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
+        <p>「送る」のハードルを極限まで下げること。考えなくても、構えなくても、数秒で送れる体験。コンピテンシーはAIが裏で勝手にやってくれるので、本人は「ありがとう」と気持ちだけ書けばいい——その設計思想が伝わったとき、森山さんは動き出す。非公開で送れることが「最初の一通」を後押しする。</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- 03 PERSONA C (SECONDARY) -->
+  <section id="persona-c">
+    <div class="section-num">03</div>
+    <div class="tag t-mint">SECONDARY PERSONA</div>
+    <h2>中西 康弘（なかにし やすひろ）</h2>
+    <p class="lead">明るくて社交的。楽しいかどうかがすべての行動基準。</p>
+
+    <div class="persona-card pc-mint">
+      <div class="persona-header">
+        <div class="persona-avatar pa-mint">☀️</div>
+        <div>
+          <div class="persona-type pt-mint">SECONDARY — 積極利用タイプ</div>
+          <div class="persona-name">中西 康弘</div>
+          <p class="persona-bio">技術が好きで、人と一緒に何かやるのも好き。リーダー役を引き受けているのは義務感ではなく、楽しいから。</p>
+        </div>
+      </div>
+      <table class="persona-table">
+        <tr><td class="pt-label">年齢</td><td class="pt-val">49歳</td></tr>
+        <tr><td class="pt-label">部署</td><td class="pt-val">開発部（フロントエンド／チームリーダー）</td></tr>
+        <tr><td class="pt-label">経験年数</td><td class="pt-val">25年以上（FREEMINDが個人事業主の集まりだった時代から在籍、18年目）</td></tr>
+        <tr><td class="pt-label">家族構成</td><td class="pt-val">妻、高校生の娘</td></tr>
+        <tr><td class="pt-label">性格</td><td class="pt-val">明るい、社交的、好奇心旺盛、楽しいかどうかが行動基準</td></tr>
+      </table>
+      <div class="persona-section">
+        <h4><svg style="color:var(--mint)"><use href="#i-user"/></svg> 普段の働き方</h4>
+        <p>技術が好きで、今でも手を動かすことに喜びを感じている。ただ、チーム内で自然とリーダー的な役割を引き受けるようになった。本人としては「偉くなりたい」わけではなく、人と一緒に何かやるのが楽しいからやっている。Chatworkでは雑談チャンネルの常連で、くだらない話にも反応するし、自分からもネタを投稿する。飲み会の幹事を自然とやるタイプ。</p>
+      </div>
+      <div class="persona-section">
+        <h4><svg style="color:var(--mint)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
+        <p>普段から「ありがとう」「助かったよ」を口に出す人。対面でもChatworkでも気軽に言う。特に深い意味を込めているわけではなく、思ったことをそのまま言葉にしている。感謝を伝えることに照れや抵抗がない。</p>
+      </div>
+      <div class="persona-section">
+        <h4><svg style="color:var(--mint)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
+        <ul>
+          <li>「お、面白そうじゃん」が第一印象。コンピテンシーの浸透とか理屈はどうでもいい。ツールとして面白いかどうか</li>
+          <li>組織全体で一つの植物を育てる仕組みに興味を持つ。「あと何件でレベルアップだろう」とゲーム感覚で気になる</li>
+          <li>自分が送ったカードに対して相手がどう反応したか気になる</li>
+          <li>タイムラインに自分のカードが流れて、他の人にも見てもらえるのは嬉しい。公開でどんどん送る</li>
+        </ul>
+      </div>
+      <div class="persona-key pk-mint">
+        <h4><svg style="color:var(--mint);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
+        <p>中西さんは動かす必要がない。勝手に動く。問題は「動き続けてくれるかどうか」。送っても反応が返ってこない、組織の植物が成長しきってしまった、タイムラインがマンネリ化した——こういった「飽き」がモチベーションを止める。中西さんの楽しさを枯らさない仕組みが必要。逆に言えば、中西さんが楽しそうに使っている姿が、森山さんの「自分もやってみようかな」に繋がる。中西さんの体験を壊さないことが、エコシステム全体を守ることになる。</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- 04 PERSONA B (SUPPORTING) -->
+  <section id="persona-b">
+    <div class="section-num">04</div>
+    <div class="tag t-sky">SUPPORTING PERSONA</div>
+    <h2>河野 真一（こうの しんいち）</h2>
+    <p class="lead">合理的でドライ。横断組織の施策にうんざりしている。でも、義理堅い。</p>
+
+    <div class="persona-card pc-sky">
+      <div class="persona-header">
+        <div class="persona-avatar pa-sky">⚡</div>
+        <div>
+          <div class="persona-type pt-sky">SUPPORTING — 懐疑的タイプ</div>
+          <div class="persona-name">河野 真一</div>
+          <p class="persona-bio">FREEMINDが個人事業主の集まりだった時代から在籍。効率至上主義で無駄が嫌い。ただし、信頼した相手には驚くほど義理堅い。</p>
+        </div>
+      </div>
+      <table class="persona-table">
+        <tr><td class="pt-label">年齢</td><td class="pt-val">45歳</td></tr>
+        <tr><td class="pt-label">部署</td><td class="pt-val">開発部（バックエンド）</td></tr>
+        <tr><td class="pt-label">経験年数</td><td class="pt-val">22年（FREEMIND在籍13年目）</td></tr>
+        <tr><td class="pt-label">家族構成</td><td class="pt-val">独身、一人暮らし</td></tr>
+        <tr><td class="pt-label">性格</td><td class="pt-val">合理的、ドライ、無駄が嫌い、信頼した相手には義理堅い</td></tr>
+      </table>
+      <div class="persona-section">
+        <h4><svg style="color:var(--sky)"><use href="#i-user"/></svg> 普段の働き方</h4>
+        <p>長年の経験で自分のやり方が確立されている。効率を重視し、必要なことだけを最短距離でやるタイプ。かつてのFREEMINDでは自分で仕事を受けて自分で完結させる働き方が当たり前だった。その感覚が今も染み付いている。Chatworkは通知を最小限に絞っていて、自分に関係ないチャンネルはミュートしている。雑談チャンネルはたまに眺めるが、基本ROM専。</p>
+      </div>
+      <div class="persona-section">
+        <h4><svg style="color:var(--sky)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
+        <p>感謝の気持ちがないわけではない。ただ、「仕事をきちんとやるのはプロとして当然」という価値観が根底にあり、いちいち感謝を形にすることに必要性を感じない。飲みの席で「あのときは助かったよ」と言うことはあるが、日常的にやることではないと思っている。</p>
+      </div>
+      <div class="persona-section">
+        <h4><svg style="color:var(--sky)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
+        <ul>
+          <li>「また横断組織の施策か」が第一印象。最近入ってきた若手が主導する組織力向上フォーラムから次々と出てくる施策に正直うんざりしている。「現場のことをわかってない人たちが、理想論を押し付けてくる」という感覚</li>
+          <li>コンピテンシーという言葉自体、自分には縁遠い。長年コードと向き合ってきた身からすると、ふわっとしたカタカナ語で仕事を語られること自体にモヤッとする</li>
+          <li>自分のペースを乱されるのが嫌。プッシュ通知が頻繁に来たら即オフにする</li>
+          <li>ただし、もし自分が信頼している同僚や、かつて面倒を見た後輩から「河野さんのおかげです」とカードが届いたら、表情には出さないが保存はする</li>
+        </ul>
+      </div>
+      <div class="persona-key pk-sky">
+        <h4><svg style="color:var(--sky);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
+        <p>正面から「使ってください」と言っても動かない。横断組織発の施策だと知った時点で心のシャッターが下りる。河野さんが動くのは「自分宛のカードが届いた」瞬間。つまり、河野さん自身をユーザーとして獲得するより先に、河野さんに感謝している周囲の人がカードを送る状態を作ることが先。「受け取る体験」から入り口を作る。押し付けがましくない通知設計が絶対条件。</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-strong"></div>
+
+  <!-- 05 JOURNEY A -->
+  <section id="journey-a">
+    <div class="section-num">05</div>
+    <div class="tag t-orange">USER JOURNEY MAP</div>
+    <h2>ジャーニーマップ：森山 隆志</h2>
+    <p class="lead">「もらう → リアクションする → 眺める → 非公開で送ってみる → じんわり定着」<br>森山さんは急がない。ゆっくり、でも確実に馴染んでいく。</p>
+
+    <div class="journey j-coral">
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--coral)">PHASE 1</div>
+        <h3>認知 — 「へぇ、そんなのできたんだ」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>全社チャットまたは朝会で「ありがとうカード」アプリの存在を知る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>説明をなんとなく聞く。Chatworkの告知を流し読みする</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「感謝カードか…悪くはないけど」「自分が使うかと言われると…」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>フラット。興味はゼロではないが、自分から動くほどではない</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>「自分が使うもの」として認識されていない。他人事として流れていく。認知フェーズで無理に引き込まなくてよい——次のフェーズ（カード受信）がトリガーになる設計にする</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--orange)">PHASE 2</div>
+        <h3>最初のカードを受け取る — 「自分に？」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>ある日、メールの受信トレイに「森山さんにありがとうカードが届きました」が届いている</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>「ん？」と思いメールを開く。リンクからアプリにアクセスし、Google認証でログイン</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「誰だろう」「自分に？ 何だろう」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😯</span>意外、少し嬉しい。素朴な好奇心</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>ログインの手間で離脱するリスク。メールからアプリへの導線がスムーズであること、Google認証がワンクリックで完了することが絶対条件</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--yellow)">PHASE 3</div>
+        <h3>カードを読む — 「わざわざ書いてくれたのか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>後輩から「先週のレビュー、丁寧に見てくれて助かりました」と書いてある。AIが「協働」のラベルを付けている。カードを開いた瞬間、パァーっと華やかな演出が入る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>演出に少し驚く。カードを読む。コンピテンシーラベルをちらっと見る。もう一度メッセージを読み返す</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「おっ」「あぁ、あのレビューのことか」「協働…まぁそういうことか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>じんわり嬉しい。演出が気恥ずかしいけど、悪い気はしない</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>この温かい気持ちを次のアクションに変換できるか。ただし「あなたも送ってみませんか？」的な誘導は不要。体験の余韻を壊さない</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--mint)">PHASE 4</div>
+        <h3>リアクションする — 「ボタン押すくらいなら」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>カードを読んだ画面に、リアクションボタンが見える。自分でカードを書くほどではないが、ボタン1つなら押せる</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>リアクションボタンを押す。「ありがとう」をワンタップで返す</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「これくらいなら…」「わざわざ文章書くのはアレだけど、ボタンなら」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>軽い。負担がない。これなら自分にもできる</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>リアクションは「カードを書く」より遥かにハードルが低い。森山さんにとって「送る体験」への橋渡しになる。リアクションボタンはカード表示画面の自然な位置に、目立ちすぎず、でも見落とさない程度に配置する。※リアクション機能はMVPには含まれない。理想体験として記載</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--sky)">PHASE 5</div>
+        <h3>タイムラインを眺める — 「こういう感じでいいんだ」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>リアクションした流れで、公開タイムラインが目に入る。中西さんが送ったカードなど、他の社員同士のカードが並んでいる</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>いくつか読む。「こういう感じで書けばいいのか」と雰囲気を掴む</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「中西さんもやってるんだ」「短くていいんだな」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>安心。自分だけじゃないとわかると心理的ハードルが下がる</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>タイムラインに十分なカードが流れている必要がある（初期のコンテンツ量問題）。中西さんのような積極利用タイプが初期のタイムラインを温めてくれることが前提。ベータテスト期間中に開発チーム内でカードを送り合っておく</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--purple)">PHASE 6</div>
+        <h3>最初のカードを送る — 「まあ、気持ちが伝わればいいか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>数日後、同僚が急ぎの対応を手伝ってくれた。ふと「あ、カードで送ってみるか」と思い出す</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>アプリを開く。宛先を選び、「急な対応ありがとう、助かった」と短く書く。公開はちょっと恥ずかしいので「非公開」を選んで送信</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「これくらいでいいのかな」「まあ2人の間でわかればいいか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😅→😊</span>最初は少し気恥ずかしいが、送った後はすっきりする</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>「何を書けばいいかわからない」で手が止まるリスク。入力の気軽さが命。非公開を選べることで「最初の一通」のハードルが大きく下がる</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
+        <h3>小さなフィードバックを得る — 「なんか育ってる」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>しばらくして、組織全体の植物が成長していることに気づく。「あと5件でレベルアップ」の表示が目に入る。月末に「今月のありがとうまとめ」の通知が届き、自分がもらったカードとコンピテンシーの傾向が見える</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>植物の成長を眺める。月次まとめを読んで「協働が多いな」と思う</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「みんなで育ててるのか」「協働か、まぁ確かにそうかも」「あと5件か…まあ俺が送らなくても誰かが送るだろうけど」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>静かな充実感。個人のスコアではなく組織の成長だから、プレッシャーがない</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>組織の植物は個人の成績ではないので、森山さんに「自分はまだ全然送っていない」というプレッシャーを与えない。それでいて「みんなで育てている」という緩やかな一体感がある。月次まとめが「また送ってみよう」のきっかけとして機能しているか</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
+        <h3>定着 — 「あると悪くないな」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>月に1〜2回、誰かに助けられたタイミングで送る程度に落ち着く。組織の植物が少しずつ育っていくのをたまに眺める</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>自然なペースで使い続ける。非公開で送ることが多いが、たまに「これは皆にも見てほしいな」と思ったときは公開にする</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「習慣ってほどじゃないけど、あると悪くないな」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>穏やかな肯定感。無理なく続いている状態</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>頻度が低いので自然消滅リスクはある。月1回の集計通知が「思い出すきっかけ」として機能していれば維持できる。通知は月1回の集計＋カード受信時のみが限度</p></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="insight in-coral">
+        <h3>森山さんのジャーニーから見えた設計示唆</h3>
+        <ul>
+          <li><strong>受け取りが起点。</strong>自分から能動的に始めることはない</li>
+          <li><strong>リアクションが「送る体験」への橋渡し。</strong>ボタン1つの軽いアクションが、カードを書く前の中間ステップになる（MVP後に追加予定）</li>
+          <li><strong>非公開が初回の鍵。</strong>「2人の間だけ」という安心感が最初の一通を後押しする</li>
+          <li><strong>コンピテンシーは裏方。</strong>AIが勝手にラベル付けしてくれる。意識させすぎない</li>
+          <li><strong>組織の植物がプレッシャーなく定着を支える。</strong>個人の実績ではなく「みんなで育てている」感覚が森山さんに合っている</li>
+          <li><strong>通知設計は控えめに。</strong>カード受信通知（メール）+ 月1回の集計通知が限度</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-strong"></div>
+
+  <!-- 06 JOURNEY C -->
+  <section id="journey-c">
+    <div class="section-num">06</div>
+    <div class="tag t-mint">USER JOURNEY MAP</div>
+    <h2>ジャーニーマップ：中西 康弘</h2>
+    <p class="lead">「面白そう → すぐ使う → どんどん送る → 植物のレベルアップが楽しい → 自然と周囲を巻き込む」<br>中西さんはエコシステムの太陽。楽しさが燃料。</p>
+
+    <div class="journey j-mint">
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--coral)">PHASE 1</div>
+        <h3>認知 — 「お、面白そうじゃん」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>全社チャットまたは朝会で「ありがとうカード」アプリの告知を見る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>告知をちゃんと読む。Chatworkの雑談チャンネルで「これ面白そうじゃない？」と反応する</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「お、なんか新しいの出たな」「組織で植物育てるの？ どういう仕組みだろう」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>素直に興味。楽しそうかどうかで判断している</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんの認知フェーズに課題はほとんどない。問題はこの後「楽しさが続くか」</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--orange)">PHASE 2</div>
+        <h3>すぐに使ってみる — 「まずは送ってみないとわかんないよね」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>告知を見たその日のうちにアプリにアクセス。Google認証でログイン</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>UIをざっと見て回る。組織の植物がまだ芽の状態なのを見て「じゃあ最初に水やりするか」と思う</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「まずは送ってみないとわかんないよね」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>ワクワク。新しいおもちゃを触る感覚</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>初期のタイムラインが空でも中西さんは気にしない。むしろ「最初に使う人」になること自体を楽しめる。ただしUIがわかりにくいと「あれ？」となる。初見で迷わない導線が必要</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--yellow)">PHASE 3</div>
+        <h3>最初のカードを送る — 「簡単でいいね」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>さっそく同僚に送ってみる。昨日一緒に障害対応した後輩に「昨日の対応ナイスだったよ！」と書く。公開で送信</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>宛先を選んで、パッと思いつくまま書いて送る。迷わない。公開を選ぶのも自然</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「こんな感じか。簡単でいいね」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>気持ちいい。思ったことをサッと伝えられた満足感</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんにとって送信体験のハードルはほぼゼロ。AIラベリングの結果は「へぇ、まあそうかも」くらいの反応。深くは気にしない</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--mint)">PHASE 4</div>
+        <h3>どんどん送る — 「あいつにも送っとくか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>その週のうちに3〜4枚送る。チーム内の後輩、他部署で手伝ってくれた人、最近頑張っていると感じた若手</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>思いついたタイミングでサッと送る。メッセージは短め。全部公開</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「あいつにも送っとくか」「タイムラインに自分のカード並んでるの、なんかいいな」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>楽しい。タイムラインが賑やかになっていくのが目に見えて気持ちいい</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんが初期のタイムラインを自分のカードで温めてくれる。これが森山さんのフェーズ5（タイムラインを眺める）の体験を支える</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--sky)">PHASE 5</div>
+        <h3>植物の成長に気づく — 「おっ、レベルアップしてる！」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>組織全体の植物がレベルアップしている。中西さんが何枚か送ったことも含め、みんなのカードの積み重ねで成長した</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>「おっ、育ってる！」と眺める。Chatworkの雑談チャンネルで「あと3件でレベルアップだぞ！」と共有する</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「みんなで育ててる感じいいな」「次のレベルどうなるんだろう」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>ゲーム的な好奇心。共通の目標がある楽しさ</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>組織の植物は「みんなで育てている」感覚を生む。中西さん一人の実績ではなく共同の成果なので、Chatworkで共有しやすい話題にもなる。ただし成長しきった後に「次」がないと飽きる。MVP後の課題として認識しておく</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--purple)">PHASE 6</div>
+        <h3>送りっぱなし問題 — 「反応あると嬉しいんだけどな」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>何枚か送ったが、アプリ内で相手からの反応がない。MVPにはリアクション機能がないので当然だが、中西さんは少し物足りなさを感じる</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>廊下で送った相手に会ったとき「カード見た？」と聞いてみる。「見たよ、ありがとう」と対面で言われる</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「アプリで反応返せたらいいのにな」「まあでも、対面で言ってもらえたからいいか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊→😐</span>対面のフィードバックで補えているが、アプリ体験としてはやや物足りない</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>MVPではリアクション機能がないため、中西さんの「送った実感」は対面の反応と植物の成長で補う。リアクション機能はMVP後に最優先で追加し、この体験のギャップを埋める</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
+        <h3>自然と周囲を巻き込む — 「みんなもやればいいのに」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>中西さんがChatworkで植物のレベルアップの話をしたり、対面で「カード送っといたよ」と言うことで、周囲が少しずつ興味を持ち始める</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>意識して布教しているわけではない。楽しいから自然と話題にしている。森山さんのような人が「中西さんもやってるなら…」と思うきっかけになる</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「みんなもやればいいのに」（ただし押し付けはしない。楽しさを共有したいだけ）</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>他の人もカードを送り始めて、タイムラインが賑やかになってきたのが嬉しい</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんが自然とエバンジェリストになるかどうかは、中西さん自身が楽しめているかどうかに完全に依存する。「広めてください」と頼んだ瞬間、義務になって楽しくなくなる</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
+        <h3>定着 — 「なかったら逆に物足りない」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>週に2〜3回のペースで安定して送り続ける。もらうカードも増えてきた。月次集計を見て「俺、協働が多いんだな」と楽しんでいる。植物のレベルが上がるたびにChatworkで報告</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>日常のコミュニケーションの一部としてカードを使う。対面で「ありがとう」と言う代わりにカードを送ることもあれば、両方やることもある</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「これもう習慣だな」「なかったら逆に物足りない」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>自然な習慣。楽しさが安定している</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>定着後の課題は「マンネリ」。植物の成長上限、同じ体験の繰り返し。リアクション機能やお返し機能など、v2以降の「後でやる」機能が中西さんの長期的な楽しさを支えることになる</p></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="insight in-mint">
+        <h3>中西さんのジャーニーから見えた設計示唆</h3>
+        <ul>
+          <li><strong>初見の導線をわかりやすく。</strong>中西さんは迷わず使い始めたいタイプ。UIが直感的であること</li>
+          <li><strong>組織の植物がゲーム的な楽しさを提供。</strong>「あと○件でレベルアップ」は中西さんがChatworkで共有する話題になる。個人の実績より「みんなで」の方が盛り上がる</li>
+          <li><strong>送りっぱなし問題はMVP時点で残る。</strong>対面フィードバックと植物の成長で補いつつ、リアクション機能をMVP後に最優先で追加</li>
+          <li><strong>中西さんが楽しそうに使う姿が、森山さんを動かす。</strong>体験を壊さないことがエコシステム全体を守る</li>
+          <li><strong>「広めてください」と頼まない。</strong>楽しいから自然と話題にする状態をつくる。義務にした瞬間に壊れる</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-strong"></div>
+
+  <!-- 07 JOURNEY B -->
+  <section id="journey-b">
+    <div class="section-num">07</div>
+    <div class="tag t-sky">USER JOURNEY MAP</div>
+    <h2>ジャーニーマップ：河野 真一</h2>
+    <p class="lead">「無視 → メールで気づく → こっそり読む → しばらく放置 → また届く → …まあ悪くない」<br>河野さんは動かない。動かさなくていい。受け取る人として存在するだけで価値がある。</p>
+
+    <div class="journey j-sky">
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--sky)">PHASE 1</div>
+        <h3>認知 — 「またあの横断組織か」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>全社チャットまたは朝会で「ありがとうカード」アプリの告知を見る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>告知を一瞥する。「組織力向上フォーラム」の文字が目に入った時点で読むのをやめる</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「またあの横断組織か」「コンピテンシー？ はいはい」「俺には関係ない」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😒</span>うんざり。心のシャッターが下りる</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>認知フェーズで既にネガティブ。ここから能動的に動くことは絶対にない。河野さんを動かすのは外部からのトリガー（＝カード受信メール）のみ</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--purple)">PHASE 2</div>
+        <h3>最初のカードを受け取る — 「…誰が送ってきたんだ」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>数週間後、メールの受信トレイに「河野さんにありがとうカードが届きました」が届いている</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>件名を見る。すぐには開かない。ただ、業務メールを処理している流れで目に入り、気になって開く</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「なんだこれ」「…誰が送ってきたんだ」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐→🤨</span>無関心から微かな好奇心へ。無視しきれない</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>メールからアプリへの導線が自然であること。リンクを踏んだらすぐ読める状態が必要。ここで「ログインがめんどくさい」となったら二度と来ない</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--coral)">PHASE 3</div>
+        <h3>カードを読む — 「…そんなこと覚えてたのか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>Google認証でログイン。かつて面倒を見た後輩から「河野さんが障害対応のとき冷静に手順を教えてくれたおかげで、自分一人で対応できるようになりました」と書いてある。AIが「当事者意識」のラベルを付けている。開封時に演出が入る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>演出には無反応を装う。メッセージを読む。もう一度読む。ブラウザを閉じる</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「……あいつか」「そんなこと覚えてたのか」「当事者意識、ね。まあ当然のことをしただけだが」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐→😌</span>表面上は何も変わらない。でも少しだけ温かい</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>ここで河野さんの心は動いている。この体験を壊さないことが最重要。余計なポップアップや「あなたもカードを送ってみませんか？」的な誘導は絶対にやってはいけない</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--orange)">PHASE 4</div>
+        <h3>しばらく何もしない — 「直接言えばいい話だ」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>カードを読んだ後、アプリを開くことはない。日常業務に戻る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>何もしない。ただし、カードをくれた後輩と廊下ですれ違ったとき、いつもより少しだけ声をかける</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「別にアプリで返す必要はないだろう」「直接言えばいい話だ」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>平常運転。でもカードの内容は覚えている</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>森山さんとの最大の違い。森山さんはリアクション→タイムラインと進むが、河野さんはアプリを閉じて戻ってこない。これは想定内。無理に引き戻そうとしない</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--yellow)">PHASE 5</div>
+        <h3>2通目のカードが届く — 「…まあ、見るだけ見るか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>1〜2ヶ月後、別の同僚からまたカードが届く。メールで気づく</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>今回は前回より抵抗なくリンクを開く。ログイン状態が残っていてすぐ読める</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「またか」「…まあ、見るだけ見るか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">🤨→😌</span>素直に認めたくはないが、悪い気はしないことに気づき始めている</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>2回目の体験がスムーズであること。前回のログイン状態が保持されていることが地味に重要。セッション切れでログインを求められたら「めんどくせえ」で終わる</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--mint)">PHASE 6</div>
+        <h3>カード一覧を見る — 「2枚か」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>2通目を読んだ流れで、自分宛のカード一覧が目に入る。前回のカードも残っている。組織の植物がそこそこ育っているのが見える</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>一覧をざっと眺める。植物を見て「ふーん、けっこう育ってるな」と思う程度</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「2枚か」「みんなけっこう送ってるのか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>表面上はフラット。ただ、自分の仕事が2人に認められている事実は静かに刺さっている</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんは植物やゲーミフィケーション要素にはあまり反応しない。ただし、組織の植物であれば「自分が送っていない」後ろめたさが生じないので、個人の花よりは相性がいい。彼にとっての価値は「メッセージの内容そのもの」にある</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
+        <h3>初めてカードを送る（かもしれない） — 「…まあ、あいつにはちゃんと言っておくか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>ある日、若手が一人で難しい障害対応をやり切った。河野さんはそれを横で見ていた</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>少し迷った後、アプリを開く。「一人でよくやった」とだけ書いて非公開で送信する</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「直接言うのもなんだしな」「…まあ、あいつにはちゃんと言っておくか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>淡々。でも送信ボタンを押した後、少しだけ口元が緩む</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>このフェーズに到達するかどうかは保証できない。到達しなくてもいい。河野さんが「受け取る人」として存在し続けるだけでも、送る側の体験を支えている</p></div>
+        </div>
+      </div>
+
+      <div class="j-phase">
+        <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
+        <h3>河野さんなりの定着 — 「まあ、こういうのも悪くないか」</h3>
+        <div class="j-grid">
+          <div class="j-item"><div class="j-item-label">状況</div><p>自分から送ることはほぼない。カードが届いたら読む。年に数回、本当に伝えたいときだけ送る</p></div>
+          <div class="j-item"><div class="j-item-label">行動</div><p>メール通知が来たら開く。月次集計はスルーするときもあるが、たまに見る</p></div>
+          <div class="j-item"><div class="j-item-label">思考</div><p>「まあ、こういうのも悪くないか」</p></div>
+          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐→😌</span>認めたくはないが、アプリの存在を受け入れている</p></div>
+          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんの利用頻度は低いまま。しかしこれは失敗ではない。懐疑的だった人が「まあ悪くない」に変わっただけで十分な成功。全員がアクティブユーザーである必要はない</p></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="insight in-sky">
+        <h3>河野さんのジャーニーから見えた設計示唆</h3>
+        <ul>
+          <li><strong>絶対に押し付けない。</strong>「送ってみませんか？」「まだカードを送っていません」系のナッジは河野さんを完全に失う</li>
+          <li><strong>受け取る体験の質がすべて。</strong>河野さんにとってこのアプリの価値は「もらったメッセージを読むこと」</li>
+          <li><strong>ログイン維持は必須。</strong>2回目以降にログインを求められたら「めんどくせえ」で終わる</li>
+          <li><strong>メール通知の頻度は最小限。</strong>カード受信時のみ。月次集計は送ってもいいが、未読でも追い打ちしない</li>
+          <li><strong>組織の植物は河野さんに後ろめたさを与えない。</strong>個人の花だと「自分は送っていない」が可視化されるが、組織全体なら距離を置いたまま眺められる</li>
+          <li><strong>河野さんが「受け取る人」として存在すること自体が価値。</strong>60名の組織で全員がアクティブユーザーである必要はない</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-strong"></div>
+
+  <!-- 08 INSIGHTS -->
+  <section id="insights">
+    <div class="section-num">08</div>
+    <div class="tag t-purple">DESIGN IMPLICATIONS</div>
+    <h2>設計示唆まとめ</h2>
+    <p class="lead">3人のジャーニーから見えた、プロトタイプ設計で押さえるべきポイント。</p>
+
+    <div class="insight in-rainbow mb24">
+      <h3>UI / UX で必ず押さえること</h3>
+      <ul>
+        <li><strong>Google認証はワンクリック。</strong>メールのリンク → 即カード表示。ここに摩擦があると森山さんも河野さんも離脱する</li>
+        <li><strong>セッション保持は長めに。</strong>河野さんの2回目訪問時にログインを求めない。最低でも数ヶ月は保持</li>
+        <li><strong>カード送信は最短導線。</strong>宛先選択 → メッセージ入力 → 公開/非公開 → 送信。それだけ</li>
+        <li><strong>非公開がデフォルト、または目立つ位置に。</strong>森山さんの「最初の一通」を後押しする最大の安心材料</li>
+        <li><strong>コンピテンシーラベルはAIが裏でつける。</strong>ユーザーに選ばせない。意識させすぎない</li>
+        <li><strong>開封演出（パァーっとする）は受け取り体験の核。</strong>ただし河野さんのように無反応の人もいる。演出はスキップ可能に</li>
+        <li><strong>組織の植物は全員で一つ。</strong>個人の実績ではなく「みんなで育てている」感覚。送る頻度が低い人にプレッシャーを与えず、送る頻度が高い人には共有の話題を提供する</li>
+        <li><strong>「送ってみませんか？」系のナッジは入れない。</strong>河野さんを失い、森山さんも引く</li>
+        <li><strong>初見で迷わない導線。</strong>中西さんは直感的に使い始めたい。UIが複雑だと最初の勢いが削がれる</li>
+        <li><strong>通知はメール。</strong>カード受信時 + 月1回の集計のみ</li>
+      </ul>
+    </div>
+
+    <h3 class="mb12">やらないことリストとの関係</h3>
+    <div class="changelog mb24">
+      <div class="changelog-item">
+        <span class="changelog-badge cb-move">後でやる → 最優先</span>
+        <p><strong>リアクション機能</strong> — MVPには含めないが、リリース後に最優先で追加する機能として位置づける。ジャーニーマップ上では「理想体験」として記載。中西さんの送りっぱなし問題と、森山さんの送る体験への橋渡しを実現するために、MVP直後の着手が望ましい。</p>
+      </div>
+    </div>
+
+    <div class="co co-sky mb24">
+      <svg class="co-i" style="color:var(--sky)"><use href="#i-lightbulb"/></svg>
+      <p><strong>ジャーニーマップの読み方：</strong>本資料のジャーニーマップはリアクション機能がある前提の「理想体験」を描いています。MVPリリース時点ではリアクションがないため、中西さんのモチベーション維持は組織の植物の成長・月次集計・対面での反応で補う想定です。リアクション追加後に体験がどう変わるかの検証ポイントにもなります。</p>
+    </div>
+
+    <h3 class="mb12">リスクと対策</h3>
+    <div class="g2 mb24">
+      <div class="co co-coral">
+        <svg class="co-i" style="color:var(--coral)"><use href="#i-warning"/></svg>
+        <p><strong>初期コンテンツ問題</strong><br>森山さんがタイムラインを見たとき、カードが1〜2枚しかなかったら安心感が生まれない。ベータ期間中に開発チーム内で送り合い、中西さんタイプに初期のタイムラインを温めてもらう</p>
+      </div>
+      <div class="co co-orange">
+        <svg class="co-i" style="color:var(--orange)"><use href="#i-warning"/></svg>
+        <p><strong>植物の成長上限問題</strong><br>組織の植物が成長しきった後、中西さんの「次のレベル」への好奇心が消える。レベル上限の設計や、季節ごとに植物が変わるなど、MVP後に飽き対策を検討する</p>
+      </div>
+    </div>
+
+    <div class="g2 mb24">
+      <div class="co co-purple">
+        <svg class="co-i" style="color:var(--purple)"><use href="#i-lightbulb"/></svg>
+        <p><strong>成功の定義を間違えない</strong><br>全員がアクティブに送り合う状態は理想であって、必須ではない。河野さんのように「受け取る人」として存在するだけでもエコシステムは成立する。利用率だけをKPIにしない</p>
+      </div>
+      <div class="co co-mint">
+        <svg class="co-i" style="color:var(--mint)"><use href="#i-flag"/></svg>
+        <p><strong>継続検討事項</strong><br>匿名送信の要否（非公開のみで十分か、匿名にも需要があるか）はMVP後のユーザーフィードバックで判断する</p>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+</body>
+</html>
