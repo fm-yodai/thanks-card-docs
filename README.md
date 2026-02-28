@@ -102,6 +102,7 @@ Claude Code で作業している場合は、以下のように一括で依頼�
 ├── deno.json                   # Deno タスク設定
 ├── scripts/
 │   ├── build-index.ts          # index.html 生成スクリプト
+│   ├── auto-register.ts        # 未登録HTML自動登録スクリプト
 │   └── index.template.html     # index.html の HTML/CSS テンプレート
 ├── docs/                       # プレゼン・ガイド形式のHTMLドキュメント
 ├── work/                       # ワークシート・ワークショップ形式の資料
@@ -117,12 +118,22 @@ Claude Code で作業している場合は、以下のように一括で依頼�
 ## 技術スタック
 
 - **Deno** — `deno task build` で `documents.json` + テンプレートから `index.html` を自動生成
-- **GitHub Actions** — main push 時に自動ビルド＋GitHub Pages デプロイ
+- **GitHub Actions** — main push 時に未登録HTML自動登録＋自動ビルド＋GitHub Pages デプロイ
 - 各HTMLページは **自己完結**（`<style>` `<script>` をインライン記述、共有CSS/JSなし）
 - フォント: Google Fonts CDN — Zen Maru Gothic, Noto Sans JP, Montserrat, DM Sans
 - 言語: すべて日本語 (`lang="ja"`)
 
 ## ドキュメントの追加
+
+### 簡単な方法: GitHub Web UI からアップロード
+
+HTMLファイルを `docs/`、`work/`、`references/` のいずれかに GitHub の Web UI からアップロードするだけで、CI が自動的に以下を行います:
+
+1. `documents.json` に仮エントリを追加（`<title>` タグからタイトル、`<meta name="description">` から説明文を抽出）
+2. `index.html` を再生成
+3. GitHub Pages にデプロイ
+
+メタデータ（アイコン・バッジ・グループ・色など）はデフォルト値で仮登録されるため、必要に応じて後から `documents.json` を手動編集してください。
 
 ### 1. HTMLファイルを作成する
 

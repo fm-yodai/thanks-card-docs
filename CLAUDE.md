@@ -12,6 +12,7 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 - `documents.json` — ドキュメントのメタデータ定義（グループ・カード情報の単一ソース）
 - `scripts/` — ビルドスクリプト:
   - `build-index.ts` — `documents.json` + テンプレートから `index.html` を生成する Deno スクリプト
+  - `auto-register.ts` — 未登録 HTML を検出し `documents.json` に自動追加するスクリプト
   - `index.template.html` — `index.html` の HTML/CSS テンプレート（`{{SECTIONS}}` / `{{ANIMATION_DELAYS}}` プレースホルダ）
 - `deno.json` — Deno タスク設定
 - `docs/` — プレゼン・ガイド形式のHTMLドキュメント
@@ -26,7 +27,8 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 ## Technical Details
 
 - **Build system:** Deno — `deno task build` で `index.html` を自動生成（`documents.json` + `scripts/index.template.html` → `index.html`）
-- **CI/CD:** GitHub Actions — main push 時に自動ビルド＋GitHub Pages デプロイ
+- **CI/CD:** GitHub Actions — main push 時に自動登録＋自動ビルド＋GitHub Pages デプロイ
+- **Auto-register:** `deno task auto-register` — `docs/`, `work/`, `references/` 直下の未登録 HTML を検出し `documents.json` に仮登録する。CI で自動実行され、変更があればコミットバックされる
 - **No tests or linting** — Static documentation only
 - `index.html` は `.gitignore` に含まれる（生成物のため直接コミットしない）
 - Each HTML page is fully self-contained (inline `<style>` and `<script>` blocks, no shared CSS/JS files)
@@ -48,8 +50,10 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 ### ドキュメントの追加手順
 
 1. HTMLファイルを適切なディレクトリに作成する（`docs/`, `work/`, `references/`）
-2. `documents.json` の `documents` 配列にエントリを追加する
+2. `documents.json` の `documents` 配列にエントリを追加する（GitHub Web UI からアップロードした場合は CI が自動で仮登録する）
 3. `deno task build` を実行して `index.html` を再生成する
+
+> **自動登録:** GitHub Web UI で HTML をアップロードするだけで、CI が `documents.json` への仮登録・`index.html` 再生成・デプロイまで自動で行います。メタデータ（タイトル・説明文・グループなど）は後から `documents.json` を手動編集して調整できます。
 
 ### documents.json のスキーマ
 
