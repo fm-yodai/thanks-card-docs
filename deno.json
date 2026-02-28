@@ -1,5 +1,6 @@
 {
   "tasks": {
-    "build": "deno run --allow-read --allow-write scripts/build-index.ts"
+    "build": "deno run --allow-read --allow-write scripts/build-index.ts",
+    "auto-register": "deno run --allow-read --allow-write scripts/auto-register.ts"
   }
 }
