@@ -211,6 +211,19 @@
       "order": 5
     },
     {
+      "title": "開発手法の比較（スクラム・カンバン・ウォーターフォール）",
+      "path": "./references/dev-methodology-comparison.html",
+      "group": "sprint0",
+      "icon": "📊",
+      "badges": ["INFO", "AGILE"],
+      "color": "sky",
+      "description": "スクラム・カンバン・ウォーターフォールの特徴・違い・使い分けをまとめた一般論の補足資料です。",
+      "meta": [
+        "📄 補足資料"
+      ],
+      "order": 8
+    },
+    {
       "title": "夜も眠れない問題 ワークショップ",
       "path": "./work/sleepless-problems-workshop.html",
       "group": "sprint0",

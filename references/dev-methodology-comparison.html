@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開発手法の比較 — スクラム・カンバン・ウォーターフォール</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F7F6F2;--card:#FFFFFF;--text:#1E1E2E;--sub:#555568;--muted:#999AAF;--warm:#E07A4B;--warm-light:#FFF3ED;--warm-border:#FDDCCC;--blue:#4A7ADB;--blue-light:#EDF3FE;--blue-border:#C5D8F8;--green:#3CA868;--green-light:#EEFAF2;--green-border:#B8E6C9;--purple:#7B5FC2;--purple-light:#F3EFFC;--purple-border:#CDBFEF;--pink:#C9506E;--pink-light:#FDF0F3;--pink-border:#F0C4CF;--yellow:#C49A1A;--yellow-light:#FDF8EA;--yellow-border:#EFE0A8;--border:#E8E7E3;--r:14px;--rs:10px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.8}
+
+  .wrap{max-width:820px;margin:0 auto;padding:48px 32px 80px}
+
+  /* header */
+  .doc-header{text-align:center;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+  .doc-header h1{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:28px;line-height:1.4;margin-bottom:8px}
+  .doc-sub{font-size:14px;color:var(--sub);margin-bottom:16px}
+  .doc-meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .doc-chip{padding:5px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;font-size:12px;color:var(--sub);font-weight:500}
+
+  /* toc */
+  .toc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;margin-bottom:40px}
+  .toc h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:var(--sub)}
+  .toc ol{padding-left:20px}
+  .toc li{font-size:13.5px;color:var(--sub);margin-bottom:4px}
+  .toc a{color:var(--blue);text-decoration:none;font-weight:500}
+  .toc a:hover{text-decoration:underline}
+  .toc .toc-sec{font-weight:700;color:var(--text);margin-top:10px}
+
+  /* section */
+  .sec{margin-bottom:48px}
+  .sec-tag{display:inline-flex;align-items:center;gap:6px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:6px;margin-bottom:10px}
+  .sec-tag.st-warm{background:var(--warm-light);color:var(--warm)}
+  .sec-tag.st-blue{background:var(--blue-light);color:var(--blue)}
+  .sec-tag.st-green{background:var(--green-light);color:var(--green)}
+  .sec-tag.st-purple{background:var(--purple-light);color:var(--purple)}
+  .sec-tag.st-yellow{background:var(--yellow-light);color:var(--yellow)}
+  .sec h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:22px;line-height:1.45;margin-bottom:8px}
+  .sec h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:17px;margin-bottom:6px;margin-top:24px}
+  .sec p{font-size:14px;color:var(--sub);line-height:1.85;margin-bottom:12px}
+
+  /* card */
+  .cd{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .cd-bar{height:4px;border-radius:var(--r) var(--r) 0 0;margin:-20px -22px 16px -22px}
+  .cd-bar.cb-warm{background:linear-gradient(90deg,var(--warm),#F2A07A)}
+  .cd-bar.cb-blue{background:linear-gradient(90deg,var(--blue),#7BA2EC)}
+  .cd-bar.cb-green{background:linear-gradient(90deg,var(--green),#6CC98B)}
+  .cd-bar.cb-purple{background:linear-gradient(90deg,var(--purple),#A68FD8)}
+  .cd-bar.cb-yellow{background:linear-gradient(90deg,var(--yellow),#D4B44A)}
+  .cd-bar.cb-pink{background:linear-gradient(90deg,var(--pink),#DE8199)}
+  .cd-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+  .cd h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+  .cd p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:8px}
+  .cd p:last-child{margin-bottom:0}
+  .cd .emoji{font-size:20px;margin-bottom:8px;display:block}
+
+  /* callout */
+  .co{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--rs);margin-bottom:14px}
+  .co.co-warm{background:var(--warm-light);border:1px solid var(--warm-border)}
+  .co.co-blue{background:var(--blue-light);border:1px solid var(--blue-border)}
+  .co.co-green{background:var(--green-light);border:1px solid var(--green-border)}
+  .co.co-purple{background:var(--purple-light);border:1px solid var(--purple-border)}
+  .co.co-yellow{background:var(--yellow-light);border:1px solid var(--yellow-border)}
+  .co-i{font-size:18px;flex-shrink:0;margin-top:1px}
+  .co p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:0}
+  .co strong{color:var(--text)}
+
+  /* grid */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+
+  /* comparison table */
+  .cmp-table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;font-size:13px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:var(--card)}
+  .cmp-table thead th{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;padding:14px 16px;text-align:left;border-bottom:2px solid var(--border)}
+  .cmp-table thead th:first-child{background:var(--bg);color:var(--sub);width:25%}
+  .cmp-table thead th.th-wf{background:var(--blue-light);color:var(--blue)}
+  .cmp-table thead th.th-kb{background:var(--green-light);color:var(--green)}
+  .cmp-table thead th.th-sc{background:var(--warm-light);color:var(--warm)}
+  .cmp-table tbody td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--sub);line-height:1.7;vertical-align:top}
+  .cmp-table tbody tr:last-child td{border-bottom:none}
+  .cmp-table tbody td:first-child{font-weight:600;color:var(--text);background:var(--bg)}
+
+  /* spectrum bar */
+  .spectrum{display:flex;align-items:center;gap:0;margin:24px 0;border-radius:var(--rs);overflow:hidden;height:48px;font-size:12px;font-weight:700;text-align:center}
+  .spectrum-seg{flex:1;display:flex;align-items:center;justify-content:center;height:100%;color:#fff;position:relative}
+  .spectrum-seg.s-wf{background:var(--blue)}
+  .spectrum-seg.s-kb{background:var(--green)}
+  .spectrum-seg.s-sc{background:var(--warm)}
+  .spectrum-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:-4px;margin-bottom:20px;padding:0 4px}
+
+  /* flow diagram */
+  .flow{display:flex;align-items:center;justify-content:center;gap:0;margin:20px 0 24px;flex-wrap:wrap}
+  .flow-step{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;color:#fff}
+  .flow-step.f-sc{background:var(--warm)}
+  .flow-step.f-kb{background:var(--green)}
+  .flow-step.f-wf{background:var(--blue)}
+  .flow-arrow{font-size:18px;color:var(--muted);padding:0 8px}
+
+  /* divider */
+  .divider{height:1px;background:var(--border);margin:48px 0}
+
+  /* reference */
+  .ref{font-size:12px;color:var(--muted);line-height:1.7;margin-top:6px}
+
+  @media(max-width:700px){
+    .wrap{padding:32px 18px 60px}
+    .g2,.g3{grid-template-columns:1fr}
+    .cmp-table{font-size:11.5px}
+    .cmp-table thead th,.cmp-table tbody td{padding:10px 12px}
+    .flow{flex-direction:column;gap:4px}
+    .flow-arrow{transform:rotate(90deg);padding:4px 0}
+  }
+  @media print{
+    body{background:#fff}
+    .wrap{padding:24px}
+    .cd,.co{break-inside:avoid}
+    .cmp-table{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== HEADER ===== -->
+<div class="doc-header">
+  <h1>📊 開発手法の比較<br>スクラム・カンバン・ウォーターフォール</h1>
+  <p class="doc-sub">3つの代表的な開発手法の特徴・違い・使い分けをまとめた一般論の資料です。</p>
+  <div class="doc-meta">
+    <span class="doc-chip">🎯 チーム全員向け</span>
+    <span class="doc-chip">📄 補足資料</span>
+  </div>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="toc">
+  <h2>📑 目次</h2>
+  <ol>
+    <li class="toc-sec">各手法の概要</li>
+    <li><a href="#waterfall">ウォーターフォール</a></li>
+    <li><a href="#kanban">カンバン</a></li>
+    <li><a href="#scrum">スクラム</a></li>
+    <li style="margin-top:10px" class="toc-sec">比較・使い分け</li>
+    <li><a href="#compare">比較表</a></li>
+    <li><a href="#spectrum">スペクトラムで理解する</a></li>
+    <li><a href="#choose">どう使い分けるか</a></li>
+    <li style="margin-top:10px" class="toc-sec">参考</li>
+    <li><a href="#ref">出典・参考文献</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!--  各手法の概要                                                   -->
+<!-- ============================================================ -->
+
+<!-- Waterfall -->
+<div class="sec" id="waterfall">
+  <div class="sec-tag st-blue">METHODOLOGY 1</div>
+  <h2>🏗️ ウォーターフォール</h2>
+  <p>ウォーターフォール（Waterfall）は、ソフトウェア開発で最も古くから使われている手法です。<strong>要件定義→設計→実装→テスト→リリース</strong>の各フェーズを順番に進めます。「滝（Waterfall）」のように上流から下流へ一方向に流れていくことからこの名前が付いています。</p>
+
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">✅</span>
+      <h4>メリット</h4>
+      <p>• 計画が明確で進捗管理しやすい<br>• ドキュメントが充実する<br>• 各フェーズの成果物が明確<br>• 関係者への説明がしやすい<br>• 要件が安定しているプロジェクトに強い</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⚠️</span>
+      <h4>デメリット</h4>
+      <p>• 途中での方向転換が難しい<br>• 動くものが出来るのが終盤になる<br>• 「作ってみたら違った」に弱い<br>• テスト段階で大きな問題が見つかると手戻りが大きい<br>• フィードバックループが長い</p>
+    </div>
+  </div>
+
+  <div class="co co-blue">
+    <div class="co-i">💡</div>
+    <p><strong>ポイント：</strong>「要件が最初からはっきりしていて、途中で変わらない」プロジェクトに向いています。建設・製造など、やり直しのコストが極めて高い分野で生まれた考え方です。</p>
+  </div>
+</div>
+
+<!-- Kanban -->
+<div class="sec" id="kanban">
+  <div class="sec-tag st-green">METHODOLOGY 2</div>
+  <h2>📋 カンバン</h2>
+  <p>カンバン（Kanban）は、トヨタ生産方式の「かんばん」に着想を得た手法です。<strong>作業を「見える化」</strong>し、<strong>同時に進行する作業量を制限（WIP制限）</strong>することで、スムーズな作業の流れを作ります。スクラムのような固定的な「スプリント」の区切りはなく、タスクを継続的に流していきます。</p>
+
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">✅</span>
+      <h4>メリット</h4>
+      <p>• 導入のハードルが低い（今の仕事のやり方から始められる）<br>• 固定のイベントやロールが少なく柔軟<br>• ボトルネックが視覚的にわかる<br>• 優先度の変更に即座に対応できる<br>• チームの負荷を適切にコントロールできる</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⚠️</span>
+      <h4>デメリット</h4>
+      <p>• 期限やスケジュール管理は自分たちで工夫が必要<br>• WIP制限を守る規律が求められる<br>• スプリントレビューのような定期的なフィードバックの仕組みがない<br>• チームの自律性がないと形骸化しやすい</p>
+    </div>
+  </div>
+
+  <h3>カンバンボードの基本</h3>
+  <p>カンバンの中心となるのが<strong>カンバンボード</strong>です。作業の状態を列で表し、各タスクをカードとして管理します。</p>
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>カンバンボードの例</h4>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;font-size:12px">
+      <div style="background:var(--bg);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-weight:700;color:var(--text);margin-bottom:6px">📥 Backlog</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin-bottom:4px;color:var(--sub)">タスクA</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin-bottom:4px;color:var(--sub)">タスクB</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--sub)">タスクC</div>
+      </div>
+      <div style="background:var(--yellow-light);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-weight:700;color:var(--yellow);margin-bottom:6px">🔨 作業中 <span style="font-size:10px;opacity:.7">(上限2)</span></div>
+        <div style="background:var(--card);border:1px solid var(--yellow-border);border-radius:6px;padding:6px 8px;margin-bottom:4px;color:var(--sub)">タスクD</div>
+        <div style="background:var(--card);border:1px solid var(--yellow-border);border-radius:6px;padding:6px 8px;color:var(--sub)">タスクE</div>
+      </div>
+      <div style="background:var(--purple-light);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-weight:700;color:var(--purple);margin-bottom:6px">👀 レビュー <span style="font-size:10px;opacity:.7">(上限2)</span></div>
+        <div style="background:var(--card);border:1px solid var(--purple-border);border-radius:6px;padding:6px 8px;color:var(--sub)">タスクF</div>
+      </div>
+      <div style="background:var(--green-light);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ 完了</div>
+        <div style="background:var(--card);border:1px solid var(--green-border);border-radius:6px;padding:6px 8px;margin-bottom:4px;color:var(--sub)">タスクG</div>
+        <div style="background:var(--card);border:1px solid var(--green-border);border-radius:6px;padding:6px 8px;color:var(--sub)">タスクH</div>
+      </div>
+    </div>
+    <p style="margin-top:12px"><strong>WIP（Work In Progress）制限</strong>が重要です。「作業中」や「レビュー」の列に上限を設けることで、チームが多くのタスクを同時に抱えすぎるのを防ぎます。1つのタスクを完了してから次に進む流れを作ります。</p>
+  </div>
+
+  <div class="co co-green">
+    <div class="co-i">💡</div>
+    <p><strong>ポイント：</strong>カンバンの最大の強みは<strong>「今の仕事のやり方を急に変えなくていい」</strong>ことです。まず現在の作業を見える化し、そこから少しずつ改善していくアプローチを取ります。</p>
+  </div>
+</div>
+
+<!-- Scrum -->
+<div class="sec" id="scrum">
+  <div class="sec-tag st-warm">METHODOLOGY 3</div>
+  <h2>🔄 スクラム</h2>
+  <p>スクラム（Scrum）は、アジャイル開発の中で最も広く使われているフレームワークです。<strong>1〜4週間の「スプリント」</strong>という固定の期間を繰り返し、その中で計画・実装・レビュー・ふりかえりを行います。チームには明確なロール（スクラムマスター・プロダクトオーナー・開発チーム）が定められています。</p>
+
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">✅</span>
+      <h4>メリット</h4>
+      <p>• スプリントごとに動くものが出来る<br>• 定期的なフィードバックで軌道修正できる<br>• ふりかえりでチームが継続的に改善できる<br>• 役割とイベントが明確で、チームの自律性が育つ<br>• 変化する要件に強い</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⚠️</span>
+      <h4>デメリット</h4>
+      <p>• スクラムイベント（会議）に時間がかかる<br>• ロールやルールを正しく運用するための学習コストがある<br>• 小規模チームではオーバーヘッドに感じることがある<br>• スクラムマスターの力量に大きく依存する<br>• 兼務が多い組織では運用が難しい</p>
+    </div>
+  </div>
+
+  <h3>スクラムの主なイベント</h3>
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <h4>スプリント中に行うイベント</h4>
+    <p><strong>スプリントプランニング：</strong>スプリントで何をやるか計画する会議。</p>
+    <p><strong>デイリースクラム：</strong>毎日15分の短い進捗共有。問題の早期発見が目的。</p>
+    <p><strong>スプリントレビュー：</strong>スプリントの成果をステークホルダーに見せてフィードバックをもらう。</p>
+    <p><strong>スプリントレトロスペクティブ：</strong>チームの働き方をふりかえり、改善策を話し合う。</p>
+  </div>
+
+  <div class="co co-warm">
+    <div class="co-i">💡</div>
+    <p><strong>ポイント：</strong>スクラムは「フレームワーク」であり「プロセス」ではありません。チームの状況に合わせてカスタマイズすることが前提ですが、基本的なルールを守らないと形骸化しやすい側面もあります。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  比較・使い分け                                                 -->
+<!-- ============================================================ -->
+
+<div class="sec" id="compare">
+  <div class="sec-tag st-purple">COMPARISON</div>
+  <h2>比較表</h2>
+  <p>3つの手法を主要な観点で比較します。</p>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="th-wf">🏗️ ウォーターフォール</th>
+        <th class="th-kb">📋 カンバン</th>
+        <th class="th-sc">🔄 スクラム</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>進め方</td>
+        <td>フェーズを順番に進める</td>
+        <td>タスクを継続的に流す</td>
+        <td>スプリントを繰り返す</td>
+      </tr>
+      <tr>
+        <td>計画のタイミング</td>
+        <td>最初に全体計画</td>
+        <td>随時（必要に応じて）</td>
+        <td>スプリントごと</td>
+      </tr>
+      <tr>
+        <td>変更への対応</td>
+        <td>原則として変更しない</td>
+        <td>いつでも柔軟に変更可</td>
+        <td>スプリント単位で変更可</td>
+      </tr>
+      <tr>
+        <td>固定イベント</td>
+        <td>フェーズレビュー</td>
+        <td>なし（任意で設定）</td>
+        <td>4つの定例イベント</td>
+      </tr>
+      <tr>
+        <td>役割（ロール）</td>
+        <td>PMが全体管理</td>
+        <td>特に定めなし</td>
+        <td>SM・PO・開発チーム</td>
+      </tr>
+      <tr>
+        <td>作業の区切り</td>
+        <td>フェーズ完了時</td>
+        <td>区切りなし（連続的）</td>
+        <td>スプリント（1〜4週間）</td>
+      </tr>
+      <tr>
+        <td>成果物のリリース</td>
+        <td>全体完成後に一括</td>
+        <td>準備ができ次第いつでも</td>
+        <td>スプリント終了ごと</td>
+      </tr>
+      <tr>
+        <td>ドキュメント</td>
+        <td>重視（各フェーズで作成）</td>
+        <td>最小限</td>
+        <td>必要十分</td>
+      </tr>
+      <tr>
+        <td>導入の難しさ</td>
+        <td>低い（馴染みやすい）</td>
+        <td>低い（段階的に始められる）</td>
+        <td>中〜高（ルール理解が必要）</td>
+      </tr>
+      <tr>
+        <td>チームの会議負荷</td>
+        <td>低い</td>
+        <td>低い</td>
+        <td>高め（4つの定例）</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sec" id="spectrum">
+  <div class="sec-tag st-purple">SPECTRUM</div>
+  <h2>スペクトラムで理解する</h2>
+  <p>3つの手法は「計画重視 ↔ 柔軟性重視」のスペクトラム（連続的な尺度）上に位置づけることができます。<strong>カンバンは、ウォーターフォールとスクラムの中間</strong>に位置する手法です。</p>
+
+  <div class="spectrum">
+    <div class="spectrum-seg s-wf">🏗️ ウォーターフォール</div>
+    <div class="spectrum-seg s-kb">📋 カンバン</div>
+    <div class="spectrum-seg s-sc">🔄 スクラム</div>
+  </div>
+  <div class="spectrum-label">
+    <span>← 計画重視・変更少</span>
+    <span>柔軟・変更に強い →</span>
+  </div>
+
+  <div class="g3">
+    <div class="cd" style="text-align:center">
+      <h4 style="color:var(--blue)">ウォーターフォール</h4>
+      <p style="font-size:12px">最初にしっかり計画し<br>計画どおりに進める</p>
+    </div>
+    <div class="cd" style="text-align:center">
+      <h4 style="color:var(--green)">カンバン</h4>
+      <p style="font-size:12px">今の進め方を活かしつつ<br>少しずつ改善する</p>
+    </div>
+    <div class="cd" style="text-align:center">
+      <h4 style="color:var(--warm)">スクラム</h4>
+      <p style="font-size:12px">短い周期で計画し<br>頻繁にフィードバックを得る</p>
+    </div>
+  </div>
+
+  <div class="co co-purple">
+    <div class="co-i">💡</div>
+    <p><strong>整理すると：</strong>「スクラムほどアジャイルではないが、ウォーターフォールほどガチガチではない」のがカンバンです。定期的なイベントや厳密なロール定義がないため、オーバーヘッドが小さく、少人数チームや兼務が多い状況でも取り入れやすいという特徴があります。</p>
+  </div>
+</div>
+
+<div class="sec" id="choose">
+  <div class="sec-tag st-yellow">HOW TO CHOOSE</div>
+  <h2>どう使い分けるか</h2>
+  <p>プロジェクトの状況やチームの特性に応じて、最適な手法は変わります。また、<strong>手法は固定ではなく、段階的に切り替えていく</strong>こともできます。</p>
+
+  <h3>各手法が向いているケース</h3>
+
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <h4>🏗️ ウォーターフォールが向いているとき</h4>
+    <p>• 要件が最初から明確で、途中で大きく変わらない<br>• 規制・法令対応など、厳密なドキュメントが求められる<br>• 複数の外部ベンダーとの連携が必要で、全体の計画を先に固める必要がある<br>• プロジェクトの経験が豊富で、見積もりの精度が高い</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>📋 カンバンが向いているとき</h4>
+    <p>• チームが他の業務と兼務しており、開発に使える時間が限られている<br>• まずは小さく始めて、徐々にプロセスを改善していきたい<br>• タスクの優先度が頻繁に変わる<br>• スクラムのイベント（会議）を回すだけの時間的余裕がない<br>• チームの人数が少なく、固定ロールの割り当てが難しい</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <h4>🔄 スクラムが向いているとき</h4>
+    <p>• 要件が不確実で、作りながら発見していく必要がある<br>• ステークホルダーからの定期的なフィードバックが重要<br>• チームメンバーが開発に専念できる環境がある<br>• チームの自律的な改善を重視したい<br>• ある程度の学習コストをかけられる余裕がある</p>
+  </div>
+
+  <h3>段階的な切り替えという考え方</h3>
+  <p>手法は「どれか1つを最初に選んで最後まで使い続ける」必要はありません。プロジェクトの進行に合わせて、段階的に切り替えることができます。</p>
+
+  <div class="flow">
+    <div class="flow-step f-sc">🔄 スクラム</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step f-kb">📋 カンバン</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step f-wf">🏗️ ウォーターフォール</div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-purple"></div>
+    <h4>例：スクラム → カンバン → ウォーターフォール</h4>
+    <p><strong>序盤（スクラム）：</strong>何を作るべきかが不確実な段階では、スクラムで短い周期のフィードバックを得ながら方向性を固めていく。</p>
+    <p><strong>中盤（カンバン）：</strong>方向性が固まり、やるべきことが見えてきたら、カンバンに移行して開発時間を最大化する。スクラムイベントの負荷を減らしつつ、作業の見える化とWIP制限で効率的に進める。</p>
+    <p><strong>終盤（ウォーターフォール）：</strong>リリースに向けてやることが明確になったら、計画的に順番に仕上げていく。</p>
+  </div>
+
+  <div class="co co-yellow">
+    <div class="co-i">🔑</div>
+    <p><strong>大事なのは：</strong>手法はあくまで「道具」です。チームの状況に合わない道具を無理に使い続けるよりも、<strong>その時々で最も効果的な進め方を選ぶ</strong>ことが重要です。「正しい手法を選ぶ」のではなく「チームがうまく進められる手法を選ぶ」という視点で考えましょう。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== 参考 ===== -->
+<div class="sec" id="ref">
+  <div class="sec-tag st-green">REFERENCES</div>
+  <h2>出典・参考文献</h2>
+  <div class="cd">
+    <p class="ref">Ken Schwaber, Jeff Sutherland.『スクラムガイド』2020.<br>https://scrumguides.org/</p>
+    <p class="ref" style="margin-top:10px">David J. Anderson.『Kanban: Successful Evolutionary Change for Your Technology Business』Blue Hole Press, 2010.</p>
+    <p class="ref" style="margin-top:10px">Henrik Kniberg, Mattias Skarin.『Kanban and Scrum: Making the Most of Both』InfoQ, 2010.<br>https://www.infoq.com/minibooks/kanban-scrum-minibook/</p>
+    <p class="ref" style="margin-top:10px">Atlassian.『Kanban vs Scrum』<br>https://www.atlassian.com/agile/kanban/kanban-vs-scrum</p>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>
