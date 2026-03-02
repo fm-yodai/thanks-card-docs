@@ -211,6 +211,20 @@
       "order": 5
     },
     {
+      "title": "夜も眠れない問題 ワークショップ",
+      "path": "./work/sleepless-problems-workshop.html",
+      "group": "sprint0",
+      "icon": "😰",
+      "badges": ["WORK", "DECK"],
+      "color": "coral",
+      "description": "インセプションデッキ7番目の質問。プロジェクトのリスクをチームで共有し、対策を議論するワークショップ資料です。",
+      "meta": [
+        "📄 全7スライド",
+        "⏱ 60分"
+      ],
+      "order": 7
+    },
+    {
       "title": "プロトタイプ",
       "path": "https://www.figma.com/make/A6s3aCmn1G6Glatzlv2Y1e/%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86%E3%82%AB%E3%83%BC%E3%83%89_%E3%83%97%E3%83%AD%E3%83%88%E3%82%BF%E3%82%A4%E3%83%97?t=p4qdhPU3HsJSAuY9-20&fullscreen=1&preview-route=%2Fmy",
       "group": "sprint0",

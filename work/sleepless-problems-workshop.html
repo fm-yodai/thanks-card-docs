@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夜も眠れない問題 — ワークショップ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #181b24;
+    --bg3: #1e2230;
+    --surface: #252a38;
+    --border: #2e3448;
+    --text: #e8eaf0;
+    --text-sub: #9ba3b8;
+    --text-muted: #5c6478;
+    --amber: #f0a030;
+    --amber-glow: rgba(240,160,48,0.15);
+    --coral: #e8655a;
+    --coral-glow: rgba(232,101,90,0.12);
+    --teal: #3ecfaf;
+    --teal-glow: rgba(62,207,175,0.12);
+    --sky: #5ba4f0;
+    --sky-glow: rgba(91,164,240,0.12);
+    --purple: #a07cf0;
+    --purple-glow: rgba(160,124,240,0.12);
+    --cat-a: var(--coral);
+    --cat-a-glow: var(--coral-glow);
+    --cat-b: var(--amber);
+    --cat-b-glow: var(--amber-glow);
+    --cat-c: var(--teal);
+    --cat-c-glow: var(--teal-glow);
+    --cat-d: var(--sky);
+    --cat-d-glow: var(--sky-glow);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+  }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .topbar-title {
+    font-size: 14px; font-weight: 500; color: var(--text-sub);
+  }
+  .topbar-right { display:flex; align-items:center; gap:20px; }
+  .step-indicator {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .step-indicator .current { color: var(--amber); font-weight:700; }
+
+
+
+  /* Progress */
+  .progress-bar {
+    position: fixed; top: 56px; left: 0; right: 0; height: 3px;
+    background: var(--bg3); z-index: 100;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--amber), var(--coral));
+    transition: width 0.4s ease;
+  }
+
+  /* ===== SLIDE CONTAINER ===== */
+  .slides-wrap {
+    position: fixed; top: 59px; bottom: 60px; left: 0; right: 0;
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute; top:0; left:0; right:0; bottom:0;
+    padding: 48px 64px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: all 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1; transform: translateX(0); pointer-events: all;
+  }
+  .slide.exit-left {
+    opacity: 0; transform: translateX(-60px);
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottombar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: rgba(15,17,23,0.95);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+  }
+  .nav-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; font-weight: 500;
+    padding: 10px 24px; border-radius: 8px;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: var(--bg3); border-color: var(--text-muted); }
+  .nav-btn.primary {
+    background: var(--amber); border-color: var(--amber);
+    color: #0f1117; font-weight: 700;
+  }
+  .nav-btn.primary:hover { filter: brightness(1.1); }
+  .nav-btn:disabled { opacity:0.3; pointer-events:none; }
+  .nav-dots {
+    display: flex; gap: 6px;
+  }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border); cursor: pointer;
+    transition: all 0.3s;
+  }
+  .nav-dot.active { background: var(--amber); transform: scale(1.3); }
+  .nav-dot:hover { background: var(--text-muted); }
+
+  /* ===== TYPOGRAPHY ===== */
+  .slide h1 {
+    font-size: 42px; font-weight: 900; line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .slide h2 {
+    font-size: 28px; font-weight: 700; line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .slide .lead {
+    font-size: 16px; color: var(--text-sub); line-height: 1.8;
+    max-width: 720px;
+  }
+
+  /* Category tag */
+  .cat-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .cat-tag-a { color: var(--cat-a); background: var(--cat-a-glow); }
+  .cat-tag-b { color: var(--cat-b); background: var(--cat-b-glow); }
+  .cat-tag-c { color: var(--cat-c); background: var(--cat-c-glow); }
+  .cat-tag-d { color: var(--cat-d); background: var(--cat-d-glow); }
+
+  /* ===== HERO SLIDE ===== */
+  .hero-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    height: 100%;
+    gap: 16px;
+  }
+  .hero-icon {
+    font-size: 64px; margin-bottom: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .hero-center h1 { font-size: 52px; }
+  .hero-meta {
+    display: flex; gap: 32px; margin-top: 16px;
+  }
+  .hero-meta-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .hero-meta-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px; font-weight: 700; color: var(--amber);
+  }
+  .hero-meta-label {
+    font-size: 12px; color: var(--text-muted);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  /* ===== AGENDA SLIDE ===== */
+  .agenda-list {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-top: 28px; max-width: 800px;
+  }
+  .agenda-item {
+    display: flex; align-items: center; gap: 20px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 24px;
+    transition: all 0.2s;
+  }
+  .agenda-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 700; color: var(--amber);
+    min-width: 60px;
+  }
+  .agenda-name { font-size: 15px; font-weight: 500; flex:1; }
+  .agenda-badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    font-weight: 700; letter-spacing: 0.5px;
+  }
+
+  /* ===== PROBLEM CARDS ===== */
+  .problems-grid {
+    display: grid; gap: 12px; margin-top: 20px;
+  }
+  .problem-card {
+    display: flex; align-items: flex-start; gap: 16px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 22px;
+    border-left: 3px solid var(--border);
+    transition: all 0.25s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .problem-card:nth-child(1) { animation-delay: 0.05s; }
+  .problem-card:nth-child(2) { animation-delay: 0.1s; }
+  .problem-card:nth-child(3) { animation-delay: 0.15s; }
+  .problem-card:nth-child(4) { animation-delay: 0.2s; }
+  .problem-card:nth-child(5) { animation-delay: 0.25s; }
+  .problem-card:nth-child(6) { animation-delay: 0.3s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(12px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+  .problem-card.cat-a { border-left-color: var(--cat-a); }
+  .problem-card.cat-b { border-left-color: var(--cat-b); }
+  .problem-card.cat-c { border-left-color: var(--cat-c); }
+  .problem-card.cat-d { border-left-color: var(--cat-d); }
+  .problem-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    min-width: 24px; padding-top: 2px;
+  }
+  .problem-text {
+    font-size: 14.5px; line-height: 1.7; flex: 1;
+  }
+
+  /* ===== MEMO SECTION ===== */
+  .memo-section {
+    margin-top: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .memo-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 22px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .memo-header-icon { font-size: 16px; }
+  .memo-header-text {
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.5px; color: var(--text-sub);
+  }
+  .memo-body { padding: 4px; }
+  .memo-textarea {
+    width: 100%; min-height: 220px; padding: 16px 18px;
+    background: transparent; border: none; outline: none;
+    color: var(--text); font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px; line-height: 1.8; resize: vertical;
+  }
+  .memo-textarea::placeholder { color: var(--text-muted); }
+
+  /* ===== ADD PROBLEM ===== */
+  .add-problem-row {
+    display: flex; gap: 10px; margin-top: 16px;
+  }
+  .add-input {
+    flex: 1; padding: 12px 16px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: inherit; font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .add-input:focus { border-color: var(--amber); }
+  .add-input::placeholder { color: var(--text-muted); }
+  .add-btn {
+    padding: 12px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--amber);
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .add-btn:hover { background: var(--amber-glow); border-color: var(--amber); }
+
+  /* ===== TWO COLUMN LAYOUT ===== */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+    margin-top: 20px;
+  }
+  .col-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 12px;
+  }
+
+  /* ===== SUMMARY SLIDE ===== */
+  .summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-top: 24px;
+  }
+  .summary-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 24px;
+    border-top: 3px solid var(--border);
+  }
+  .summary-card.s-a { border-top-color: var(--cat-a); }
+  .summary-card.s-b { border-top-color: var(--cat-b); }
+  .summary-card.s-c { border-top-color: var(--cat-c); }
+  .summary-card.s-d { border-top-color: var(--cat-d); }
+  .summary-card h3 {
+    font-size: 15px; font-weight: 700; margin-bottom: 8px;
+  }
+  .summary-memo {
+    font-size: 13px; line-height: 1.8; color: var(--text-sub);
+    white-space: pre-wrap; min-height: 60px;
+  }
+  .summary-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  /* ===== CALLOUT ===== */
+  .callout {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--amber-glow);
+    border: 1px solid rgba(240,160,48,0.25);
+    border-radius: var(--radius); padding: 16px 20px;
+    margin-top: 20px; max-width: 800px;
+  }
+  .callout-icon { font-size: 20px; flex-shrink: 0; padding-top: 1px; }
+  .callout-text {
+    font-size: 14px; line-height: 1.7; color: var(--text-sub);
+  }
+  .callout-text strong { color: var(--text); }
+
+  /* ===== KEYBOARD HINT ===== */
+  .key-hints {
+    position: fixed; bottom: 68px; right: 32px; z-index: 90;
+    display: flex; gap: 8px; opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+  .key-hints:hover { opacity: 0.8; }
+  .key-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-muted);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 4px;
+  }
+
+  /* Scrollbar */
+  .slide::-webkit-scrollbar { width: 6px; }
+  .slide::-webkit-scrollbar-track { background: transparent; }
+  .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .slide::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">Workshop</div>
+    <div class="topbar-title">夜も眠れない問題 — リスク議論セッション</div>
+  </div>
+  <div class="topbar-right">
+    <div class="step-indicator">
+      <span class="current" id="stepCurrent">1</span> / <span id="stepTotal">7</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- SLIDES -->
+<div class="slides-wrap">
+
+  <!-- ===== SLIDE 0: HERO ===== -->
+  <div class="slide active" data-slide="0">
+    <div class="hero-center">
+      <div class="hero-icon">😰</div>
+      <h1>夜も眠れない問題</h1>
+      <p class="lead">
+        プロジェクトを脅かすリスクをテーブルに出し、<br>
+        チームで向き合い、対策を考えるセッション
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <div class="hero-meta-val">60</div>
+          <div class="hero-meta-label">min</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="hero-meta-val">6</div>
+          <div class="hero-meta-label">members</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="hero-meta-val">12</div>
+          <div class="hero-meta-label">problems</div>
+        </div>
+        <div class="hero-meta-item">
+          <div class="hero-meta-val">4</div>
+          <div class="hero-meta-label">categories</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 1: AGENDA ===== -->
+  <div class="slide" data-slide="1">
+    <h2>📋 アジェンダ</h2>
+    <p class="lead">60分で「問題の共有 → 対策の議論 → 合意」まで進めます。</p>
+    <div class="agenda-list">
+      <div class="agenda-item">
+        <div class="agenda-time">5 min</div>
+        <div class="agenda-name">オープニング — セッションの目的とルール確認</div>
+        <div class="agenda-badge" style="color:var(--text-muted);background:var(--surface);">導入</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">12 min</div>
+        <div class="agenda-name">カテゴリA：業務優先度・時間確保（6件）</div>
+        <div class="agenda-badge" style="color:var(--cat-a);background:var(--cat-a-glow);">最重要</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">10 min</div>
+        <div class="agenda-name">カテゴリB：チーム推進力・スクラム運営（2件）</div>
+        <div class="agenda-badge" style="color:var(--cat-b);background:var(--cat-b-glow);">議論</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">10 min</div>
+        <div class="agenda-name">カテゴリC：社内訴求・プロダクト定着（2件）</div>
+        <div class="agenda-badge" style="color:var(--cat-c);background:var(--cat-c-glow);">議論</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">10 min</div>
+        <div class="agenda-name">カテゴリD：技術・コスト（2件）</div>
+        <div class="agenda-badge" style="color:var(--cat-d);background:var(--cat-d-glow);">議論</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">8 min</div>
+        <div class="agenda-name">追加リスクの募集 & フリーディスカッション</div>
+        <div class="agenda-badge" style="color:var(--purple);background:var(--purple-glow);">追加</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">5 min</div>
+        <div class="agenda-name">まとめ — 対策の振り返りとネクストアクション</div>
+        <div class="agenda-badge" style="color:var(--text-muted);background:var(--surface);">締め</div>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="callout-icon">💡</div>
+      <div class="callout-text">
+        <strong>グラウンドルール：</strong>正直ベースで話す / 批判ではなく建設的に / 新しい不安も歓迎 / 全部解決しなくてOK、認識の共有が大事
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 2: INTRO — 夜も眠れない問題とは ===== -->
+  <div class="slide" data-slide="2">
+    <div class="cat-tag" style="color:var(--purple);background:var(--purple-glow);">● おさらい</div>
+    <h2>そもそも「夜も眠れない問題」とは</h2>
+    <p class="lead">インセプションデッキ 10の質問のうち、7番目のタフクエッション。</p>
+
+    <div class="intro-content" style="margin-top:32px; display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+      <div>
+        <div class="intro-block" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px;">
+          <div style="font-size:36px; margin-bottom:12px;">😰</div>
+          <h3 style="font-size:17px; margin-bottom:12px;">何をするのか</h3>
+          <p style="font-size:14.5px; line-height:1.9; color:var(--text-sub);">
+            プロジェクトのリスクや不安を<strong style="color:var(--text);">全員でテーブルに出す</strong>。<br>
+            技術的な不確実性、チームの懸念、スケジュールの不安——<br>
+            「うまくいかないかもしれない」と感じていることを正直に共有する。
+          </p>
+        </div>
+
+        <div class="intro-block" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; margin-top:16px;">
+          <div style="font-size:36px; margin-bottom:12px;">🔖</div>
+          <h3 style="font-size:17px; margin-bottom:12px;">洗い出した後は</h3>
+          <p style="font-size:14.5px; line-height:1.9; color:var(--text-sub);">
+            リスクを 2 つに分類する：<br>
+            <span style="color:var(--amber);">■</span> <strong style="color:var(--text);">取り組むべきリスク</strong> — 対策を考え、行動に移す<br>
+            <span style="color:var(--text-muted);">■</span> <strong style="color:var(--text);">どうしようもないリスク</strong> — 認識を共有し、受け入れる
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div class="intro-block" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px;">
+          <div style="font-size:36px; margin-bottom:12px;">💡</div>
+          <h3 style="font-size:17px; margin-bottom:12px;">なぜやるのか</h3>
+          <p style="font-size:14.5px; line-height:1.9; color:var(--text-sub);">
+            全部を解決することが目的ではない。<br>
+            <strong style="color:var(--text);">チームで不安を共有するプロセスそのものに価値がある。</strong><br><br>
+            一人で抱えていた不安をテーブルに出すことで、<br>
+            「自分だけが心配していたわけじゃない」とわかる。<br>
+            それだけで気持ちが楽になる効果もある。
+          </p>
+        </div>
+
+        <div class="callout" style="margin-top:16px; max-width:100%;">
+          <div class="callout-icon">📖</div>
+          <div class="callout-text">
+            <strong>出典：</strong>『アジャイルサムライ』（Jonathan Rasmusson 著）<br>
+            プロジェクト開始時に「質問しにくいけど、聞いておかないと後で困ること」を先に話し合っておくためのツール。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 3: CATEGORY A ===== -->
+  <div class="slide" data-slide="3">
+    <div class="cat-tag cat-tag-a">● Category A — 最多 6件</div>
+    <h2>業務優先度・時間確保</h2>
+    <p class="lead">メンバーから最も多く挙がった懸念。本業との両立が最大のリスク。</p>
+    <div class="two-col">
+      <div>
+        <div class="col-label">挙がった問題</div>
+        <div class="problems-grid" id="problems-a">
+          <div class="problem-card cat-a">
+            <div class="problem-num">A-1</div>
+            <div class="problem-text">みんな業務が忙しくてコミットできない＆スクラムイベントに時間を食われ、肝心の作業が進まなかった</div>
+          </div>
+          <div class="problem-card cat-a">
+            <div class="problem-num">A-2</div>
+            <div class="problem-text">優先度が下がった結果、進捗が滞り、スコープを狭くしリリース（品質も学びも限定的に）</div>
+          </div>
+          <div class="problem-card cat-a">
+            <div class="problem-num">A-3</div>
+            <div class="problem-text">社内案件化されないことで限られた時間しかコミットできず、全然進まない</div>
+          </div>
+          <div class="problem-card cat-a">
+            <div class="problem-num">A-4</div>
+            <div class="problem-text">業務との兼ね合いで優先度が下がってしまい、メンバーがオーナーシップを取れずに進まない</div>
+          </div>
+          <div class="problem-card cat-a">
+            <div class="problem-num">A-5</div>
+            <div class="problem-text">思ったより膨大な時間（日報）が若手勉強会に使われており、社内から制限を受ける</div>
+          </div>
+          <div class="problem-card cat-a">
+            <div class="problem-num">A-6</div>
+            <div class="problem-text">業務量の予測がつきづらく（急な発注、短納期）、その人の担当で作業が止まる</div>
+          </div>
+        </div>
+        <div class="add-problem-row">
+          <input class="add-input" id="addInput-a" placeholder="新しい問題を追加…" onkeydown="if(event.key==='Enter')addProblem('a')">
+          <button class="add-btn" onclick="addProblem('a')">＋ 追加</button>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">対策メモ</div>
+        <div class="memo-section">
+          <div class="memo-header">
+            <div class="memo-header-icon">✏️</div>
+            <div class="memo-header-text">議論で出た対策・アイデアを記録</div>
+          </div>
+          <div class="memo-body">
+            <textarea class="memo-textarea" id="memo-a" placeholder="ここに対策メモを入力…&#10;&#10;例）&#10;・週◯時間は確保する合意を取る&#10;・社内案件化のために○○を準備する"></textarea>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <div class="callout-icon">🔍</div>
+          <div class="callout-text">
+            <strong>議論のヒント：</strong>「社内案件化」は多くの問題の根本原因では？ ここを解決できれば A-1〜A-5 の大部分が緩和される可能性がある。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 4: CATEGORY B ===== -->
+  <div class="slide" data-slide="4">
+    <div class="cat-tag cat-tag-b">● Category B — 2件</div>
+    <h2>チーム推進力・スクラム運営</h2>
+    <p class="lead">プロジェクトの進め方そのものに関するリスク。</p>
+    <div class="two-col">
+      <div>
+        <div class="col-label">挙がった問題</div>
+        <div class="problems-grid" id="problems-b">
+          <div class="problem-card cat-b">
+            <div class="problem-num">B-1</div>
+            <div class="problem-text">各種ファシリテート or メンバの推進力/やる気不足によって、プロジェクトがなあなあとなり空中分解する</div>
+          </div>
+          <div class="problem-card cat-b">
+            <div class="problem-num">B-2</div>
+            <div class="problem-text">目的よりも手法が先行してスクラムイベントが形骸化してしまった</div>
+          </div>
+        </div>
+        <div class="add-problem-row">
+          <input class="add-input" id="addInput-b" placeholder="新しい問題を追加…" onkeydown="if(event.key==='Enter')addProblem('b')">
+          <button class="add-btn" onclick="addProblem('b')">＋ 追加</button>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">対策メモ</div>
+        <div class="memo-section">
+          <div class="memo-header">
+            <div class="memo-header-icon">✏️</div>
+            <div class="memo-header-text">議論で出た対策・アイデアを記録</div>
+          </div>
+          <div class="memo-body">
+            <textarea class="memo-textarea" id="memo-b" placeholder="ここに対策メモを入力…&#10;&#10;例）&#10;・各イベントの目的を毎回冒頭で確認&#10;・レトロスペクティブで形骸化を検知"></textarea>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <div class="callout-icon">🔍</div>
+          <div class="callout-text">
+            <strong>議論のヒント：</strong>「学び」が最優先というプロジェクトの性質上、スクラムの「なぜやるか」を常に問い直す仕組みが鍵になりそう。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 4: CATEGORY C ===== -->
+  <div class="slide" data-slide="5">
+    <div class="cat-tag cat-tag-c">● Category C — 2件</div>
+    <h2>社内訴求・プロダクト定着</h2>
+    <p class="lead">作ったものが使われ続けるか。リリース後の世界を見据えたリスク。</p>
+    <div class="two-col">
+      <div>
+        <div class="col-label">挙がった問題</div>
+        <div class="problems-grid" id="problems-c">
+          <div class="problem-card cat-c">
+            <div class="problem-num">C-1</div>
+            <div class="problem-text">社内への訴求が充分でなく、エンドユーザーに目的が伝わらないままリリースしてしまった</div>
+          </div>
+          <div class="problem-card cat-c">
+            <div class="problem-num">C-2</div>
+            <div class="problem-text">使い続けてもらうための設計が足りず、リリース直後だけちょっと使われて、その後全く使われなかった</div>
+          </div>
+        </div>
+        <div class="add-problem-row">
+          <input class="add-input" id="addInput-c" placeholder="新しい問題を追加…" onkeydown="if(event.key==='Enter')addProblem('c')">
+          <button class="add-btn" onclick="addProblem('c')">＋ 追加</button>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">対策メモ</div>
+        <div class="memo-section">
+          <div class="memo-header">
+            <div class="memo-header-icon">✏️</div>
+            <div class="memo-header-text">議論で出た対策・アイデアを記録</div>
+          </div>
+          <div class="memo-body">
+            <textarea class="memo-textarea" id="memo-c" placeholder="ここに対策メモを入力…&#10;&#10;例）&#10;・ベータテストで早期フィードバック&#10;・通知やリマインドで利用を促進"></textarea>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <div class="callout-icon">🔍</div>
+          <div class="callout-text">
+            <strong>議論のヒント：</strong>インセプションデッキの「エレベーターピッチ」で決めた訴求ポイントを、社内展開時にどう伝えるかまでセットで考えておくと良い。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 5: CATEGORY D ===== -->
+  <div class="slide" data-slide="6">
+    <div class="cat-tag cat-tag-d">● Category D — 2件</div>
+    <h2>技術・コスト</h2>
+    <p class="lead">技術選定やインフラ費用に関するリスク。月50 USDの制約あり。</p>
+    <div class="two-col">
+      <div>
+        <div class="col-label">挙がった問題</div>
+        <div class="problems-grid" id="problems-d">
+          <div class="problem-card cat-d">
+            <div class="problem-num">D-1</div>
+            <div class="problem-text">生成AIやサーバーレスのインフラコストが嵩み、アプリケーション止めてくれと経営層から言われる</div>
+          </div>
+          <div class="problem-card cat-d">
+            <div class="problem-num">D-2</div>
+            <div class="problem-text">やりたいように技術、フレームワークで実装した結果、セキュリティ的に問題がある状態になる</div>
+          </div>
+        </div>
+        <div class="add-problem-row">
+          <input class="add-input" id="addInput-d" placeholder="新しい問題を追加…" onkeydown="if(event.key==='Enter')addProblem('d')">
+          <button class="add-btn" onclick="addProblem('d')">＋ 追加</button>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">対策メモ</div>
+        <div class="memo-section">
+          <div class="memo-header">
+            <div class="memo-header-icon">✏️</div>
+            <div class="memo-header-text">議論で出た対策・アイデアを記録</div>
+          </div>
+          <div class="memo-body">
+            <textarea class="memo-textarea" id="memo-d" placeholder="ここに対策メモを入力…&#10;&#10;例）&#10;・Sprint 0でコスト試算を必ず実施&#10;・セキュリティレビューのチェックリスト"></textarea>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <div class="callout-icon">🔍</div>
+          <div class="callout-text">
+            <strong>議論のヒント：</strong>予算 50 USD/月 は Sprint 0 の技術選定に直結する。コスト試算を早い段階で行い、超過時のフォールバックプランを決めておくと安心。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 6: SUMMARY ===== -->
+  <div class="slide" data-slide="7">
+    <h2>📝 まとめ — 対策の振り返り</h2>
+    <p class="lead">各カテゴリで議論した対策を一覧で確認し、ネクストアクションを決めましょう。</p>
+    <div class="summary-grid">
+      <div class="summary-card s-a">
+        <div class="summary-count" id="summary-count-a">6 件</div>
+        <h3 style="color:var(--cat-a);">A. 業務優先度・時間確保</h3>
+        <div class="summary-memo" id="summary-memo-a">（対策メモがここに反映されます）</div>
+      </div>
+      <div class="summary-card s-b">
+        <div class="summary-count" id="summary-count-b">2 件</div>
+        <h3 style="color:var(--cat-b);">B. チーム推進力・スクラム運営</h3>
+        <div class="summary-memo" id="summary-memo-b">（対策メモがここに反映されます）</div>
+      </div>
+      <div class="summary-card s-c">
+        <div class="summary-count" id="summary-count-c">2 件</div>
+        <h3 style="color:var(--cat-c);">C. 社内訴求・プロダクト定着</h3>
+        <div class="summary-memo" id="summary-memo-c">（対策メモがここに反映されます）</div>
+      </div>
+      <div class="summary-card s-d">
+        <div class="summary-count" id="summary-count-d">2 件</div>
+        <h3 style="color:var(--cat-d);">D. 技術・コスト</h3>
+        <div class="summary-memo" id="summary-memo-d">（対策メモがここに反映されます）</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px;">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-text">
+        <strong>最後に確認：</strong>全部を解決する必要はありません。「チームとしてリスクを認識している」こと自体に大きな価値があります。<br>
+        今日決めた対策のうち、<strong>最初の一手として今週やること</strong>を1つ決めて終わりましょう。
+      </div>
+    </div>
+  </div>
+
+</div><!-- /slides-wrap -->
+
+<!-- BOTTOM NAV -->
+<div class="bottombar">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>← 前へ</button>
+  <div class="nav-dots" id="navDots"></div>
+  <button class="nav-btn primary" id="nextBtn" onclick="navigate(1)">次へ →</button>
+</div>
+
+<!-- KEY HINTS -->
+<div class="key-hints">
+  <span class="key-hint">← → キーで移動</span>
+</div>
+
+<script>
+  // ===== SLIDE NAVIGATION =====
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  document.getElementById('stepTotal').textContent = totalSlides;
+
+  // Build nav dots
+  const dotsContainer = document.getElementById('navDots');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    const direction = index > currentSlide ? 1 : -1;
+    slides[currentSlide].classList.remove('active');
+    slides[currentSlide].classList.add(direction > 0 ? 'exit-left' : '');
+    setTimeout(() => {
+      slides[currentSlide].classList.remove('exit-left');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      if (currentSlide === totalSlides - 1) updateSummary();
+    }, 50);
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+    if (currentSlide === totalSlides - 1) updateSummary();
+  }
+
+  function navigate(dir) {
+    const next = currentSlide + dir;
+    if (next < 0 || next >= totalSlides) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = next;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+    if (currentSlide === totalSlides - 1) updateSummary();
+  }
+
+  function updateNav() {
+    document.getElementById('stepCurrent').textContent = currentSlide + 1;
+    document.getElementById('prevBtn').disabled = currentSlide === 0;
+    document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    document.getElementById('progressFill').style.width =
+      ((currentSlide + 1) / totalSlides * 100) + '%';
+    document.querySelectorAll('.nav-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === currentSlide);
+    });
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' || e.key === ' ') navigate(1);
+    if (e.key === 'ArrowLeft') navigate(-1);
+  });
+
+
+
+  // ===== ADD PROBLEM =====
+  const problemCounts = { a: 6, b: 2, c: 2, d: 2 };
+
+  function addProblem(cat) {
+    const input = document.getElementById(`addInput-${cat}`);
+    const text = input.value.trim();
+    if (!text) return;
+
+    problemCounts[cat]++;
+    const prefix = cat.toUpperCase();
+    const grid = document.getElementById(`problems-${cat}`);
+    const card = document.createElement('div');
+    card.className = `problem-card cat-${cat}`;
+    card.innerHTML = `
+      <div class="problem-num">${prefix}-${problemCounts[cat]}</div>
+      <div class="problem-text">${escapeHtml(text)}</div>
+    `;
+    grid.appendChild(card);
+    input.value = '';
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ===== SUMMARY UPDATE =====
+  function updateSummary() {
+    ['a', 'b', 'c', 'd'].forEach(cat => {
+      const memo = document.getElementById(`memo-${cat}`).value;
+      const summaryMemo = document.getElementById(`summary-memo-${cat}`);
+      summaryMemo.textContent = memo || '（対策メモなし）';
+      const count = document.getElementById(`problems-${cat}`).children.length;
+      document.getElementById(`summary-count-${cat}`).textContent = `${count} 件`;
+    });
+  }
+</script>
+
+</body>
+</html>
