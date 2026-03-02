@@ -343,6 +343,7 @@
     .section:nth-child(1) { animation-delay: 0.20s; }
   .section:nth-child(2) { animation-delay: 0.35s; }
   .section:nth-child(3) { animation-delay: 0.50s; }
+  .section:nth-child(4) { animation-delay: 0.65s; }
 
   @keyframes cardIn {
     from { opacity: 0; transform: translateY(24px); }
@@ -520,18 +521,6 @@
         </div>
       </a>
 
-      <a class="doc-card" data-color="orange" data-badges="DESIGN,GUIDE" href="./docs/design-system-intro.html">
-        <span class="doc-card-icon">📖</span>
-        <div class="doc-card-badges"><span class="doc-card-badge">DESIGN</span>
-        <span class="doc-card-badge">GUIDE</span></div>
-        <h3>デザインシステム入門</h3>
-        <p>「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。</p>
-        <div class="doc-card-meta">
-          <span>📄 入門ガイド</span>
-          <div class="doc-card-arrow">→</div>
-        </div>
-      </a>
-
       <a class="doc-card" data-color="purple" data-badges="DESIGN,GUIDE" href="./docs/design-guideline.html">
         <span class="doc-card-icon">🎨</span>
         <div class="doc-card-badges"><span class="doc-card-badge">DESIGN</span>
@@ -540,6 +529,39 @@
         <p>カラー・タイポグラフィ・コンポーネント・パターン・保守ルールをまとめたデザインシステム仕様書。</p>
         <div class="doc-card-meta">
           <span>📄 全6セクション</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
+
+      <div class="doc-card coming-soon" data-color="orange" data-badges="TEMPLATE,AGILE">
+        <span class="doc-card-icon">📝</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">TEMPLATE</span>
+        <span class="doc-card-badge">AGILE</span></div>
+        <h3>議事録テンプレート</h3>
+        <p>スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。</p>
+        <span class="coming-soon-tag">COMING SOON</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 一般知識ガイド -->
+  <div class="section" data-theme="reference">
+    <div class="section-header">
+      <span class="section-label">KNOWLEDGE</span>
+      <span class="section-title">一般知識ガイド</span>
+    </div>
+    <p class="section-desc">開発手法・設計・デザインなど、一般的な知識をわかりやすく解説した入門・補足資料です。</p>
+    <div class="doc-grid">
+
+      <a class="doc-card" data-color="orange" data-badges="DESIGN,GUIDE" href="./docs/design-system-intro.html">
+        <span class="doc-card-icon">📖</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">DESIGN</span>
+        <span class="doc-card-badge">GUIDE</span></div>
+        <h3>デザインシステム入門</h3>
+        <p>「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。</p>
+        <div class="doc-card-meta">
+          <span>📄 入門ガイド</span>
           <div class="doc-card-arrow">→</div>
         </div>
       </a>
@@ -557,14 +579,28 @@
         </div>
       </a>
 
-      <div class="doc-card coming-soon" data-color="orange" data-badges="TEMPLATE,AGILE">
-        <span class="doc-card-icon">📝</span>
-        <div class="doc-card-badges"><span class="doc-card-badge">TEMPLATE</span>
+      <a class="doc-card" data-color="purple" data-badges="INFO" href="./references/sprint0-first-half.html">
+        <span class="doc-card-icon">📘</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">INFO</span></div>
+        <h3>Sprint0前半 補足資料</h3>
+        <p>インセプションデッキ作成やデザインスプリントに関する一般的な手法の補足資料です。</p>
+        <div class="doc-card-meta">
+          <span>📄</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
+
+      <a class="doc-card" data-color="sky" data-badges="INFO,AGILE" href="./references/dev-methodology-comparison.html">
+        <span class="doc-card-icon">📊</span>
+        <div class="doc-card-badges"><span class="doc-card-badge">INFO</span>
         <span class="doc-card-badge">AGILE</span></div>
-        <h3>議事録テンプレート</h3>
-        <p>スプリントレビュー・ふりかえり・プランニングの議事録フォーマット。</p>
-        <span class="coming-soon-tag">COMING SOON</span>
-      </div>
+        <h3>開発手法の比較（スクラム・カンバン・ウォーターフォール）</h3>
+        <p>スクラム・カンバン・ウォーターフォールの特徴・違い・使い分けをまとめた一般論の補足資料です。</p>
+        <div class="doc-card-meta">
+          <span>📄 補足資料</span>
+          <div class="doc-card-arrow">→</div>
+        </div>
+      </a>
 
     </div>
   </div>
@@ -586,17 +622,6 @@
         <div class="doc-card-meta">
           <span>📄 全7セクション</span>
           <span>⏱ 約5分</span>
-          <div class="doc-card-arrow">→</div>
-        </div>
-      </a>
-
-      <a class="doc-card" data-color="purple" data-badges="INFO" href="./references/sprint0-first-half.html">
-        <span class="doc-card-icon">📘</span>
-        <div class="doc-card-badges"><span class="doc-card-badge">INFO</span></div>
-        <h3>Sprint0前半 補足資料</h3>
-        <p>Sprint0前半で行われる、インセプションデッキ作成やデザインスプリントに関する補足資料です。</p>
-        <div class="doc-card-meta">
-          <span>📄</span>
           <div class="doc-card-arrow">→</div>
         </div>
       </a>
@@ -660,18 +685,6 @@
         <div class="doc-card-meta">
           <span>📄 全7スライド</span>
           <span>⏱ 60分</span>
-          <div class="doc-card-arrow">→</div>
-        </div>
-      </a>
-
-      <a class="doc-card" data-color="sky" data-badges="INFO,AGILE" href="./references/dev-methodology-comparison.html">
-        <span class="doc-card-icon">📊</span>
-        <div class="doc-card-badges"><span class="doc-card-badge">INFO</span>
-        <span class="doc-card-badge">AGILE</span></div>
-        <h3>開発手法の比較（スクラム・カンバン・ウォーターフォール）</h3>
-        <p>スクラム・カンバン・ウォーターフォールの特徴・違い・使い分けをまとめた一般論の補足資料です。</p>
-        <div class="doc-card-meta">
-          <span>📄 補足資料</span>
           <div class="doc-card-arrow">→</div>
         </div>
       </a>

@@ -17,12 +17,20 @@
       "order": 2
     },
     {
+      "id": "knowledge",
+      "theme": "reference",
+      "label": "KNOWLEDGE",
+      "title": "一般知識ガイド",
+      "description": "開発手法・設計・デザインなど、一般的な知識をわかりやすく解説した入門・補足資料です。",
+      "order": 3
+    },
+    {
       "id": "sprint0",
       "theme": "reference",
       "label": "SPRINT 0",
       "title": "Sprint 0",
       "description": "Sprint 0 で作成・使用した資料です。当時の内容がそのまま残っています。",
-      "order": 3
+      "order": 4
     }
   ],
   "documents": [
@@ -93,19 +101,6 @@
       "order": 2
     },
     {
-      "title": "デザインシステム入門",
-      "path": "./docs/design-system-intro.html",
-      "group": "dev",
-      "icon": "📖",
-      "badges": ["DESIGN", "GUIDE"],
-      "color": "orange",
-      "description": "「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。",
-      "meta": [
-        "📄 入門ガイド"
-      ],
-      "order": 3
-    },
-    {
       "title": "デザインガイドライン",
       "path": "./docs/design-guideline.html",
       "group": "dev",
@@ -116,12 +111,25 @@
       "meta": [
         "📄 全6セクション"
       ],
-      "order": 4
+      "order": 3
+    },
+    {
+      "title": "デザインシステム入門",
+      "path": "./docs/design-system-intro.html",
+      "group": "knowledge",
+      "icon": "📖",
+      "badges": ["DESIGN", "GUIDE"],
+      "color": "orange",
+      "description": "「デザインシステムってなに？」を理解するための入門ガイド。一般的な知識をわかりやすく解説しています。",
+      "meta": [
+        "📄 入門ガイド"
+      ],
+      "order": 1
     },
     {
       "title": "アーキテクチャ設計と技術選定",
       "path": "./docs/architecture_and_tech_selection.html",
-      "group": "dev",
+      "group": "knowledge",
       "icon": "📐",
       "badges": ["GUIDE", "ARCH"],
       "color": "sky",
@@ -130,7 +138,7 @@
         "📄 全9スライド",
         "⏱ 約10分"
       ],
-      "order": 5
+      "order": 2
     },
     {
       "title": "議事録テンプレート",
@@ -160,15 +168,15 @@
     {
       "title": "Sprint0前半 補足資料",
       "path": "./references/sprint0-first-half.html",
-      "group": "sprint0",
+      "group": "knowledge",
       "icon": "📘",
       "badges": ["INFO"],
       "color": "purple",
-      "description": "Sprint0前半で行われる、インセプションデッキ作成やデザインスプリントに関する補足資料です。",
+      "description": "インセプションデッキ作成やデザインスプリントに関する一般的な手法の補足資料です。",
       "meta": [
         "📄"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "title": "インセプションデッキ ワーク",
@@ -213,7 +221,7 @@
     {
       "title": "開発手法の比較（スクラム・カンバン・ウォーターフォール）",
       "path": "./references/dev-methodology-comparison.html",
-      "group": "sprint0",
+      "group": "knowledge",
       "icon": "📊",
       "badges": ["INFO", "AGILE"],
       "color": "sky",
@@ -221,7 +229,7 @@
       "meta": [
         "📄 補足資料"
       ],
-      "order": 8
+      "order": 4
     },
     {
       "title": "夜も眠れない問題 ワークショップ",

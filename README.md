@@ -185,7 +185,7 @@ HTMLファイルを `docs/`、`work/`、`references/` のいずれかに GitHub 
 }
 ```
 
-- **`group`**: 既存グループの `id`（`project` / `dev` / `sprint0` など）から選ぶ
+- **`group`**: 既存グループの `id`（`project` / `dev` / `knowledge` / `sprint0` など）から選ぶ
 - **`color`**: `coral` / `sky` / `mint` / `purple` / `orange`
 - **`comingSoon: true`**: 未公開カード（グレーアウト表示）
 

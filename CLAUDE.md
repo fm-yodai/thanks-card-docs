@@ -76,6 +76,7 @@ This is a static HTML documentation site for the "ありがとうカード" (Tha
 |----------|-------|------|
 | **プロジェクト概要** (PROJECT) | `project` | プロジェクトの「今」を表すドキュメント（体制図、インセプションデッキなど） |
 | **開発ガイド** (DEVELOPMENT) | `dev` | 開発プロセス・手法に関するガイドやテンプレート |
+| **一般知識ガイド** (KNOWLEDGE) | `reference` | プロジェクト固有でない一般的な知識の入門・補足資料 |
 | **Sprint N** | `reference` | 各スプリントフェーズで作成・使用した資料。Sprint単位でグループを作る |
 
 ## Skill References (skills/thanks-card-overview/)
