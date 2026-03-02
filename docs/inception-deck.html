@@ -87,6 +87,7 @@
   .cd-accent.a-mint { background: linear-gradient(90deg, var(--mint), var(--sky)); }
   .cd-accent.a-purple { background: linear-gradient(90deg, var(--purple), var(--pink)); }
   .cd-accent.a-yellow { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+  .cd-accent.a-orange { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
   .cd-accent.a-pink { background: linear-gradient(90deg, var(--pink), var(--coral)); }
   .cd h3 { font-size: 15px; margin-bottom: 6px; }
   .cd p, .cd-p { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
@@ -159,6 +160,16 @@
   .risk h3 { font-size: 15px; margin-bottom: 6px; }
   .risk p { font-size: 12.5px; color: var(--text-sub); line-height: 1.7; }
   .risk-counter { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--mint); line-height: 1.7; }
+  .risk-cat { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .06em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .risk-count { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.06); }
+  .risk-list { list-style: none; padding: 0; }
+  .risk-list li { font-size: 12px; color: var(--text-sub); line-height: 1.7; padding: 4px 0; border-bottom: 1px solid var(--border); position: relative; padding-left: 16px; }
+  .risk-list li:last-child { border-bottom: none; }
+  .risk-list li::before { content: ''; position: absolute; left: 0; top: 11px; width: 6px; height: 6px; border-radius: 50%; }
+  .risk-list.rl-coral li::before { background: var(--coral); }
+  .risk-list.rl-orange li::before { background: var(--orange); }
+  .risk-list.rl-mint li::before { background: var(--mint); }
+  .risk-list.rl-sky li::before { background: var(--sky); }
 
   /* ── SLIDER ── */
   .slider-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
@@ -781,57 +792,96 @@
   <div class="slide-num">07 / 10</div>
   <div class="tag t-coral">WHAT KEEPS US UP AT NIGHT</div>
   <h2>夜も眠れない問題</h2>
-  <p class="lead">このプロジェクトを脅かすリスクと、その対策案。不安を共有し、チームで向き合う。</p>
+  <p class="lead">チームで洗い出した13のリスク。4つのカテゴリに分類し、正面から向き合う。</p>
 
-  <div class="co co-coral mb20">
-    <svg class="icon-sm co-i" style="color:var(--coral)"><use href="#i-warning"/></svg>
-    <p><strong>TBD</strong> — チームワークで議論して決定します。</p>
-  </div>
-
-  <div class="discuss">
-    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
-    <p>
-      <strong>Q1.</strong> 正直に聞きます——このプロジェクトで一番不安なことは何？（技術・チーム・運用、何でもOK）<br>
-      <strong>Q2.</strong> リリースしたのに誰も使わなかった、という最悪のシナリオを想像してみよう。何が原因でそうなる？<br>
-      <strong>Q3.</strong> 月50 USDの予算制約はどれくらい厳しい？ 超えそうになったらどうする？<br>
-      <strong>Q4.</strong> 開発中に「これは自分たちだけでは解決できない」と感じたとき、誰にどう助けを求める？<br>
-      <strong>Q5.</strong> 挙がったリスクそれぞれに、今から打てる「最初の一手」は何だろう？
-    </p>
-  </div>
-
-  <!--
-  <div class="g3 mb20">
-    <div class="risk r-high">
-      <div class="risk-level">HIGH RISK</div>
-      <h3>全社展開後の定着率</h3>
-      <p>リリースしても社員が使わなくなる可能性。60名全員に「使い続けたい」と思ってもらえるかが最大の不確実性。</p>
-      <div class="risk-counter">
-        <strong>対策案：</strong>ベータテストで早期フィードバック。通知によるリマインド。ランダム通知で「今日の感謝」を促す。使い始めのハードルを極限まで下げる。
-      </div>
+  <div class="g2 mb20">
+    <div class="risk" style="border-color:rgba(255,107,107,0.2)">
+      <div class="risk-cat" style="color:var(--coral)">A — 業務優先度・時間確保 <span class="risk-count">6件</span></div>
+      <ul class="risk-list rl-coral">
+        <li>みんな業務が忙しくてコミットできない＆スクラムイベントに時間を食われ、肝心の作業が進まない</li>
+        <li>優先度が下がった結果、進捗が滞り、スコープを狭くしリリース</li>
+        <li>社内案件化されないことで限られた時間しかコミットできず、全然進まない</li>
+        <li>業務との兼ね合いで優先度が下がり、メンバーがオーナーシップを取れずに進まない</li>
+        <li>思ったより膨大な時間が若手勉強会に使われており、社内から制限を受ける</li>
+        <li>業務量の予測がつきづらく、その人の担当で作業が止まる</li>
+      </ul>
     </div>
-    <div class="risk r-high">
-      <div class="risk-level">HIGH RISK</div>
-      <h3>予算制約（50 USD/月）</h3>
-      <p>インフラ費 + AI API コストを月50ドルに収める必要がある。生成AI のAPI呼び出しコストが読みにくい。</p>
-      <div class="risk-counter">
-        <strong>対策案：</strong>軽量モデルの採用。バッチ処理によるコスト最適化。Sprint 0 で概算コスト試算を実施。超過時のフォールバック設計。
-      </div>
+    <div class="risk" style="border-color:rgba(255,165,82,0.2)">
+      <div class="risk-cat" style="color:var(--orange)">B — チーム推進力・スクラム運営 <span class="risk-count">2件</span></div>
+      <ul class="risk-list rl-orange">
+        <li>ファシリテート or メンバの推進力不足でプロジェクトが空中分解する</li>
+        <li>手法が先行してスクラムイベントが形骸化する</li>
+      </ul>
     </div>
-    <div class="risk r-mid">
-      <div class="risk-level">MEDIUM RISK</div>
-      <h3>経験不足による遅延</h3>
-      <p>経験年数3年未満の若手9名が主体。技術的なハマりポイントで想定以上に時間がかかる可能性。</p>
-      <div class="risk-counter">
-        <strong>対策案：</strong>TL/PO による技術サポート。2週間スプリントで早期に遅れを検知。「学び」が最優先なので、スコープ調整で対応。
-      </div>
+    <div class="risk" style="border-color:rgba(107,203,119,0.2)">
+      <div class="risk-cat" style="color:var(--mint)">C — 社内訴求・プロダクト定着 <span class="risk-count">3件</span></div>
+      <ul class="risk-list rl-mint">
+        <li>社内への訴求が不十分で、目的が伝わらないままリリースしてしまう</li>
+        <li>使い続けてもらうための設計が足りず、リリース直後だけ使われて定着しない</li>
+        <li>プロダクトの効果を説明しきれず、開発が下火になる</li>
+      </ul>
+    </div>
+    <div class="risk" style="border-color:rgba(77,150,255,0.2)">
+      <div class="risk-cat" style="color:var(--sky)">D — 技術・コスト <span class="risk-count">2件</span></div>
+      <ul class="risk-list rl-sky">
+        <li>生成AIやサーバーレスのコストが嵩み、経営層からアプリ停止を言われる</li>
+        <li>やりたいように実装した結果、セキュリティ的に問題がある状態になる</li>
+      </ul>
     </div>
   </div>
+</div>
+</div>
 
-  <div class="discuss">
-    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
-    <p>他に「眠れなくなるほど不安なこと」はありますか？ AI精度の不確実性、チーム内コミュニケーション、稟議の不透明さなど、思いつくものがあれば挙げてください。</p>
+<!-- ==================== SLIDE 8b: COUNTERMEASURES ==================== -->
+<div class="sl" data-title="07 夜も眠れない問題 — 対策">
+<div class="sc">
+  <div class="slide-num">07 / 10</div>
+  <div class="tag t-coral">COUNTERMEASURES</div>
+  <h2>夜も眠れない問題 — 対策</h2>
+  <p class="lead">洗い出したリスクに対して、チームで合意した対策方針。</p>
+
+  <div class="g2">
+    <div class="cd">
+      <div class="cd-accent a-coral"></div>
+      <h3 style="color:var(--coral)">A — 業務優先度・時間確保</h3>
+      <ul class="risk-list rl-coral">
+        <li>納期を遅らせ、品質と学びは優先的に確保する</li>
+        <li>スプリント期間を1か月に変更（2週間分のタスク想定）、週2スクラムで開発時間を確保</li>
+        <li>段階的エスカレーション：スクラム → カンバン → ウォーターフォール</li>
+        <li>社内案件化を目指す。無理なら教育訓練を10%程度に抑え、目を付けられないように気を付ける</li>
+      </ul>
+    </div>
+    <div class="cd">
+      <div class="cd-accent a-orange"></div>
+      <h3 style="color:var(--orange)">B — チーム推進力・スクラム運営</h3>
+      <ul class="risk-list rl-orange">
+        <li>稼働可能時間・ブロッカーの有無など客観指標を可視化する仕組みを導入</li>
+        <li>他メンバーがオーナーシップを持つ</li>
+        <li>形骸化時は段階的にカンバン → ウォーターフォールへ移行</li>
+      </ul>
+    </div>
+    <div class="cd">
+      <div class="cd-accent a-mint"></div>
+      <h3 style="color:var(--mint)">C — 社内訴求・プロダクト定着</h3>
+      <ul class="risk-list rl-mint">
+        <li>社内案件化のための価値訴求をしっかり組み立てる</li>
+        <li>UX設計に明確に時間をかけ、エコシステムを設計する</li>
+        <li>ユーザーの利用データを取得・分析し、経営層に価値を訴求する</li>
+      </ul>
+      <div class="co co-mint" style="margin-top:12px;padding:12px 16px">
+        <svg class="icon-sm co-i" style="color:var(--mint)"><use href="#i-warning"/></svg>
+        <p style="font-size:11.5px"><strong>判断基準：</strong>Sprint 0終了時に社内案件化の目処が立たなければ教育訓練として縮小運営に切替。リリース後3ヶ月で利用状況を評価し継続判断</p>
+      </div>
+    </div>
+    <div class="cd">
+      <div class="cd-accent a-sky"></div>
+      <h3 style="color:var(--sky)">D — 技術・コスト</h3>
+      <ul class="risk-list rl-sky">
+        <li>アーキテクチャ設計時にコスト試算をしっかり行い、AWS活用推進組織の学習用費用に按分する</li>
+        <li>やりたいようにやらない。意思決定の理由を明確にする</li>
+      </ul>
+    </div>
   </div>
-  -->
 </div>
 </div>
 
