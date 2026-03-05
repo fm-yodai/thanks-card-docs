@@ -160,14 +160,6 @@
   .co-i { flex-shrink: 0; margin-top: 2px; width: 18px; height: 18px; }
   .co p { font-size: 13px; color: var(--text-sub); line-height: 1.85; }
   .co strong { color: var(--text); }
-  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--shadow); }
-  .toc h3 { font-size: 14px; margin-bottom: 12px; color: var(--text-muted); }
-  .toc-list { list-style: none; padding: 0; }
-  .toc-list li { padding: 6px 0; border-bottom: 1px solid var(--border); }
-  .toc-list li:last-child { border-bottom: none; }
-  .toc-list a { font-size: 13.5px; color: var(--text-sub); text-decoration: none; transition: color .2s; display: flex; align-items: center; gap: 10px; }
-  .toc-list a:hover { color: var(--coral); }
-  .toc-num { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 24px; }
   .eco { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 28px 0; }
   .eco-node { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 22px; text-align: center; box-shadow: var(--shadow); min-width: 180px; }
   .eco-node-emoji { font-size: 24px; margin-bottom: 6px; }
@@ -177,9 +169,9 @@
   .eco-arrow span { font-size: 10px; }
   .eco-loop { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--shadow); margin: 20px 0; }
   .eco-loop h4 { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 12px; }
-  .eco-loop-steps { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0; }
-  .eco-loop-step { background: var(--surface-sub); border-radius: var(--rs); padding: 12px 16px; text-align: center; font-size: 12px; color: var(--text-sub); line-height: 1.6; min-width: 130px; }
-  .eco-loop-arrow { padding: 0 8px; font-size: 12px; color: var(--text-muted); }
+  .eco-loop-steps { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 0; }
+  .eco-loop-step { background: var(--surface-sub); border-radius: var(--rs); padding: 12px 14px; text-align: center; font-size: 11.5px; color: var(--text-sub); line-height: 1.6; min-width: 0; flex: 1; }
+  .eco-loop-arrow { padding: 0 6px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
   .changelog { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--shadow); }
   .changelog-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .changelog-item:last-child { border-bottom: none; }
@@ -188,10 +180,22 @@
   .changelog-badge.cb-move { background: rgba(53,120,229,0.1); color: var(--sky); }
   .changelog-badge.cb-launch { background: rgba(232,135,58,0.1); color: var(--orange); }
   .changelog-badge.cb-verify { background: rgba(126,87,194,0.1); color: var(--purple); }
+  .changelog-badge.cb-future { background: rgba(212,160,23,0.1); color: var(--yellow); }
   .changelog-item p { font-size: 13px; color: var(--text-sub); line-height: 1.7; }
   .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
   .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}.mb28{margin-bottom:28px}.mb32{margin-bottom:32px}.mb40{margin-bottom:40px}.mb48{margin-bottom:48px}.mb64{margin-bottom:64px}
+
+  /* TAB */
+  .tab-nav { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 40px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn { font-family: 'Zen Maru Gothic', sans-serif; font-weight: 700; font-size: 13.5px; color: var(--text-muted); background: none; border: none; padding: 12px 20px; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color .2s, border-color .2s; }
+  .tab-btn:hover { color: var(--text-sub); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--coral); }
+  .tab-btn .tab-emoji { margin-right: 6px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
   @media (max-width: 700px) {
     .container { padding: 40px 18px 80px; }
     .compare, .g2, .g3, .j-grid { grid-template-columns: 1fr; }
@@ -202,6 +206,7 @@
     .eco-arrow { transform: rotate(90deg); padding: 8px 0; }
     .eco-loop-steps { flex-direction: column; }
     .eco-loop-arrow { transform: rotate(90deg); padding: 8px 0; }
+    .tab-btn { font-size: 12.5px; padding: 10px 14px; }
   }
 </style>
 </head>
@@ -239,26 +244,22 @@
 
   <div class="divider-strong"></div>
 
-  <!-- TOC -->
-  <section>
-    <div class="toc">
-      <h3>目次</h3>
-      <ul class="toc-list">
-        <li><a href="#overview"><span class="toc-num">01</span>ペルソナ概要 — 3人の比較とエコシステム</a></li>
-        <li><a href="#persona-a"><span class="toc-num">02</span>ペルソナA：森山 隆志（プライマリ — 受動的タイプ）</a></li>
-        <li><a href="#persona-c"><span class="toc-num">03</span>ペルソナB：中西 康弘（セカンダリ — 積極利用タイプ）</a></li>
-        <li><a href="#persona-b"><span class="toc-num">04</span>ペルソナC：河野 真一（サポーティング — 無関心タイプ）</a></li>
-        <li><a href="#journey-a"><span class="toc-num">05</span>ジャーニーマップ：森山 隆志</a></li>
-        <li><a href="#journey-c"><span class="toc-num">06</span>ジャーニーマップ：中西 康弘</a></li>
-        <li><a href="#journey-b"><span class="toc-num">07</span>ジャーニーマップ：河野 真一</a></li>
-        <li><a href="#insights"><span class="toc-num">08</span>設計示唆まとめ</a></li>
-      </ul>
-    </div>
-  </section>
+  <!-- TAB NAV -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="overview"><span class="tab-emoji">🔭</span>概要</button>
+    <button class="tab-btn" data-tab="moriyama"><span class="tab-emoji">🌿</span>森山 隆志</button>
+    <button class="tab-btn" data-tab="nakanishi"><span class="tab-emoji">☀️</span>中西 康弘</button>
+    <button class="tab-btn" data-tab="kouno"><span class="tab-emoji">⚡</span>河野 真一</button>
+    <button class="tab-btn" data-tab="insights"><span class="tab-emoji">💡</span>設計示唆</button>
+  </nav>
+
+  <!-- TAB: 概要 -->
+  <div class="tab-panel active" id="tab-overview">
+    <!-- ===== タブ1：概要（エコシステム） ===== -->
 
   <!-- 01 OVERVIEW -->
+  <!-- 01 OVERVIEW -->
   <section id="overview">
-    <div class="section-num">01</div>
     <div class="tag t-coral">PERSONA OVERVIEW</div>
     <h2>3人のペルソナとエコシステム</h2>
     <p class="lead">このプロダクトは、3つのタイプのユーザーと、プロダクト・開発チームが循環をつくることで成り立つ。</p>
@@ -268,7 +269,7 @@
         <div class="compare-avatar ca-coral">🌿</div>
         <div class="compare-name">森山 隆志</div>
         <div class="compare-type ct-coral">PRIMARY — 受動的</div>
-        <p class="compare-desc">もらったら嬉しいけど、自分からは送らない。日々の業務が忙しく、わざわざアプリを開く余裕がない。「嬉しかった」体験の積み重ねだけが、森山さんを動かす。</p>
+        <p class="compare-desc">業務が多忙で、業務以外のことへの関心・優先度が低い。「なんのためにやるのか」に納得できないと動かない。ただし面倒見がよく、若手に頼られたら助けてやりたいという気持ちはある。</p>
       </div>
       <div class="compare-card cc-mint">
         <div class="compare-avatar ca-mint">☀️</div>
@@ -280,80 +281,85 @@
         <div class="compare-avatar ca-sky">⚡</div>
         <div class="compare-name">河野 真一</div>
         <div class="compare-type ct-sky">SUPPORTING — 無関心</div>
-        <p class="compare-desc">業務以外のことに関心がない。人にも無関心。あってもなくても、もらってももらわなくても、よい。能動的には動かないが、存在自体がエコシステムの受け皿になる。</p>
+        <p class="compare-desc">業務以外のことに関心がない。人にも無関心。あってもなくても、もらってももらわなくてもよい。能動的には動かないが、存在自体がエコシステムの受け皿になる。</p>
       </div>
     </div>
 
-    <h3 class="mb12">エコシステムの循環</h3>
-    <p class="lead">ユーザー間のカードの流れだけでは一方通行になる。循環を成立させるには、開発チームとプロダクトの進化がループに組み込まれている必要がある。加えて、開発チームはプロダクトを作る側であると同時に、自らカードを送るユーザーでもある。</p>
-
-    <div class="eco mb16">
-      <div class="eco-node">
-        <div class="eco-node-emoji">☀️</div>
-        <div class="eco-node-name">中西さん</div>
-        <div class="eco-node-role">積極的に送る</div>
-      </div>
-      <div class="eco-arrow">→<span>カードを送る</span></div>
-      <div class="eco-node">
-        <div class="eco-node-emoji">🌿</div>
-        <div class="eco-node-name">森山さん</div>
-        <div class="eco-node-role">受け取り、リアクションする</div>
-      </div>
-      <div class="eco-arrow">→<span>カードを送る</span></div>
-      <div class="eco-node">
-        <div class="eco-node-emoji">⚡</div>
-        <div class="eco-node-name">河野さん</div>
-        <div class="eco-node-role">あれば受け取る</div>
-      </div>
-    </div>
-
-    <div class="eco mb24">
-      <div class="eco-node" style="border-color:rgba(232,135,58,0.3)">
-        <div class="eco-node-emoji">🛠</div>
-        <div class="eco-node-name">開発チーム（若手）</div>
-        <div class="eco-node-role">ユーザーとしても参加する</div>
-      </div>
-      <div class="eco-arrow">→<span>カードを送る</span></div>
-      <div class="eco-node">
-        <div class="eco-node-emoji">🌿</div>
-        <div class="eco-node-name">森山さん</div>
-        <div class="eco-node-role">最初の「嬉しい」体験</div>
-      </div>
-    </div>
-
-    <div class="eco-loop mb24">
-      <h4>🔄 循環を成立させるループ</h4>
-      <div class="eco-loop-steps">
-        <div class="eco-loop-step">👥 ユーザーが使う<br><small>（または使わない）</small></div>
-        <div class="eco-loop-arrow">→</div>
-        <div class="eco-loop-step">📊 行動データ・<br>フィードバック</div>
-        <div class="eco-loop-arrow">→</div>
-        <div class="eco-loop-step">🛠 開発チームが<br>プロダクトを進化</div>
-        <div class="eco-loop-arrow">→</div>
-        <div class="eco-loop-step">✨ 新しい楽しさが<br>中西さんに返る</div>
-        <div class="eco-loop-arrow">→</div>
-        <div class="eco-loop-step">☀️ 中西さんが<br>使い続ける</div>
-      </div>
-    </div>
+    <!-- ===== 設計の大方針 ===== -->
+    <h3 class="mb12">設計の大方針</h3>
+    <p class="lead">全員がアクティブユーザーでなくてよい。積極的に使う中西さんと、たまに使う森山さんによって、プロダクトが継続的に使われ続ける状態を理想とする。河野さんは最も動かしにくいユーザー像として、設計の下限を示す。</p>
 
     <div class="co co-coral mb20">
       <svg class="co-i" style="color:var(--coral)"><use href="#i-heart"/></svg>
-      <p><strong>設計の大方針：</strong>このプロダクトは「嬉しい気持ち」を起点に使ってもらう。強制感やネガティブな動機（同調圧力、リマインド、ナッジ）で参加させると、プロダクトへの印象を損ねて長期的には逆効果になる。</p>
+      <p><strong>なぜ森山さんがプライマリか：</strong>このプロダクトが組織に根づくかどうかは、森山さんのような「忙しくて業務以外に関心が薄い層」が使ってくれるかで決まる。設計上もっとも工夫が必要で、かつ動いてくれれば組織全体に波及する層。</p>
+    </div>
+
+    <div class="co co-mint mb20">
+      <svg class="co-i" style="color:var(--mint)"><use href="#i-lightbulb"/></svg>
+      <p><strong>なぜ中西さんがセカンダリか：</strong>設計の工夫がなくても使ってくれる層。ただし、この人が止まるとエコシステムの起点が弱まってしまう重要な存在。プロダクトの継続的な進化で、楽しさを枯らさない工夫が必要。</p>
+    </div>
+
+    <div class="co co-sky mb20">
+      <svg class="co-i" style="color:var(--sky)"><use href="#i-flag"/></svg>
+      <p><strong>なぜ河野さんがサポーティングか：</strong>受け取ってさえくれればよい、と位置付ける。河野さんが受け取る人として存在するだけでエコシステムの受け皿になる。この人に不快感・拒否感を生じさせないことを設計の下限とする。</p>
+    </div>
+
+
+    <!-- ===== エコシステムの循環 ===== -->
+    <h3 class="mb12">エコシステムの循環</h3>
+    <p class="lead">中西さん・開発チーム（若手）・管理職は互いにカードを送り合い、エコシステムを温める。その中から森山さんや河野さんにもカードが届く。森山さんは体験が積み重なれば返してくれるかもしれないが、強制はしない。河野さんは受け取るだけで十分。</p>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:28px 24px; box-shadow:var(--shadow); margin-bottom:24px;">
+
+      <!-- 送り合うグループ -->
+      <div style="text-align:center; font-size:12px; font-weight:700; color:var(--text-muted); letter-spacing:.08em; margin-bottom:12px;">互いに送り合う</div>
+      <div style="display:flex; justify-content:center; align-items:center; gap:0; flex-wrap:wrap; margin-bottom:8px;">
+        <div style="text-align:center; min-width:100px;">
+          <div style="font-size:24px;">☀️</div>
+          <div style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:13px;">中西さん</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">楽しいから送る</div>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); padding:0 8px;">⇄</div>
+        <div style="text-align:center; min-width:100px;">
+          <div style="font-size:24px;">🛠</div>
+          <div style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:13px;">開発チーム</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">自らも送る</div>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); padding:0 8px;">⇄</div>
+        <div style="text-align:center; min-width:100px;">
+          <div style="font-size:24px;">👔</div>
+          <div style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:13px;">管理職</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">率先して送る</div>
+        </div>
+      </div>
+
+      <!-- 下矢印 -->
+      <div style="text-align:center; color:var(--text-muted); font-size:18px; margin:12px 0;">↓ <span style="font-size:11px;">カードが届く</span></div>
+
+      <!-- 受け取る側 -->
+      <div style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap;">
+        <div style="text-align:center; min-width:120px;">
+          <div style="font-size:24px;">🌿</div>
+          <div style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:13px;">森山さん</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">受け取り、いずれ返すかも</div>
+        </div>
+        <div style="text-align:center; min-width:120px;">
+          <div style="font-size:24px;">⚡</div>
+          <div style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:13px;">河野さん</div>
+          <div style="font-size:10.5px; color:var(--text-muted);">受け取るだけでOK</div>
+        </div>
+      </div>
+
     </div>
 
     <div class="co co-orange mb20">
       <svg class="co-i" style="color:var(--orange)"><use href="#i-lightbulb"/></svg>
-      <p><strong>開発チームの二重の役割：</strong>開発チームはプロダクトを作る側であると同時に、自らカードを送るユーザーでもある。森山さんや河野さんに「嬉しい」体験を届ける最初の一通を、中西さんタイプの自発的行動に頼るのではなく、開発チーム自身が意図的に作り出せる。循環の起点をコントロールできることは、設計上の大きな安心材料。</p>
+      <p><strong>送る側の役割分担：</strong>中西さんは楽しいから自然に送る。開発チーム（若手）は自らユーザーとして参加し、最初の体験を意図的に作り出す。管理職が加わることで送る側の層が厚くなり、カードが届かない人が出にくくなる。送る側が特定の誰かに依存して枯れない構造にすることが重要。</p>
     </div>
 
-    <div class="co co-yellow mb20">
-      <svg class="co-i" style="color:var(--yellow)"><use href="#i-lightbulb"/></svg>
-      <p><strong>設計の焦点：</strong>森山さんには「受け取って嬉しかった体験の積み重ね」を。中西さんには「プロダクトの進化を通じて楽しさを枯らさない」を。河野さんには「何もしなくてよい」を。3人へのアプローチはそれぞれ異なる。</p>
-    </div>
-
-    <div class="co co-mint mb20">
-      <svg class="co-i" style="color:var(--mint)"><use href="#i-refresh"/></svg>
-      <p><strong>循環の条件：</strong>中西さんの楽しさを個人の性格や好奇心に依存させたままでは、いずれ枯れる。ユーザーの行動データやフィードバックを開発チームが受け取り、プロダクトを進化させ続けることで、中西さんに新しい楽しさが返ってくる。この構造が循環を成立させる。</p>
+    <div class="co co-purple mb20">
+      <svg class="co-i" style="color:var(--purple)"><use href="#i-refresh"/></svg>
+      <p><strong>循環の条件：</strong>中西さんの楽しさを個人の性格や好奇心に依存させたままでは、いずれ枯れる。ユーザーの行動データやフィードバックを開発チームが受け取り、プロダクトを進化させ続けることで、新しい楽しさが返ってくる。この構造が循環を成立させる。</p>
     </div>
 
     <div class="co co-sky">
@@ -361,11 +367,14 @@
       <p><strong>前提条件：</strong>このエコシステムが回り続けるには、プロダクトの継続的な開発が必要であり、そのためのリソースと体制が維持されることが前提となる。</p>
     </div>
 
-  <div class="divider"></div>
+  </section>
 
-  <!-- 02 PERSONA A -->
+  </div>
+
+  <!-- TAB: 森山 隆志 -->
+  <div class="tab-panel" id="tab-moriyama">
+      <!-- 02 PERSONA A -->
   <section id="persona-a">
-    <div class="section-num">02</div>
     <div class="tag t-coral">PRIMARY PERSONA</div>
     <h2>森山 隆志（もりやま たかし）</h2>
     <p class="lead">穏やかで面倒見がいい。心の中ではありがたいと思っているが、日々の業務に追われていてそれどころではない。</p>
@@ -376,7 +385,8 @@
         <div>
           <div class="persona-type pt-coral">PRIMARY — 受動的タイプ</div>
           <div class="persona-name">森山 隆志</div>
-          <p class="persona-bio">口下手だけど、後輩の面倒見はいい。心の中では「ありがたいな」と思っているが、日々の業務に追われて余裕がない。</p>
+          <!-- persona-bio -->
+          <p class="persona-bio">口下手だけど、後輩の面倒見はいい。心の中では「ありがたいな」と思っているが、日々の業務に追われて余裕がない。現実的なタイプで、納得できないことに時間は使わない。</p>
         </div>
       </div>
       <table class="persona-table">
@@ -384,11 +394,13 @@
         <tr><td class="pt-label">部署</td><td class="pt-val">開発部（バックエンド）</td></tr>
         <tr><td class="pt-label">経験年数</td><td class="pt-val">20年以上（FREEMIND在籍12年）</td></tr>
         <tr><td class="pt-label">家族構成</td><td class="pt-val">妻、中学生の息子、小学生の娘</td></tr>
-        <tr><td class="pt-label">性格</td><td class="pt-val">穏やか、職人気質、口下手だが面倒見はいい</td></tr>
+        <tr><td class="pt-label">性格</td><td class="pt-val">穏やか、職人気質、口下手だが面倒見はいい、現実的で感情より納得感で動く</td></tr>
       </table>
       <div class="persona-section">
         <h4><svg style="color:var(--coral)"><use href="#i-user"/></svg> 普段の働き方</h4>
-        <p>自社内で受託開発案件を担当。朝9時に出社して淡々とコードを書き、18時には退社して家族との時間を大切にしている。日中は案件の対応に追われていて、正直なところ業務以外のことに時間を割く余裕がない。Chatworkは業務連絡中心に使い、雑談チャンネルでスタンプを押すくらいの参加はしているが、自分から雑談を投稿することはほぼない。</p>
+        <p>自社内で受託開発案件を担当。朝9時に出社して淡々とコードを書き、18時には退社して家族との時間を大切にしている。
+          日中は案件の対応に追われていて、業務以外のことに時間を割く余裕がない。
+          Chatworkは業務連絡中心に使い、雑談チャンネルでスタンプを押すくらいの参加はしているが、自分から雑談を投稿することはほぼない。</p>
       </div>
       <div class="persona-section">
         <h4><svg style="color:var(--coral)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
@@ -399,615 +411,671 @@
         <ul>
           <li>もらったら素直に嬉しい。リアクションボタンを押すくらいはする</li>
           <li>ただ、自分から「アプリを開いてカードを送ろう」という行動には至らない。業務が優先で、そこまでの余裕がない</li>
-          <li>「コンピテンシー」という言葉に堅さを感じる。自分の言葉で「助かった」と言いたいだけなのに、大げさにされると引く</li>
-          <li>中西さんに「みんなもっと書こうよ」と言われると、気持ちはわかるがすこし引いてしまう。善意だとわかっていても、忙しいときに言われると「そんな余裕ないって…」となる</li>
+          <li>「これをやって何になるのか」「導入する意味は何か」が明確でないと、時間を使う気にならない</li>
+          <li>若手が頑張って作っていることについては応援したい気持ちがある。頼られると悪い気はしない。</li>
+          <li>中西さんに「みんなもっと書こうよ」と言われると、気持ちはわかるがすこし引いてしまう。
+            忙しいときに言われると「そんな余裕ないって…」となる</li>
         </ul>
       </div>
       <div class="persona-key pk-coral">
         <h4><svg style="color:var(--coral);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
-        <p>森山さんは感謝の気持ち自体はある。足りないのは時間と動機。</p>
-        <p style="margin-top:8px">森山さんを動かすのは「カードを受け取って嬉しかった」体験の積み重ね。誰かにありがとうと言われて、じんわり嬉しかった。その体験が何度か重なったときに、ふと「自分も送ってみるか」と思う。それだけ。強制感や同調圧力で動かそうとすると、プロダクトへの印象を損ねて逆効果になる。</p>
-        <p style="margin-top:8px">送る体験のハードルは極限まで下げる。「わざわざアプリを開いて書く」というコストを限りなくゼロに近づける導線が必要。リアクションボタンは押す人なので、まずは「受け取る → リアクションする」のサイクルに馴染んでもらい、送る体験は焦らず待つ。</p>
-        <p style="margin-top:8px">また、中西さんのような積極利用タイプが善意で「みんなも書こうよ」と促してしまう可能性がある。それが森山さんにとっては逆効果になりうる点を設計上認識しておく必要がある。</p>
+        <p>森山さんの壁は「業務以外のことへの関心・優先度の低さ」。原価制で時間管理意識が高い環境にいるため、<strong>「なんのためにやるのか」に納得できないと動かない。</strong>感情ではなく納得感で動く現実的なタイプ。強制感・同調圧力・ネガティブな動機での参加誘導はプロダクトへの印象を損ね、長期的には逆効果。</p>
+        <p style="margin-top:8px">森山さんを動かすには3つの理由が必要。<br>
+          <strong>①納得感</strong>——導入効果（コミュニケーション改善・心理的安全性向上・離職率低下など）を定量的・定性的に伝え、時間を使う価値があると理解してもらう。<br>
+          <strong>②面倒見のよさ</strong>——若手が頑張って作ったプロダクトだから使ってあげるか、若手に送ってあげるか、という先輩としての気持ち。導入時に「若手に送ってあげて」と伝え、森山さんの面倒見のよさに訴える。<br>
+          <strong>③受取体験</strong>——カードをもらって嬉しかった経験が下地になる。ただし嬉しいだけでは送る行動には至らない。①と②があった上で③が重なることで、ようやく送る側に回る。</p>
+        <p style="margin-top:8px"><strong>送る体験のハードルは極限まで下げる。</strong>「わざわざアプリを開いて書く」というコストを限りなくゼロに近づける導線が必要。リアクションボタンは押す人なので、まずは「受け取る → リアクションする」のサイクルに馴染んでもらい、送る体験は焦らず待つ。</p>
+        <p style="margin-top:8px">中西さんのような積極利用タイプが善意で「みんなも書こうよ」と促してしまう可能性がある。それが森山さんにとっては逆効果になりうる点を設計上認識しておく必要がある。</p>
       </div>
     </div>
+
+      <!-- 05 JOURNEY A -->
+      <div class="divider-strong"></div>
+      <div class="tag t-orange">USER JOURNEY MAP</div>
+      <h2>ジャーニーマップ：森山 隆志</h2>
+      <p class="lead">「説明を聞いて納得する → もらう → リアクションする → 眺める → 若手に送ってやるか → 低頻度で定着」<br>森山さんは急がない。納得感と面倒見のよさが土台にあり、受取体験が重なることで送る側に回る。</p>
+
+      <div class="journey j-coral">
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--coral)">PHASE 1</div>
+          <h3>認知 — 「へぇ、そんなのできたんだ」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>空チャット・チームミーティングで「ありがとうカード」アプリの存在を知る。導入の目的・期待される効果の説明がある。「若手が作りました、先輩方ぜひ若手に送ってあげてください」という声かけもある</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>説明をなんとなく聞く。導入効果の話には少し耳を傾ける。「若手が作った」という部分が記憶に残る</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「感謝カードか…まあ、意味はわからなくもないな」「若手が作ったのか、頑張ったんだな」「ただ、今の業務で手一杯だし…」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>フラット。導入効果の説明で「意味のないこと」ではないと理解はした。若手が作ったことに少し感心。ただし自分から動くほどではない</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>導入時の説明で「なんのためにやるのか」への答えを提示し、森山さんの納得感を作る。加えて「若手に送ってあげて」という声かけが、面倒見のよさに自然に訴える。認知フェーズで無理に引き込まなくてよいが、「意味がないこと」と切り捨てられないようにする。次のフェーズ（カード受信）がトリガーになる設計に</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--orange)">PHASE 2</div>
+          <h3>最初のカードを受け取る — 「自分に？」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>ある日、メールの受信トレイに「森山さんにありがとうカードが届きました」が届いている</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>「ん？」と思いメールを開く。リンクからアプリにアクセスし、Google認証でログイン</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「誰だろう」「自分に？ 何だろう」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😯</span>意外、少し嬉しい。素朴な好奇心</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>ログインの手間で離脱するリスク。メールからアプリへの導線がスムーズであること、Google認証がワンクリックで完了することが絶対条件。忙しい森山さんが業務メール処理の流れで自然に開けることが重要</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--yellow)">PHASE 3</div>
+          <h3>カードを読む — 「わざわざ書いてくれたのか」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>後輩から「先週のレビュー、丁寧に見てくれて助かりました」と書いてある。AIが「協働」のラベルを付けている。カードを開いた瞬間、パァーっと華やかな演出が入る</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>演出に少し驚く。カードを読む。コンピテンシーラベルをちらっと見る。もう一度メッセージを読み返す</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「おっ」「あぁ、あのレビューのことか」「わざわざ書いてくれたのか」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>じんわり嬉しい。忙しい中でも、こういうのは悪くないと思う</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>この「嬉しい」は3つの動機のうちの③。①納得感と②面倒見のよさがPHASE 1で土台として敷かれているからこそ、ここでの嬉しさが「自分も送ってみるか」に繋がる可能性が生まれる。体験の余韻を壊さないことが最重要。「あなたも送ってみませんか？」的な誘導は不要</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--mint)">PHASE 4</div>
+          <h3>リアクションする — 「ボタン押すくらいなら」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>カードを読んだ画面に、リアクションボタンが見える。カードを書くのは時間がかかるが、ボタン1つなら業務の合間でもできる</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>リアクションボタンを押す。「ありがとう」をワンタップで返す</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「これくらいなら…」「文章書く時間はないけど、ボタンなら一瞬だし」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>軽い。負担がない。忙しくてもこれなら自分にもできる</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>リアクションは森山さんにとって「このアプリで自分ができること」の第一歩。カード表示画面の自然な位置に、目立ちすぎず見落とさない程度に配置する。※リアクション機能はMVP後の最優先追加。理想体験として記載</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--sky)">PHASE 5</div>
+          <h3>タイムラインを眺める — 「こういう感じでいいんだ」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>リアクションした流れで、公開タイムラインが目に入る。中西さんが送ったカードなど、他の社員同士のカードが並んでいる</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>いくつか読む。「こういう感じで書けばいいのか」と雰囲気を掴む</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「中西さんもやってるんだ」「短くていいんだな」「みんな気軽に書いてるな」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>安心。短くていい、気軽でいいとわかると心理的ハードルが下がる</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>タイムラインに十分なカードが流れている必要がある（初期のコンテンツ量問題）。中西さん・開発チーム・管理職が初期のタイムラインを温めてくれることが前提</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--purple)">PHASE 6</div>
+          <h3>最初のカードを送る — 「まあ、若手に送ってやるか」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>数週間後、後輩が急ぎの対応を手伝ってくれた。ふと「あ、カードで送るか」と思い出す。導入時に「若手に送ってあげて」と言われたのが頭の片隅にある。何度かカードをもらって嬉しかった経験も下地にある</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>アプリを開く。宛先を選び、「急な対応ありがとう、助かった」と短く書く。公開はちょっと恥ずかしいので「非公開」を選んで送信。所要時間は30秒程度</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「まあ、若手に送ってやるか」「これくらいならすぐ終わるな」「2人の間でわかればいいか」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>億劫だったわりに、送ってみたらあっという間だった。ちょっとすっきり</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>3つの動機がここで合流する。①導入効果を聞いて「意味のないことではない」と納得している。②「若手に送ってあげて」が面倒見のよさに刺さっている。③何度かもらって嬉しかった体験がある。この3つが揃って初めて「まあ、送るか」になる。入力の気軽さと非公開の選択肢が最後の一押し。ここに至るまでに数週間かかる可能性がある。焦らない</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
+          <h3>小さなフィードバックを得る — 「なんか育ってる」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>しばらくして、「組織の木がレベルアップしました！」というメール通知が届く。月末には「今月のありがとうまとめ」も届き、自分がもらったカードとコンピテンシーの傾向が見える</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>植物の成長を眺める。月次まとめを読んで「協働が多いな」と思う</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「みんなで育ててるのか」「協働か、まぁ確かにそうかも」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>静かな充実感。個人のスコアではなく組織の成長だから、プレッシャーがない</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>組織の植物は個人の成績ではないので、「自分はまだ全然送っていない」というプレッシャーを与えない。月次まとめがやわらかく存在感・プロダクトが動いている感を伝えてくる</p></div>
+          </div>
+        </div>
+
+        <div class="j-phase">
+          <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
+          <h3>定着 — 「あると悪くないな」</h3>
+          <div class="j-grid">
+            <div class="j-item"><div class="j-item-label">状況</div><p>月に1〜2回、業務がひと段落したタイミングで送る程度に落ち着く。もらったカードにはリアクションを返す。組織の植物が少しずつ育っていくのをたまに眺める</p></div>
+            <div class="j-item"><div class="j-item-label">行動</div><p>自然なペースで使い続ける。非公開で送ることが多いが、たまに「これは皆にも見てほしいな」と思ったときは公開にする</p></div>
+            <div class="j-item"><div class="j-item-label">思考</div><p>「習慣ってほどじゃないけど、あると悪くないな」「自分のペースでやれるのがいい」</p></div>
+            <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>穏やかな肯定感。無理なく続いている状態</p></div>
+            <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>頻度が低いので自然消滅リスクはある。通知はカード受信時・月1回の集計・木のレベルアップ時の3種類。メール通知なので不要ならスルーできる。忘れることの方がリスクなので、思い出すきっかけは多めに用意しておく。ただし「まだ送っていません」系の催促通知は入れない</p></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:28px">
+        <div class="insight in-coral">
+          <h3>森山さんのジャーニーから見えた設計示唆</h3>
+          <ul>
+            <li><strong>納得感が土台。</strong>導入時に「なんのためにやるのか」を明確に伝え、時間を使う価値があると理解してもらう。これがないと他の動機が機能しない</li>
+            <li><strong>面倒見のよさが背中を押す。</strong>「若手に送ってあげて」は強制ではなく、森山さんの先輩としての気持ちに訴える自然なコミュニケーション</li>
+            <li><strong>受取体験が最後のきっかけ。</strong>カードをもらって嬉しかった経験の積み重ねが「自分も送るか」に繋がる。ただし嬉しいだけでは動かない。①②が前提</li>
+            <li><strong>受け取りが行動の起点。</strong>自分から能動的に始めることはない。カード受信が唯一のトリガー</li>
+            <li><strong>リアクションが森山さんの主な参加方法。</strong>ボタン1つが忙しい日常に馴染む。MVP後に最優先で追加</li>
+            <li><strong>非公開が初回の鍵。</strong>「2人の間だけ」という安心感が最初の一通を後押しする</li>
+            <li><strong>30秒で完了する送信体験。</strong>業務の隙間に終わらなければ送らない</li>
+            <li><strong>組織の植物がプレッシャーなく定着を支える。</strong>個人の実績ではなく「みんなで育てている」感覚</li>
+            <li><strong>利用を促されると引く。</strong>アプリからのナッジも、中西さんの善意の声かけも逆効果になりうる</li>
+            <li><strong>通知は思い出すきっかけとして機能させる。</strong>カード受信・月1回の集計・木のレベルアップの3種類。メールなのでスルーできる。忘れるリスクの方が高いので、きっかけは多めに。ただし催促通知は入れない</li>
+          </ul>
+        </div>
+      </div>
+
   </section>
 
-  <div class="divider"></div>
+  </div>
 
-  <!-- 03 PERSONA C (SECONDARY) -->
-  <section id="persona-c">
-    <div class="section-num">03</div>
-    <div class="tag t-mint">SECONDARY PERSONA</div>
-    <h2>中西 康弘（なかにし やすひろ）</h2>
-    <p class="lead">明るくて社交的。楽しいかどうかがすべての行動基準。</p>
-
-    <div class="persona-card pc-mint">
-      <div class="persona-header">
-        <div class="persona-avatar pa-mint">☀️</div>
-        <div>
-          <div class="persona-type pt-mint">SECONDARY — 積極利用タイプ</div>
-          <div class="persona-name">中西 康弘</div>
-          <p class="persona-bio">技術が好きで、人と一緒に何かやるのも好き。リーダー役を引き受けているのは義務感ではなく、楽しいから。</p>
-        </div>
-      </div>
-      <table class="persona-table">
-        <tr><td class="pt-label">年齢</td><td class="pt-val">49歳</td></tr>
-        <tr><td class="pt-label">部署</td><td class="pt-val">開発部（フロントエンド／チームリーダー）</td></tr>
-        <tr><td class="pt-label">経験年数</td><td class="pt-val">25年以上（FREEMINDが個人事業主の集まりだった時代から在籍、18年目）</td></tr>
-        <tr><td class="pt-label">家族構成</td><td class="pt-val">妻、高校生の娘</td></tr>
-        <tr><td class="pt-label">性格</td><td class="pt-val">明るい、社交的、好奇心旺盛、楽しいかどうかが行動基準</td></tr>
-      </table>
-      <div class="persona-section">
-        <h4><svg style="color:var(--mint)"><use href="#i-user"/></svg> 普段の働き方</h4>
-        <p>技術が好きで、今でも手を動かすことに喜びを感じている。ただ、チーム内で自然とリーダー的な役割を引き受けるようになった。本人としては「偉くなりたい」わけではなく、人と一緒に何かやるのが楽しいからやっている。Chatworkでは雑談チャンネルの常連で、くだらない話にも反応するし、自分からもネタを投稿する。飲み会の幹事を自然とやるタイプ。</p>
-      </div>
-      <div class="persona-section">
-        <h4><svg style="color:var(--mint)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
-        <p>普段から「ありがとう」「助かったよ」を口に出す人。対面でもChatworkでも気軽に言う。特に深い意味を込めているわけではなく、思ったことをそのまま言葉にしている。感謝を伝えることに照れや抵抗がない。</p>
-      </div>
-      <div class="persona-section">
-        <h4><svg style="color:var(--mint)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
-        <ul>
-          <li>「お、面白そうじゃん」が第一印象。コンピテンシーの浸透とか理屈はどうでもいい。ツールとして面白いかどうか</li>
-          <li>組織全体で一つの植物を育てる仕組みに興味を持つ。「あと何件でレベルアップだろう」とゲーム感覚で気になる</li>
-          <li>自分が送ったカードに対して相手がどう反応したか気になる</li>
-          <li>タイムラインに自分のカードが流れて、他の人にも見てもらえるのは嬉しい。公開でどんどん送る</li>
-        </ul>
-      </div>
-      <div class="persona-key pk-mint">
-        <h4><svg style="color:var(--mint);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
-        <p>中西さんは動かす必要がない。勝手に動く。問題は「動き続けてくれるかどうか」。送っても反応が返ってこない、組織の植物が成長しきってしまった、タイムラインがマンネリ化した——こういった「飽き」がモチベーションを止める。</p>
-        <p style="margin-top:8px">中西さんの楽しさを個人の性格や好奇心に依存させたままでは、いずれ枯れる。楽しさを構造的に支えるのは「プロダクトの継続的な進化」。ユーザーの行動データやフィードバックを開発チームが受け取り、プロダクトを進化させ続けることで、中西さんに新しい楽しさが返ってくる。リアクション機能、お返し機能、植物の新しい成長段階——こういった進化が中西さんのモチベーションを維持するフィードバックループになる。</p>
-        <p style="margin-top:8px">中西さんが楽しそうに使っている姿が、森山さんの「自分もやってみようかな」に繋がる。ただし、中西さんが善意で「みんなもっと書こうよ」と働きかけたとき、森山さんのような人は引いてしまう。中西さんの熱量が周囲への圧力にならないよう、設計側で「個人の利用頻度を可視化しない」「ランキングを作らない」といった配慮が必要になる。</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- 04 PERSONA B (SUPPORTING) -->
-  <section id="persona-b">
-    <div class="section-num">04</div>
-    <div class="tag t-sky">SUPPORTING PERSONA</div>
-    <h2>河野 真一（こうの しんいち）</h2>
-    <p class="lead">業務以外のことに関心がない。人にも無関心。悪意はなく、ただ興味がない。</p>
-
-    <div class="persona-card pc-sky">
-      <div class="persona-header">
-        <div class="persona-avatar pa-sky">⚡</div>
-        <div>
-          <div class="persona-type pt-sky">SUPPORTING — 無関心タイプ</div>
-          <div class="persona-name">河野 真一</div>
-          <p class="persona-bio">長年の経験で自分のやり方が確立されている。業務以外のことに関心が薄く、人に対しても無関心。悪い人ではなく、ただ興味がない。</p>
-        </div>
-      </div>
-      <table class="persona-table">
-        <tr><td class="pt-label">年齢</td><td class="pt-val">45歳</td></tr>
-        <tr><td class="pt-label">部署</td><td class="pt-val">開発部（バックエンド）</td></tr>
-        <tr><td class="pt-label">経験年数</td><td class="pt-val">22年（FREEMIND在籍13年目）</td></tr>
-        <tr><td class="pt-label">家族構成</td><td class="pt-val">独身、一人暮らし</td></tr>
-        <tr><td class="pt-label">性格</td><td class="pt-val">合理的、マイペース、業務以外のことに関心が薄い、人に対しても無関心</td></tr>
-      </table>
-      <div class="persona-section">
-        <h4><svg style="color:var(--sky)"><use href="#i-user"/></svg> 普段の働き方</h4>
-        <p>長年の経験で自分のやり方が確立されている。効率を重視し、必要なことだけを最短距離でやるタイプ。自分の担当範囲をきっちりこなし、定時で帰る。他人の仕事に口を出さないし、口を出されるのも好まない。Chatworkは業務連絡のみ確認していて、雑談チャンネルはほぼ見ない。社内イベントにも特に参加しない。悪い人ではなく、ただ業務以外のことに興味がない。</p>
-      </div>
-      <div class="persona-section">
-        <h4><svg style="color:var(--sky)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
-        <p>感謝の気持ちがないわけではないが、それを積極的に表現しようという発想がない。「仕事をきちんとやるのは当然のこと」という感覚が根底にあり、いちいち感謝を形にすること自体がピンとこない。誰かに助けてもらったら「どうも」くらいは言うが、それ以上の行動には至らない。</p>
-      </div>
-      <div class="persona-section">
-        <h4><svg style="color:var(--sky)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
-        <ul>
-          <li>特に何も感じない、というのが正直なところ。業務に必要なツールではないので、視界に入ってもスルーする</li>
-          <li>コンピテンシーや感謝カードの意義を否定しているわけではない。ただ、自分には関係ないと思っている</li>
-          <li>カードが届いたら読むかもしれないし、読まないかもしれない。あってもなくてもどちらでもよい</li>
-          <li>もらって嫌な気持ちにはならないが、特別嬉しいわけでもない。「ふーん」くらいの温度感</li>
-        </ul>
-      </div>
-      <div class="persona-key pk-sky">
-        <h4><svg style="color:var(--sky);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
-        <p>動かそうとしなくてよい。河野さんは業務以外のことに関心がなく、このアプリも業務外の存在として認識している。カードが届けば読むかもしれないが、それ以上のアクションは期待しない。</p>
-        <p style="margin-top:8px">重要なのは、河野さんに不快な思いをさせないこと。過剰な通知、利用を促すナッジ、「まだカードを送っていません」的なリマインドは、無関心を不快に変えてしまう。河野さんが「あってもなくてもいい」と思い続けられる状態——つまりこのアプリが河野さんの業務や日常を一切邪魔しない状態を維持することが、唯一の設計指針。</p>
-        <p style="margin-top:8px">河野さんは「受け取る人」として存在するだけでも、送る側にとっての送り先になっており、エコシステムの受け皿として機能している。</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider-strong"></div>
-
-  <!-- 05 JOURNEY A -->
-  <section id="journey-a">
-    <div class="section-num">05</div>
-    <div class="tag t-orange">USER JOURNEY MAP</div>
-    <h2>ジャーニーマップ：森山 隆志</h2>
-    <p class="lead">「もらう → リアクションする → 眺める → 忙しい日々の中でふと送る → 低頻度で定着」<br>森山さんは急がない。「嬉しかった」体験の積み重ねだけが、森山さんを動かす。</p>
-
-    <div class="journey j-coral">
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--coral)">PHASE 1</div>
-        <h3>認知 — 「へぇ、そんなのできたんだ」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>全社チャットまたは朝会で「ありがとうカード」アプリの存在を知る</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>説明をなんとなく聞く。Chatworkの告知を流し読みする</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「感謝カードか…悪くはないけど」「今の業務で手一杯だし、わざわざ使うかって言われると…」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>フラット。興味はゼロではないが、業務で忙しい中で自分から動くほどではない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>「自分が使うもの」として認識されていない。業務優先の森山さんにとって、業務外のツールは優先順位が低い。認知フェーズで無理に引き込まなくてよい——次のフェーズ（カード受信）がトリガーになる設計にする</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--orange)">PHASE 2</div>
-        <h3>最初のカードを受け取る — 「自分に？」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>ある日、メールの受信トレイに「森山さんにありがとうカードが届きました」が届いている</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>「ん？」と思いメールを開く。リンクからアプリにアクセスし、Google認証でログイン</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「誰だろう」「自分に？ 何だろう」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😯</span>意外、少し嬉しい。素朴な好奇心</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>ログインの手間で離脱するリスク。メールからアプリへの導線がスムーズであること、Google認証がワンクリックで完了することが絶対条件。忙しい森山さんが業務メール処理の流れで自然に開けることが重要</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--yellow)">PHASE 3</div>
-        <h3>カードを読む — 「わざわざ書いてくれたのか」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>後輩から「先週のレビュー、丁寧に見てくれて助かりました」と書いてある。AIが「協働」のラベルを付けている。カードを開いた瞬間、パァーっと華やかな演出が入る</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>演出に少し驚く。カードを読む。コンピテンシーラベルをちらっと見る。もう一度メッセージを読み返す</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「おっ」「あぁ、あのレビューのことか」「わざわざ書いてくれたのか」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>じんわり嬉しい。忙しい中でも、こういうのは悪くないと思う</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>この「嬉しい」が森山さんを動かす唯一の燃料。体験の余韻を壊さないことが最重要。「あなたも送ってみませんか？」的な誘導は絶対に不要</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--mint)">PHASE 4</div>
-        <h3>リアクションする — 「ボタン押すくらいなら」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>カードを読んだ画面に、リアクションボタンが見える。カードを書くのは時間がかかるが、ボタン1つなら業務の合間でもできる</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>リアクションボタンを押す。「ありがとう」をワンタップで返す</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「これくらいなら…」「文章書く時間はないけど、ボタンなら一瞬だし」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>軽い。負担がない。忙しくてもこれなら自分にもできる</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>リアクションは「カードを書く」より遥かにハードルが低い。業務が忙しい森山さんにとって、これが「このアプリで自分ができること」の第一歩になる。リアクションボタンはカード表示画面の自然な位置に、目立ちすぎず、でも見落とさない程度に配置する。※リアクション機能はMVPには含まれない。理想体験として記載</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--sky)">PHASE 5</div>
-        <h3>タイムラインを眺める — 「こういう感じでいいんだ」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>リアクションした流れで、公開タイムラインが目に入る。中西さんが送ったカードなど、他の社員同士のカードが並んでいる</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>いくつか読む。「こういう感じで書けばいいのか」と雰囲気を掴む</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「中西さんもやってるんだ」「短くていいんだな」「みんな気軽に書いてるな」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>安心。自分だけじゃないとわかると心理的ハードルが下がる</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>タイムラインに十分なカードが流れている必要がある（初期のコンテンツ量問題）。中西さんのような積極利用タイプが初期のタイムラインを温めてくれることが前提。ベータテスト期間中に開発チーム内でカードを送り合っておく</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--purple)">PHASE 6</div>
-        <h3>最初のカードを送る — 「まあ、ぱっと送るか」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>数週間後、同僚が急ぎの対応を手伝ってくれた。ふと「あ、カードで送るか」と思い出す。業務がひと段落したタイミング。何度かカードをもらって嬉しかった経験が下地にある</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>アプリを開く。宛先を選び、「急な対応ありがとう、助かった」と短く書く。公開はちょっと恥ずかしいので「非公開」を選んで送信。所要時間は30秒程度</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「これくらいならすぐ終わるな」「まあ2人の間でわかればいいか」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>億劫だったわりに、送ってみたらあっという間だった。ちょっとすっきり</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>森山さんが送るのは「業務がひと段落した隙間」。その短い時間で完了できることが命。入力の気軽さと非公開の選択肢が「最初の一通」を支える。森山さんがここに至るのは「何度かもらって嬉しかった」体験があるから。このフェーズに到達するまでに数週間かかる可能性がある。焦らない</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
-        <h3>小さなフィードバックを得る — 「なんか育ってる」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>しばらくして、組織全体の植物が成長していることに気づく。「あと5件でレベルアップ」の表示が目に入る。月末に「今月のありがとうまとめ」の通知が届き、自分がもらったカードとコンピテンシーの傾向が見える</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>植物の成長を眺める。月次まとめを読んで「協働が多いな」と思う</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「みんなで育ててるのか」「協働か、まぁ確かにそうかも」「あと5件か…まあ俺が送らなくても誰かが送るだろうけど」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>静かな充実感。個人のスコアではなく組織の成長だから、プレッシャーがない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>組織の植物は個人の成績ではないので、森山さんに「自分はまだ全然送っていない」というプレッシャーを与えない。それでいて「みんなで育てている」という緩やかな一体感がある。月次まとめが「また送ってみよう」のきっかけとして機能しているか</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
-        <h3>定着 — 「あると悪くないな」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>月に1〜2回、業務がひと段落したタイミングで送る程度に落ち着く。もらったカードにはリアクションを返す。組織の植物が少しずつ育っていくのをたまに眺める</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>自然なペースで使い続ける。非公開で送ることが多いが、たまに「これは皆にも見てほしいな」と思ったときは公開にする。中西さんに「もっと送ろうよ」と言われると「まあね…」と流す</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「習慣ってほどじゃないけど、あると悪くないな」「自分のペースでやれるのがいい」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😌</span>穏やかな肯定感。無理なく続いている状態</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>頻度が低いので自然消滅リスクはある。月1回の集計通知が「思い出すきっかけ」として機能していれば維持できる。通知は月1回の集計＋カード受信時のみが限度。中西さんのような積極的なユーザーが「みんなも書こうよ」と声をかけることが、森山さんにとっては逆効果になりうる。アプリ側から利用を促すナッジを入れないのはもちろん、ユーザー間で「送っていない人」が可視化されない設計が重要</p></div>
-        </div>
-      </div>
-
-    </div>
-
-    <div style="margin-top:28px">
-      <div class="insight in-coral">
-        <h3>森山さんのジャーニーから見えた設計示唆</h3>
-        <ul>
-          <li><strong>「嬉しかった」体験が唯一の燃料。</strong>カードを受け取って嬉しかった経験の積み重ねだけが、森山さんを「送る側」に変える。強制感や同調圧力は逆効果</li>
-          <li><strong>受け取りが行動の起点。</strong>自分から能動的に始めることはない。業務が忙しく、わざわざアプリを開く動機がない</li>
-          <li><strong>リアクションが森山さんの主な参加方法。</strong>カードを書くよりボタン1つの方が、忙しい日常に馴染む。リアクションこそが森山さんの「使っている」状態（MVP後に追加予定）</li>
-          <li><strong>非公開が初回の鍵。</strong>「2人の間だけ」という安心感が最初の一通を後押しする</li>
-          <li><strong>「送る」は業務の隙間に30秒で終わる体験に。</strong>森山さんが送るのは「業務がひと段落した瞬間」。その短い時間で完了できなければ送らない</li>
-          <li><strong>コンピテンシーは裏方。</strong>AIが勝手にラベル付けしてくれる。意識させすぎない</li>
-          <li><strong>組織の植物がプレッシャーなく定着を支える。</strong>個人の実績ではなく「みんなで育てている」感覚が森山さんに合っている</li>
-          <li><strong>利用を促されると引く。</strong>アプリからのナッジはもちろん、中西さんのような善意の声かけも逆効果になりうる。「送っていない人」が可視化されない設計が必要</li>
-          <li><strong>通知設計は控えめに。</strong>カード受信通知（メール）+ 月1回の集計通知が限度</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider-strong"></div>
-
+  <!-- TAB: 中西 康弘 -->
+  <div class="tab-panel" id="tab-nakanishi">
   <!-- 06 JOURNEY C -->
-  <section id="journey-c">
-    <div class="section-num">06</div>
-    <div class="tag t-mint">USER JOURNEY MAP</div>
-    <h2>ジャーニーマップ：中西 康弘</h2>
-    <p class="lead">「面白そう → すぐ使う → どんどん送る → 植物のレベルアップが楽しい → 自然と周囲を巻き込む → プロダクトの進化が楽しさを更新する」<br>中西さんはエコシステムの太陽。楽しさが燃料。その楽しさを枯らさないのはプロダクトの進化。</p>
-
-    <div class="journey j-mint">
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--coral)">PHASE 1</div>
-        <h3>認知 — 「お、面白そうじゃん」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>全社チャットまたは朝会で「ありがとうカード」アプリの告知を見る</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>告知をちゃんと読む。Chatworkの雑談チャンネルで「これ面白そうじゃない？」と反応する</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「お、なんか新しいの出たな」「組織で植物育てるの？ どういう仕組みだろう」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>素直に興味。楽しそうかどうかで判断している</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんの認知フェーズに課題はほとんどない。問題はこの後「楽しさが続くか」</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--orange)">PHASE 2</div>
-        <h3>すぐに使ってみる — 「まずは送ってみないとわかんないよね」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>告知を見たその日のうちにアプリにアクセス。Google認証でログイン</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>UIをざっと見て回る。組織の植物がまだ芽の状態なのを見て「じゃあ最初に水やりするか」と思う</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「まずは送ってみないとわかんないよね」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>ワクワク。新しいおもちゃを触る感覚</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>初期のタイムラインが空でも中西さんは気にしない。むしろ「最初に使う人」になること自体を楽しめる。ただしUIがわかりにくいと「あれ？」となる。初見で迷わない導線が必要</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--yellow)">PHASE 3</div>
-        <h3>最初のカードを送る — 「簡単でいいね」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>さっそく同僚に送ってみる。昨日一緒に障害対応した後輩に「昨日の対応ナイスだったよ！」と書く。公開で送信</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>宛先を選んで、パッと思いつくまま書いて送る。迷わない。公開を選ぶのも自然</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「こんな感じか。簡単でいいね」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>気持ちいい。思ったことをサッと伝えられた満足感</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんにとって送信体験のハードルはほぼゼロ。AIラベリングの結果は「へぇ、まあそうかも」くらいの反応。深くは気にしない</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--mint)">PHASE 4</div>
-        <h3>どんどん送る — 「あいつにも送っとくか」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>その週のうちに3〜4枚送る。チーム内の後輩、他部署で手伝ってくれた人、最近頑張っていると感じた若手</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>思いついたタイミングでサッと送る。メッセージは短め。全部公開</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「あいつにも送っとくか」「タイムラインに自分のカード並んでるの、なんかいいな」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>楽しい。タイムラインが賑やかになっていくのが目に見えて気持ちいい</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんが初期のタイムラインを自分のカードで温めてくれる。これが森山さんのPHASE 5（タイムラインを眺める）の体験を支える。森山さんがタイムラインを見たとき、「短くていいんだ」「気軽に書いてるんだな」と感じられるかどうかがポイント</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--sky)">PHASE 5</div>
-        <h3>植物の成長に気づく — 「おっ、レベルアップしてる！」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>組織全体の植物がレベルアップしている。中西さんが何枚か送ったことも含め、みんなのカードの積み重ねで成長した</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>「おっ、育ってる！」と眺める。Chatworkの雑談チャンネルで「あと3件でレベルアップだぞ！」と共有する</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「みんなで育ててる感じいいな」「次のレベルどうなるんだろう」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>ゲーム的な好奇心。共通の目標がある楽しさ</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>組織の植物は「みんなで育てている」感覚を生む。中西さん一人の実績ではなく共同の成果なので、Chatworkで共有しやすい話題にもなる。ただし成長しきった後に「次」がないと飽きる。プロダクトの進化で新しい成長段階やバリエーションを追加し、この楽しさを更新し続ける必要がある</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--purple)">PHASE 6</div>
-        <h3>送りっぱなし問題 — 「反応あると嬉しいんだけどな」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>何枚か送ったが、アプリ内で相手からの反応がない。MVPにはリアクション機能がないので当然だが、中西さんは少し物足りなさを感じる</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>廊下で送った相手に会ったとき「カード見た？」と聞いてみる。「見たよ、ありがとう」と対面で言われる</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「アプリで反応返せたらいいのにな」「まあでも、対面で言ってもらえたからいいか」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>対面のフィードバックで補えているが、アプリ体験としてはやや物足りない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>MVPではリアクション機能がないため、中西さんの「送った実感」は対面の反応と植物の成長で補う。リアクション機能はMVP後に最優先で追加し、この体験のギャップを埋める。これが「プロダクトの進化が中西さんに正のフィードバックを返す」最初の具体例になる</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
-        <h3>自然と周囲を巻き込む — 「みんなもやればいいのに」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>中西さんがChatworkで植物のレベルアップの話をしたり、対面で「カード送っといたよ」と言うことで、周囲が少しずつ興味を持ち始める</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>意識して布教しているわけではない。楽しいから自然と話題にしている。森山さんのような人が「中西さんもやってるなら…」と思うきっかけになる</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「みんなもやればいいのに」（ただし押し付けはしていないつもり）</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>他の人もカードを送り始めて、タイムラインが賑やかになってきたのが嬉しい</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんが自然とエバンジェリストになるかどうかは、中西さん自身が楽しめているかどうかに完全に依存する。「広めてください」と頼んだ瞬間、義務になって楽しくなくなる。また、中西さんの「みんなもやればいいのに」が森山さんのような人にとっては圧力になりうる。中西さん本人に悪気はないが、設計側で「個人の利用頻度を可視化しない」「ランキングを作らない」ことで、この圧力を構造的に緩和する</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
-        <h3>定着 — 「なかったら逆に物足りない」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>週に2〜3回のペースで安定して送り続ける。もらうカードも増えてきた。月次集計を見て「俺、協働が多いんだな」と楽しんでいる。植物のレベルが上がるたびにChatworkで報告</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>日常のコミュニケーションの一部としてカードを使う。対面で「ありがとう」と言う代わりにカードを送ることもあれば、両方やることもある</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「これもう習慣だな」「なかったら逆に物足りない」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>自然な習慣。楽しさが安定している</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>定着後の課題は「マンネリ」。植物の成長上限、同じ体験の繰り返し。中西さんの楽しさを個人の性格頼みにせず、プロダクトの継続的な進化で支える。リアクション機能、お返し機能、植物の新しい成長段階など、ユーザーの行動データやフィードバックをもとに開発チームがプロダクトを進化させ続けることが、中西さんの長期的な楽しさを構造的に維持する。これがエコシステムの循環を成立させる条件になる</p></div>
-        </div>
-      </div>
-
-    </div>
-
-    <div style="margin-top:28px">
-      <div class="insight in-mint">
-        <h3>中西さんのジャーニーから見えた設計示唆</h3>
-        <ul>
-          <li><strong>初見の導線をわかりやすく。</strong>中西さんは迷わず使い始めたいタイプ。UIが直感的であること</li>
-          <li><strong>組織の植物がゲーム的な楽しさを提供。</strong>「あと○件でレベルアップ」は中西さんがChatworkで共有する話題になる。個人の実績より「みんなで」の方が盛り上がる</li>
-          <li><strong>送りっぱなし問題はMVP時点で残る。</strong>対面フィードバックと植物の成長で補いつつ、リアクション機能をMVP後に最優先で追加</li>
-          <li><strong>プロダクトの継続的な進化が中西さんの楽しさを支える。</strong>リアクション機能の追加が「プロダクトの進化が正のフィードバックを返す」最初の具体例になる。楽しさを個人の性格頼みにしない</li>
-          <li><strong>中西さんが楽しそうに使う姿が、森山さんを動かす。</strong>ただし「みんなも書こうよ」は森山さんには圧力になりうる。個人の利用頻度を可視化しない・ランキングを作らないことで構造的に緩和する</li>
-          <li><strong>「広めてください」と頼まない。</strong>楽しいから自然と話題にする状態をつくる。義務にした瞬間に壊れる</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
   <div class="divider-strong"></div>
+  <!-- 03 PERSONA C (SECONDARY) -->
+  <div class="tag t-mint">SECONDARY PERSONA</div>
+  <h2>中西 康弘（なかにし やすひろ）</h2>
+  <p class="lead">明るくて社交的。楽しいかどうかがすべての行動基準。</p>
 
-  <!-- 07 JOURNEY B -->
-  <section id="journey-b">
-    <div class="section-num">07</div>
-    <div class="tag t-sky">USER JOURNEY MAP</div>
-    <h2>ジャーニーマップ：河野 真一</h2>
-    <p class="lead">「スルー → メールで気づく → 読むかもしれない → 放置 → また届く → …まあ、別にいいけど」<br>河野さんは動かない。動かさなくていい。受け取る人として存在するだけで十分。</p>
-
-    <div class="journey j-sky">
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--sky)">PHASE 1</div>
-        <h3>認知 — 「ふーん」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>全社チャットまたは朝会で「ありがとうカード」アプリの告知を見る</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>告知を一瞥する。業務に関係ないと判断してスルーする</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「ふーん」「業務じゃないし、関係ないな」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>無関心。否定でも肯定でもない。視界に入っただけ</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>認知フェーズで既に無関心。ここから能動的に動くことはない。河野さんを動かすのは外部からのトリガー（＝カード受信メール）のみ。ただし、強いネガティブ感情があるわけではないので、不快にさえしなければ問題ない</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--purple)">PHASE 2</div>
-        <h3>最初のカードを受け取る — 「…なんか届いてる」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>数週間後、メールの受信トレイに「河野さんにありがとうカードが届きました」が届いている</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>件名を見る。すぐには開かない。業務メールを処理している流れで目に入り、なんとなく開く</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「なんか届いてる」「…誰だろう」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>無関心のまま。ただ、メールが届いた以上は一応見るかという程度</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>メールからアプリへの導線が自然であること。リンクを踏んだらすぐ読める状態が必要。ここで「ログインがめんどくさい」となったら二度と来ない。河野さんにとっての最大の離脱ポイント</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--coral)">PHASE 3</div>
-        <h3>カードを読む — 「ふーん、そうか」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>Google認証でログイン。同僚から「河野さんが障害対応のとき冷静に手順を教えてくれたおかげで、自分一人で対応できるようになりました」と書いてある。AIが「当事者意識」のラベルを付けている。開封時に演出が入る</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>演出は特に気にしない。メッセージを読む。ブラウザを閉じる</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「ふーん、そうか」「当事者意識ね。まあ、普通のことだけど」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>表面上は何も変わらない。嫌な気持ちにはなっていない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんの反応は薄い。それで問題ない。ここで余計なポップアップや「あなたもカードを送ってみませんか？」的な誘導を出すと、「めんどくさい」に変わる。読んで閉じる。それだけで完結する体験にする</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--orange)">PHASE 4</div>
-        <h3>何もしない — 「別に」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>カードを読んだ後、アプリを開くことはない。日常業務に戻る</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>何もしない。カードをくれた同僚に対して特別な反応もない。普段通り</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「別に」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>平常運転。カードをもらったこと自体を特に意識していない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>森山さんとの最大の違い。森山さんはリアクション → タイムラインと進むが、河野さんはアプリを閉じて戻ってこない。これは想定内。無理に引き戻そうとしない</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--yellow)">PHASE 5</div>
-        <h3>2通目のカードが届く — 「…また来たのか」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>1〜2ヶ月後、別の同僚からまたカードが届く。メールで気づく</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>メールを見る。前回と同じように、なんとなくリンクを開く。ログイン状態が残っていてすぐ読める</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「また来たのか」「…まあ、見るか」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>前回と同じ温度感。ただ、2回目なのでアプリへの抵抗はない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>2回目の体験がスムーズであること。前回のログイン状態が保持されていることが地味に重要。セッション切れでログインを求められたら「めんどくさい」で終わる</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--mint)">PHASE 6</div>
-        <h3>カード一覧を見る — 「2枚あるのか」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>2通目を読んだ流れで、自分宛のカード一覧が目に入る。前回のカードも残っている。組織の植物がそこそこ育っているのが見える</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>一覧をざっと眺める。植物を見て「ふーん」と思う程度</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「2枚あるのか」「みんなけっこう送ってるのか」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>フラット。植物やゲーミフィケーション要素には特に反応しない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんは植物やゲーミフィケーション要素にはあまり反応しない。ただし、組織の植物であれば「自分が送っていない」後ろめたさが生じないので、個人の花よりは相性がいい。河野さんがここで「自分は送っていない」と気まずく感じる設計は避ける</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
-        <h3>送ることはないかもしれない — 「別に、送らなくてもいいだろう」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>日常業務が続く。感謝カードを送ろうという発想が浮かぶことはない</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>何もしない</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「別に、送らなくてもいいだろう」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>何も感じていない。送らないことに対する後ろめたさもない</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>このフェーズに「送るかもしれない」という期待を持たない。河野さんが送らないことは失敗ではない。河野さんが「受け取る人」として存在し続けるだけでも、送る側の体験を支えている</p></div>
-        </div>
-      </div>
-
-      <div class="j-phase">
-        <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
-        <h3>河野さんなりの定着 — 「まあ、別にいいけど」</h3>
-        <div class="j-grid">
-          <div class="j-item"><div class="j-item-label">状況</div><p>自分から送ることはない。カードが届いたら読むときもあれば、読まないときもある</p></div>
-          <div class="j-item"><div class="j-item-label">行動</div><p>メール通知が来たら、気が向けば開く。月次集計はスルー</p></div>
-          <div class="j-item"><div class="j-item-label">思考</div><p>「まあ、別にいいけど」</p></div>
-          <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>終始フラット。アプリの存在を否定も肯定もしていない。あってもなくてもどちらでもよい</p></div>
-          <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんの温度感は最初から最後まで変わらない。これは失敗ではない。「まあ、別にいいけど」が河野さんにとっての最良の状態。無関心を不快に変えないことだけが設計上の条件。全員がアクティブユーザーである必要はない</p></div>
-        </div>
-      </div>
-
-    </div>
-
-    <div style="margin-top:28px">
-      <div class="insight in-sky">
-        <h3>河野さんのジャーニーから見えた設計示唆</h3>
-        <ul>
-          <li><strong>絶対に押し付けない。</strong>「送ってみませんか？」「まだカードを送っていません」系のナッジは河野さんの無関心を不快に変える</li>
-          <li><strong>受け取る体験を邪魔しない。</strong>河野さんにとってこのアプリの接点は「メールが届く → 読むかもしれない」だけ。その体験に余計なものを足さない</li>
-          <li><strong>ログイン維持は必須。</strong>2回目以降にログインを求められたら「めんどくさい」で終わる</li>
-          <li><strong>メール通知の頻度は最小限。</strong>カード受信時のみ。月次集計は送ってもいいが、未読でも追い打ちしない</li>
-          <li><strong>組織の植物は河野さんに後ろめたさを与えない。</strong>個人の花だと「自分は送っていない」が可視化されるが、組織全体なら距離を置いたまま眺められる</li>
-          <li><strong>河野さんが「受け取る人」として存在すること自体が価値。</strong>60名の組織で全員がアクティブユーザーである必要はない</li>
-          <li><strong>河野さんの温度感は変わらなくてよい。</strong>「まあ、別にいいけど」が最良の状態。無関心のままでいてもらうことが成功</li>
-        </ul>
+  <div class="persona-card pc-mint">
+    <div class="persona-header">
+      <div class="persona-avatar pa-mint">☀️</div>
+      <div>
+        <div class="persona-type pt-mint">SECONDARY — 積極利用タイプ</div>
+        <div class="persona-name">中西 康弘</div>
+        <p class="persona-bio">技術が好きで、人と一緒に何かやるのも好き。リーダー役を引き受けているのは義務感ではなく、楽しいから。</p>
       </div>
     </div>
-  </section>
-
-  <div class="divider-strong"></div>
-
-  <!-- 08 INSIGHTS -->
-  <section id="insights">
-    <div class="section-num">08</div>
-    <div class="tag t-purple">DESIGN IMPLICATIONS</div>
-    <h2>設計示唆まとめ</h2>
-    <p class="lead">3人のジャーニーから見えた、プロトタイプ設計で押さえるべきポイント。</p>
-
-    <div class="co co-coral mb24">
-      <svg class="co-i" style="color:var(--coral)"><use href="#i-heart"/></svg>
-      <p><strong>設計の大方針：</strong>このプロダクトは「嬉しい気持ち」を起点に使ってもらう。森山さんの壁は「心理的ハードル」ではなく「業務以外のことへの関心・優先度の低さ」。難易度は高い。しかし、強制感やネガティブな動機（同調圧力、リマインド、ナッジ）で参加させるとプロダクトへの印象を損ねて長期的には逆効果になる。「嬉しかった」体験の積み重ねだけが、森山さんを動かす唯一の方法。</p>
+    <table class="persona-table">
+      <tr><td class="pt-label">年齢</td><td class="pt-val">49歳</td></tr>
+      <tr><td class="pt-label">部署</td><td class="pt-val">開発部（フロントエンド／チームリーダー）</td></tr>
+      <tr><td class="pt-label">経験年数</td><td class="pt-val">25年以上（FREEMINDが個人事業主の集まりだった時代から在籍、18年目）</td></tr>
+      <tr><td class="pt-label">家族構成</td><td class="pt-val">妻、高校生の娘</td></tr>
+      <tr><td class="pt-label">性格</td><td class="pt-val">明るい、社交的、好奇心旺盛、楽しいかどうかが行動基準</td></tr>
+    </table>
+    <div class="persona-section">
+      <h4><svg style="color:var(--mint)"><use href="#i-user"/></svg> 普段の働き方</h4>
+      <p>技術が好きで、今でも手を動かすことに喜びを感じている。ただ、チーム内で自然とリーダー的な役割を引き受けるようになった。本人としては「偉くなりたい」わけではなく、人と一緒に何かやるのが楽しいからやっている。Chatworkでは雑談チャンネルの常連で、くだらない話にも反応するし、自分からもネタを投稿する。飲み会の幹事を自然とやるタイプ。</p>
     </div>
-
-    <div class="insight in-rainbow mb24">
-      <h3>UI / UX で必ず押さえること</h3>
+    <div class="persona-section">
+      <h4><svg style="color:var(--mint)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
+      <p>普段から「ありがとう」「助かったよ」を口に出す人。対面でもChatworkでも気軽に言う。特に深い意味を込めているわけではなく、思ったことをそのまま言葉にしている。感謝を伝えることに照れや抵抗がない。</p>
+    </div>
+    <div class="persona-section">
+      <h4><svg style="color:var(--mint)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
       <ul>
-        <li><strong>Google認証はワンクリック。</strong>メールのリンク → 即カード表示。ここに摩擦があると森山さんも河野さんも離脱する</li>
-        <li><strong>セッション保持は長めに。</strong>河野さんの2回目訪問時にログインを求めない。最低でも数ヶ月は保持</li>
-        <li><strong>カード送信は最短導線。</strong>宛先選択 → メッセージ入力 → 公開/非公開 → 送信。それだけ。業務の隙間に30秒で完了する体験</li>
-        <li><strong>非公開がデフォルト、または目立つ位置に。</strong>森山さんの「最初の一通」を後押しする最大の安心材料</li>
-        <li><strong>コンピテンシーラベルはAIが裏でつける。</strong>ユーザーに選ばせない。意識させすぎない</li>
-        <li><strong>開封演出（パァーっとする）は受け取り体験の核。</strong>「嬉しい」を増幅する装置。ただし河野さんのように無反応の人もいる。演出はスキップ可能に</li>
-        <li><strong>組織の植物は全員で一つ。</strong>個人の実績ではなく「みんなで育てている」感覚。送る頻度が低い人にプレッシャーを与えず、送る頻度が高い人には共有の話題を提供する</li>
-        <li><strong>「送ってみませんか？」系のナッジは入れない。</strong>河野さんの無関心を不快に変え、森山さんも引く</li>
-        <li><strong>個人の利用頻度を可視化しない。ランキングを作らない。</strong>中西さんの善意の声かけが森山さんへの圧力にならないよう、構造的に緩和する</li>
-        <li><strong>初見で迷わない導線。</strong>中西さんは直感的に使い始めたい。UIが複雑だと最初の勢いが削がれる</li>
-        <li><strong>通知はメール。</strong>カード受信時 + 月1回の集計のみ。未読でも追い打ちしない</li>
+        <li>「お、面白そうじゃん」が第一印象。コンピテンシーの浸透とか理屈はどうでもいい。ツールとして面白いかどうか</li>
+        <li>組織全体で一つの植物を育てる仕組みに興味を持つ。「あと何件でレベルアップだろう」とゲーム感覚で気になる</li>
+        <li>自分が送ったカードに対して相手がどう反応したか気になる</li>
+        <li>タイムラインに自分のカードが流れて、他の人にも見てもらえるのは嬉しい。公開でどんどん送る</li>
       </ul>
     </div>
+    <div class="persona-key pk-mint">
+      <h4><svg style="color:var(--mint);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
+      <p>中西さんは動かす必要がない。勝手に動く。問題は「動き続けてくれるかどうか」。送っても反応が返ってこない、組織の植物が成長しきってしまった、タイムラインがマンネリ化した——こういった「飽き」がモチベーションを止める。</p>
+      <p style="margin-top:8px">中西さんの楽しさを個人の性格や好奇心に依存させたままでは、いずれ枯れる。楽しさを構造的に支えるのは「プロダクトの継続的な進化」。ユーザーの行動データやフィードバックを開発チームが受け取り、プロダクトを進化させ続けることで、中西さんに新しい楽しさが返ってくる。リアクション機能、お返し機能、植物の新しい成長段階——こういった進化が中西さんのモチベーションを維持するフィードバックループになる。</p>
+      <p style="margin-top:8px">中西さんが楽しそうに使っている姿が、森山さんの「自分もやってみようかな」に繋がる。ただし、中西さんが善意で「みんなもっと書こうよ」と働きかけたとき、森山さんのような人は引いてしまう。中西さんの熱量が周囲への圧力にならないよう、設計側で「個人の利用頻度を可視化しない」「ランキングを作らない」といった配慮が必要になる。</p>
+    </div>
+  </div>
 
-    <h3 class="mb12">やらないことリストとの関係</h3>
-    <div class="changelog mb24">
-      <div class="changelog-item">
-        <span class="changelog-badge cb-move">後でやる → 最優先</span>
-        <p><strong>リアクション機能</strong> — MVPには含めないが、リリース後に最優先で追加する機能として位置づける。ジャーニーマップ上では「理想体験」として記載。中西さんの送りっぱなし問題と、森山さんの送る体験への橋渡しを実現するために、MVP直後の着手が望ましい。「プロダクトの進化が中西さんに正のフィードバックを返す」最初の具体例となる。</p>
+  <div class="divider"></div>
+
+  <div class="section-num">06</div>
+  <div class="tag t-mint">USER JOURNEY MAP</div>
+  <h2>ジャーニーマップ：中西 康弘</h2>
+  <p class="lead">「面白そう → すぐ使う → どんどん送る → 植物のレベルアップが楽しい → 自然と周囲を巻き込む → プロダクトの進化が楽しさを更新する」<br>中西さんはエコシステムの太陽。楽しさが燃料。その楽しさを枯らさないのはプロダクトの進化。</p>
+
+  <div class="journey j-mint">
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--coral)">PHASE 1</div>
+      <h3>認知 — 「お、面白そうじゃん」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>空チャットで「ありがとうカード」アプリの告知を受ける。その後チームミーティングでも説明を受ける。</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>告知をちゃんと読む。チームミーティングでも「いいじゃん」と反応。質問などもする。</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「お、なんか新しいの出たな」「組織で植物育てるの？ どういう仕組みだろう」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>素直に興味。楽しそうかどうかで判断している</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんの認知フェーズに課題はほとんどない。問題はこの後「楽しさが続くか」</p></div>
       </div>
     </div>
 
-    <div class="co co-sky mb24">
-      <svg class="co-i" style="color:var(--sky)"><use href="#i-lightbulb"/></svg>
-      <p><strong>ジャーニーマップの読み方：</strong>本資料のジャーニーマップはリアクション機能がある前提の「理想体験」を描いています。MVPリリース時点ではリアクションがないため、中西さんのモチベーション維持は組織の植物の成長・月次集計・対面での反応で補う想定です。リアクション追加後に体験がどう変わるかの検証ポイントにもなります。</p>
-    </div>
-
-    <h3 class="mb12">ローンチ戦略</h3>
-    <div class="changelog mb24">
-      <div class="changelog-item">
-        <span class="changelog-badge cb-launch">LAUNCH</span>
-        <p><strong>ベータ版を業務タスクとして触ってもらう</strong> — リリース前にベータ版のテスト協力を個別チャットで依頼し、業務の一部として一度触ってもらう。一回触ったことで「自分も関わった」という想いが加わり、完成版リリース時に「あ、あれか」と思い出すきっかけになる。森山さんのような受動的タイプにとっては、完成版への心理的距離を縮める入口の施策として有効。ただし、これは入口であり、定着は「受け取って嬉しかった」体験の質に依存する。</p>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-badge cb-launch">LAUNCH</span>
-        <p><strong>初期コンテンツの確保</strong> — ベータ期間中に開発チーム内でカードを送り合い、タイムラインを温めておく。森山さんがタイムラインを見たときに「短くていいんだ」「気軽に書いてるんだな」と感じられる状態を作る。</p>
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--orange)">PHASE 2</div>
+      <h3>すぐに使ってみる — 「まずは送ってみないとわかんないよね」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>告知を見たその日のうちにアプリにアクセス。Google認証でログイン</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>UIをざっと見て回る。組織の植物がまだ芽の状態なのを見て「じゃあ最初に水やりするか」と思う</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「まずは送ってみないとわかんないよね」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>ワクワク。新しいおもちゃを触る感覚</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>初期のタイムラインが空でも中西さんは気にしない。むしろ「最初に使う人」になること自体を楽しめる。ただしUIがわかりにくいと「あれ？」となる。初見で迷わない導線が必要</p></div>
       </div>
     </div>
 
-    <h3 class="mb12">リスクと対策</h3>
-    <div class="g2 mb24">
-      <div class="co co-coral">
-        <svg class="co-i" style="color:var(--coral)"><use href="#i-warning"/></svg>
-        <p><strong>「嬉しい」を作れるか問題</strong><br>森山さんを動かす唯一の燃料は「カードをもらって嬉しかった」体験。中西さんタイプの自発的行動だけに頼ると、初期に森山さんにカードが届かないリスクがある。ただし、開発チーム自身がユーザーとしてカードを送ることで、最初の「嬉しい」体験を意図的に作り出せる。循環の起点を待つのではなく、自分たちで作る</p>
-      </div>
-      <div class="co co-orange">
-        <svg class="co-i" style="color:var(--orange)"><use href="#i-warning"/></svg>
-        <p><strong>植物の成長上限問題</strong><br>組織の植物が成長しきった後、中西さんの「次のレベル」への好奇心が消える。レベル上限の設計や、季節ごとに植物が変わるなど、プロダクトの進化の一環として飽き対策を検討する</p>
-      </div>
-    </div>
-
-    <div class="g2 mb24">
-      <div class="co co-purple">
-        <svg class="co-i" style="color:var(--purple)"><use href="#i-lightbulb"/></svg>
-        <p><strong>成功の定義を間違えない</strong><br>全員がアクティブに送り合う状態は理想であって、必須ではない。河野さんのように「受け取る人」として存在するだけでもエコシステムは成立する。利用率だけをKPIにしない</p>
-      </div>
-      <div class="co co-mint">
-        <svg class="co-i" style="color:var(--mint)"><use href="#i-flag"/></svg>
-        <p><strong>エコシステムの維持条件</strong><br>中西さんの楽しさを個人の性格頼みにしない。開発チームがユーザーの行動データ・フィードバックを受け取り、プロダクトを進化させ続けることが循環の条件。継続的な開発リソースの確保が前提となる</p>
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--yellow)">PHASE 3</div>
+      <h3>最初のカードを送る — 「簡単でいいね」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>さっそく同僚に送ってみる。昨日一緒に障害対応した後輩に「昨日の対応ナイスだったよ！」と書く。公開で送信</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>宛先を選んで、パッと思いつくまま書いて送る。迷わない。公開を選ぶのも自然</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「こんな感じか。簡単でいいね」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>気持ちいい。思ったことをサッと伝えられた満足感</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんにとって送信体験のハードルはほぼゼロ。AIラベリングの結果は「へぇ、まあそうかも」くらいの反応。深くは気にしない</p></div>
       </div>
     </div>
 
-    <div class="g2 mb24">
-      <div class="co co-sky">
-        <svg class="co-i" style="color:var(--sky)"><use href="#i-flag"/></svg>
-        <p><strong>継続検討事項</strong><br>匿名送信の要否（非公開のみで十分か、匿名にも需要があるか）はMVP後のユーザーフィードバックで判断する</p>
-      </div>
-      <div class="co co-yellow">
-        <svg class="co-i" style="color:var(--yellow)"><use href="#i-warning"/></svg>
-        <p><strong>善意の圧力問題</strong><br>中西さんが「みんなも書こうよ」と声をかけることで、森山さんが引いてしまうリスク。アプリ側では個人の利用頻度を可視化しない・ランキングを作らないことで構造的に緩和するが、完全には防げない。運用上の注意点として認識しておく</p>
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--mint)">PHASE 4</div>
+      <h3>どんどん送る — 「あいつにも送っとくか」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>その週のうちに3〜4枚送る。チーム内の後輩、他部署で手伝ってくれた人、最近頑張っていると感じた若手</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>思いついたタイミングでサッと送る。メッセージは短め。全部公開</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「あいつにも送っとくか」「タイムラインに自分のカード並んでるの、なんかいいな」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>楽しい。タイムラインが賑やかになっていくのが目に見えて気持ちいい</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんと開発チーム・管理職が初期のタイムラインを温める。これが森山さんのPHASE 5（タイムラインを眺める）の体験を支える。森山さんがタイムラインを見たとき、「短くていいんだ」「気軽に書いてるんだな」と感じられるかどうかがポイント</p></div>
       </div>
     </div>
 
-    <h3 class="mb12">リリース後の検証ポイント</h3>
-    <div class="changelog mb24">
-      <div class="changelog-item">
-        <span class="changelog-badge cb-verify">VERIFY</span>
-        <p><strong>「おいてけぼり回避」は動機として機能するか</strong> — 森山さんタイプのユーザーが、周囲の利用状況を見て「自分もやっておこう」と感じるかどうか。リアルな観察として可能性はあるが、同調圧力に近づくリスクもある。設計の軸には据えず、リリース後のユーザー行動から検証する。</p>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-badge cb-verify">VERIFY</span>
-        <p><strong>受け取り体験は本当に「嬉しい」を生んでいるか</strong> — 開封演出、メッセージの内容、カードのデザイン。これらが森山さんタイプのユーザーに「嬉しい」と感じてもらえているか。「嬉しい」を前提にした設計なので、ここが機能しなければ全体が崩れる。最も重要な検証ポイント。</p>
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--sky)">PHASE 5</div>
+      <h3>植物の成長に気づく — 「おっ、レベルアップしてる！」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>組織全体の植物がレベルアップしている。「木がレベルアップしました！」のメール通知で気づく</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>「おっ、育ってる！」と眺める。Chatworkの雑談チャンネルで「あと3件でレベルアップだぞ！」と共有する</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「みんなで育ててる感じいいな」「次のレベルどうなるんだろう」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😄</span>ゲーム的な好奇心。共通の目標がある楽しさ</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>レベルアップ通知がChatworkで共有される話題になる。ただし成長しきった後に「次」がないと飽きる。新しい成長段階やバリエーションを追加し続ける必要がある</p></div>
       </div>
     </div>
-    
-    <h3 class="mb12">未解決の問い</h3>
-    <p class="lead">以下は現時点で答えが出ていない問いです。設計の前提に関わる重要な論点として、チーム内で継続的に議論していく必要がある。</p>
 
-    <div class="g2 mb24">
-      <div class="co co-coral">
-        <svg class="co-i" style="color:var(--coral)"><use href="#i-warning"/></svg>
-        <p><strong>森山さんは本当に「嬉しい」で動くのか？</strong><br>「嬉しかった体験の積み重ね」を主動機に据えているが、業務以外への関心・優先度が低い森山さんが、嬉しいだけで「送る側」に回るかは楽観的すぎるかもしれない。嬉しいと思っても、忙しさの前では行動に繋がらない可能性がある。「嬉しい」は必要条件であっても、十分条件ではないかもしれない。</p>
-      </div>
-      <div class="co co-orange">
-        <svg class="co-i" style="color:var(--orange)"><use href="#i-warning"/></svg>
-        <p><strong>圧力は本当にゼロでいいのか？</strong><br>「強制感は逆効果」という方針を置いているが、圧力をゼロにすることが本当に正解かはわからない。たとえば月1回の集計通知は、見方によっては穏やかな圧力。通知が届くこと自体が「忘れないでね」というメッセージになっている。圧力のゼロ/イチではなく、「どこまでなら許容されるか」「どの種類の圧力なら嬉しさを損なわないか」というグラデーションで考える必要があるかもしれない。</p>
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--purple)">PHASE 6</div>
+      <h3>送りっぱなし問題 — 「反応あると嬉しいんだけどな」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>何枚か送ったが、アプリ内で相手からの反応がない。MVPにはリアクション機能がないので当然だが、中西さんは少し物足りなさを感じる</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>廊下で送った相手に会ったとき「カード見た？」と聞いてみる。「見たよ、ありがとう」と対面で言われる</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「アプリで反応返せたらいいのにな」「まあでも、対面で言ってもらえたからいいか」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>対面のフィードバックで補えているが、アプリ体験としてはやや物足りない</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>MVPではリアクション機能がないため、中西さんの「送った実感」は対面の反応と植物の成長で補う。リアクション機能はMVP後に最優先で追加し、この体験のギャップを埋める。これが「プロダクトの進化が中西さんに正のフィードバックを返す」最初の具体例になる</p></div>
       </div>
     </div>
-  </section>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
+      <h3>自然と周囲を巻き込む — 「みんなもやればいいのに」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>中西さんがChatworkで植物のレベルアップの話をしたり、対面で「カード送っといたよ」と言うことで、周囲が少しずつ興味を持ち始める</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>意識して布教しているわけではない。楽しいから自然と話題にしている</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「みんなもやればいいのに」（ただし押し付けはしていないつもり）</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>他の人もカードを送り始めて、タイムラインが賑やかになってきたのが嬉しい</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>中西さんが自然とエバンジェリストになるかどうかは、中西さん自身が楽しめているかに完全に依存する。「広めてください」と頼んだ瞬間、義務になって楽しくなくなる。また、「みんなもやればいいのに」が森山さんのような人にとっては圧力になりうる。設計側で「個人の利用頻度を可視化しない」「ランキングを作らない」ことで構造的に緩和する</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
+      <h3>定着 — 「なかったら逆に物足りない」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>週に2〜3回のペースで安定して送り続ける。もらうカードも増えてきた。月次集計を見て「俺、協働が多いんだな」と楽しんでいる。植物のレベルが上がるたびにChatworkで報告</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>日常のコミュニケーションの一部としてカードを使う。対面で「ありがとう」と言う代わりにカードを送ることもあれば、両方やることもある</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「これもう習慣だな」「なかったら逆に物足りない」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😊</span>自然な習慣。楽しさが安定している</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>定着後の課題は「マンネリ」。植物の成長上限、同じ体験の繰り返し。プロダクトの継続的な進化で支える。リアクション機能、植物の新しい成長段階など、開発チームがプロダクトを進化させ続けることが中西さんの長期的な楽しさを維持する</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:28px">
+    <div class="insight in-mint">
+      <h3>中西さんのジャーニーから見えた設計示唆</h3>
+      <ul>
+        <li><strong>初見の導線をわかりやすく。</strong>中西さんは迷わず使い始めたいタイプ。UIが直感的であること</li>
+        <li><strong>組織の植物がゲーム的な楽しさを提供。</strong>「あと○件でレベルアップ」は中西さんがChatworkで共有する話題になる</li>
+        <li><strong>レベルアップ通知が楽しさを加速する。</strong>メールで届くことで中西さんの話題共有欲を刺激し、Chatworkでの自然な布教に繋がる</li>
+        <li><strong>送りっぱなし問題はMVP時点で残る。</strong>対面フィードバックと植物の成長で補いつつ、リアクション機能をMVP後に最優先で追加</li>
+        <li><strong>プロダクトの継続的な進化が中西さんの楽しさを支える。</strong>楽しさを個人の性格頼みにしない。リアクション追加が「進化が正のフィードバックを返す」最初の具体例</li>
+        <li><strong>中西さんが楽しそうに使う姿が、森山さんを動かす。</strong>ただし「みんなも書こうよ」は森山さんには圧力になりうる。利用頻度の非可視化・ランキング非作成で構造的に緩和</li>
+        <li><strong>「広めてください」と頼まない。</strong>楽しいから自然と話題にする状態をつくる。義務にした瞬間に壊れる</li>
+      </ul>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- TAB: 河野 真一 -->
+  <div class="tab-panel" id="tab-kouno">
+      <!-- PERSONA C (SUPPORTING) -->
+  <div class="tag t-sky">SUPPORTING PERSONA</div>
+  <h2>河野 真一（こうの しんいち）</h2>
+  <p class="lead">業務以外のことに関心がない。人にも無関心。悪意はなく、ただ興味がない。</p>
+
+  <div class="persona-card pc-sky">
+    <div class="persona-header">
+      <div class="persona-avatar pa-sky">⚡</div>
+      <div>
+        <div class="persona-type pt-sky">SUPPORTING — 無関心タイプ</div>
+        <div class="persona-name">河野 真一</div>
+        <p class="persona-bio">長年の経験で自分のやり方が確立されている。業務以外のことに関心が薄く、人に対しても無関心。悪い人ではなく、ただ興味がない。</p>
+      </div>
+    </div>
+    <table class="persona-table">
+      <tr><td class="pt-label">年齢</td><td class="pt-val">45歳</td></tr>
+      <tr><td class="pt-label">部署</td><td class="pt-val">開発部（バックエンド）</td></tr>
+      <tr><td class="pt-label">経験年数</td><td class="pt-val">22年（FREEMIND在籍13年目）</td></tr>
+      <tr><td class="pt-label">家族構成</td><td class="pt-val">独身、一人暮らし</td></tr>
+      <tr><td class="pt-label">性格</td><td class="pt-val">合理的、マイペース、業務以外のことに関心が薄い、人に対しても無関心</td></tr>
+    </table>
+    <div class="persona-section">
+      <h4><svg style="color:var(--sky)"><use href="#i-user"/></svg> 普段の働き方</h4>
+      <p>長年の経験で自分のやり方が確立されている。効率を重視し、必要なことだけを最短距離でやるタイプ。自分の担当範囲をきっちりこなし、定時で帰る。他人の仕事に口を出さないし、口を出されるのも好まない。Chatworkは業務連絡のみ確認していて、雑談チャンネルはほぼ見ない。社内イベントにも特に参加しない。悪い人ではなく、ただ業務以外のことに興味がない。</p>
+    </div>
+    <div class="persona-section">
+      <h4><svg style="color:var(--sky)"><use href="#i-heart"/></svg> 感謝に対するスタンス</h4>
+      <p>感謝の気持ちがないわけではないが、それを積極的に表現しようという発想がない。「仕事をきちんとやるのは当然のこと」という感覚が根底にあり、いちいち感謝を形にすること自体がピンとこない。誰かに助けてもらったら「どうも」くらいは言うが、それ以上の行動には至らない。</p>
+    </div>
+    <div class="persona-section">
+      <h4><svg style="color:var(--sky)"><use href="#i-message"/></svg> このアプリに対して感じること</h4>
+      <ul>
+        <li>特に何も感じない、というのが正直なところ。業務に必要なツールではないので、視界に入ってもスルーする</li>
+        <li>コンピテンシーや感謝カードの意義を否定しているわけではない。ただ、自分には関係ないと思っている</li>
+        <li>カードが届いたら読むかもしれないし、読まないかもしれない。あってもなくてもどちらでもよい</li>
+        <li>もらって嫌な気持ちにはならないが、特別嬉しいわけでもない。「ふーん」くらいの温度感</li>
+      </ul>
+    </div>
+    <div class="persona-key pk-sky">
+      <h4><svg style="color:var(--sky);width:16px;height:16px"><use href="#i-target"/></svg> このペルソナを動かすカギ</h4>
+      <p>動かそうとしなくてよい。河野さんは業務以外のことに関心がなく、このアプリも業務外の存在として認識している。カードが届けば読むかもしれないが、それ以上のアクションは期待しない。</p>
+      <p style="margin-top:8px">重要なのは、河野さんに不快な思いをさせないこと。過剰な通知、利用を促すナッジ、「まだカードを送っていません」的なリマインドは、無関心を不快に変えてしまう。河野さんが「あってもなくてもいい」と思い続けられる状態——つまりこのアプリが河野さんの業務や日常を一切邪魔しない状態を維持することが、唯一の設計指針。</p>
+      <p style="margin-top:8px">河野さんは「受け取る人」として存在するだけでも、送る側にとっての送り先になっており、エコシステムの受け皿として機能している。</p>
+    </div>
+  </div>
+
+  <div class="divider-strong"></div>
+
+  <!-- JOURNEY B -->
+  <div class="tag t-sky">USER JOURNEY MAP</div>
+  <h2>ジャーニーマップ：河野 真一</h2>
+  <p class="lead">「スルー → メールで気づく → 読むかもしれない → 放置 → また届く → …まあ、別にいいけど」<br>河野さんは動かない。動かさなくていい。受け取る人として存在するだけで十分。</p>
+
+  <div class="journey j-sky">
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--sky)">PHASE 1</div>
+      <h3>認知 — 「ふーん」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>空チャットで「ありがとうカード」アプリの告知が流れ、チームミーティングで導入の説明がある</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>チャットの告知は流し読み。ミーティングの説明は聞いているが、業務に関係ないと判断してスルーする</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「ふーん」「業務じゃないし、関係ないな」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>無関心。否定でも肯定でもない。視界に入っただけ</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>チャット告知もミーティングの説明も響かない。河野さんを動かすのは外部からのトリガー（＝カード受信メール）のみ。ただし、強いネガティブ感情があるわけではないので、不快にさえしなければ問題ない</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--purple)">PHASE 2</div>
+      <h3>最初のカードを受け取る — 「…なんか届いてる」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>数週間後、メールの受信トレイに「河野さんにありがとうカードが届きました」が届いている</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>件名を見る。すぐには開かない。業務メールを処理している流れで目に入り、なんとなく開く</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「なんか届いてる」「…誰だろう」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>無関心のまま。ただ、メールが届いた以上は一応見るかという程度</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>メールからアプリへの導線が自然であること。リンクを踏んだらすぐ読める状態が必要。ここで「ログインがめんどくさい」となったら二度と来ない。河野さんにとっての最大の離脱ポイント</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--coral)">PHASE 3</div>
+      <h3>カードを読む — 「ふーん、そうか」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>Google認証でログイン。同僚から「河野さんが障害対応のとき冷静に手順を教えてくれたおかげで、自分一人で対応できるようになりました」と書いてある。AIが「当事者意識」のラベルを付けている。開封時に演出が入る</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>演出は特に気にしない。メッセージを読む。ブラウザを閉じる</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「ふーん、そうか」「当事者意識ね。まあ、普通のことだけど」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>表面上は何も変わらない。嫌な気持ちにはなっていない</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんの反応は薄い。それで問題ない。ここで余計なポップアップや「あなたもカードを送ってみませんか？」的な誘導を出すと、「めんどくさい」に変わる。読んで閉じる。それだけで完結する体験にする</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--orange)">PHASE 4</div>
+      <h3>何もしない — 「別に」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>カードを読んだ後、アプリを開くことはない。日常業務に戻る</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>何もしない。カードをくれた同僚に対して特別な反応もない。普段通り</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「別に」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>平常運転。カードをもらったこと自体を特に意識していない</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>森山さんとの最大の違い。森山さんはリアクション → タイムラインと進むが、河野さんはアプリを閉じて戻ってこない。これは想定内。無理に引き戻そうとしない</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--yellow)">PHASE 5</div>
+      <h3>2通目のカードが届く — 「…また来たのか」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>1〜2ヶ月後、別の同僚からまたカードが届く。メールで気づく</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>メールを見る。前回と同じように、なんとなくリンクを開く。ログイン状態が残っていてすぐ読める</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「また来たのか」「…まあ、見るか」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>前回と同じ温度感。ただ、2回目なのでアプリへの抵抗はない</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>2回目の体験がスムーズであること。前回のログイン状態が保持されていることが地味に重要。セッション切れでログインを求められたら「めんどくさい」で終わる</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--mint)">PHASE 6</div>
+      <h3>カード一覧を見る — 「2枚あるのか」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>2通目を読んだ流れで、自分宛のカード一覧が目に入る。前回のカードも残っている。組織の植物がそこそこ育っているのが見える</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>一覧をざっと眺める。植物を見て「ふーん」と思う程度</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「2枚あるのか」「みんなけっこう送ってるのか」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>フラット。植物やゲーミフィケーション要素には特に反応しない</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんは植物やゲーミフィケーション要素にはあまり反応しない。ただし、組織の植物であれば「自分が送っていない」後ろめたさが生じないので、個人の花よりは相性がいい。河野さんがここで「自分は送っていない」と気まずく感じる設計は避ける</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--pink)">PHASE 7</div>
+      <h3>送ることはないかもしれない — 「別に、送らなくてもいいだろう」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>日常業務が続く。感謝カードを送ろうという発想が浮かぶことはない</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>何もしない</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「別に、送らなくてもいいだろう」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>何も感じていない。送らないことに対する後ろめたさもない</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>このフェーズに「送るかもしれない」という期待を持たない。河野さんが送らないことは失敗ではない。河野さんが「受け取る人」として存在し続けるだけでも、送る側の体験を支えている</p></div>
+      </div>
+    </div>
+
+    <div class="j-phase">
+      <div class="j-phase-num" style="color:var(--mint)">PHASE 8</div>
+      <h3>河野さんなりの定着 — 「まあ、別にいいけど」</h3>
+      <div class="j-grid">
+        <div class="j-item"><div class="j-item-label">状況</div><p>自分から送ることはない。カードが届いたら読むときもあれば、読まないときもある</p></div>
+        <div class="j-item"><div class="j-item-label">行動</div><p>メール通知が来たら、気が向けば開く。月次集計やレベルアップ通知はスルー</p></div>
+        <div class="j-item"><div class="j-item-label">思考</div><p>「まあ、別にいいけど」</p></div>
+        <div class="j-item"><div class="j-item-label">感情</div><p><span class="j-emotion">😐</span>終始フラット。アプリの存在を否定も肯定もしていない。あってもなくてもどちらでもよい</p></div>
+        <div class="j-item j-full j-issue"><div class="j-item-label">設計課題</div><p>河野さんの温度感は最初から最後まで変わらない。これは失敗ではない。「まあ、別にいいけど」が河野さんにとっての最良の状態。メール通知（カード受信・月次集計・レベルアップ）は届くが、河野さんはスルーする。それでいい。不要な通知に慣れている人なので、メールが届くこと自体はストレスにならない。全員がアクティブユーザーである必要はない</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:28px">
+    <div class="insight in-sky">
+      <h3>河野さんのジャーニーから見えた設計示唆</h3>
+      <ul>
+        <li><strong>絶対に押し付けない。</strong>「送ってみませんか？」「まだカードを送っていません」系のナッジは河野さんの無関心を不快に変える</li>
+        <li><strong>受け取る体験を邪魔しない。</strong>河野さんにとってこのアプリの接点は「メールが届く → 読むかもしれない」だけ。その体験に余計なものを足さない</li>
+        <li><strong>ログイン維持は必須。</strong>2回目以降にログインを求められたら「めんどくさい」で終わる</li>
+        <li><strong>メール通知はストレスにならない。</strong>カード受信・月次集計・レベルアップの通知が届くが、河野さんは不要なメールに慣れている。スルーするだけなのでストレスにはならない</li>
+        <li><strong>組織の植物は河野さんに後ろめたさを与えない。</strong>個人の花だと「自分は送っていない」が可視化されるが、組織全体なら距離を置いたまま眺められる</li>
+        <li><strong>河野さんが「受け取る人」として存在すること自体が価値。</strong>60名の組織で全員がアクティブユーザーである必要はない</li>
+        <li><strong>河野さんの温度感は変わらなくてよい。</strong>「まあ、別にいいけど」が最良の状態。無関心のままでいてもらうことが成功</li>
+      </ul>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- TAB: 設計示唆 -->
+  <div class="tab-panel" id="tab-insights">
+      <!-- 08 DESIGN IMPLICATIONS -->
+  <div class="tag t-purple">DESIGN IMPLICATIONS</div>
+  <h2>設計示唆まとめ</h2>
+  <p class="lead">3人のジャーニーから見えた、プロトタイプ設計で押さえるべきポイント。</p>
+
+  <div class="insight in-rainbow mb24">
+    <h3>UI / UX で必ず押さえること</h3>
+    <ul>
+      <li><strong>Google認証はワンクリック。</strong>メールのリンク → 即カード表示。ここに摩擦があると森山さんも河野さんも離脱する</li>
+      <li><strong>セッション保持は長めに。</strong>河野さんの2回目訪問時にログインを求めない。最低でも数ヶ月は保持</li>
+      <li><strong>カード送信は最短導線。</strong>宛先選択 → メッセージ入力 → 公開/非公開 → 送信。業務の隙間に30秒で完了する体験</li>
+      <li><strong>デフォルトは公開、非公開への切替を分かりやすく。</strong>森山さんは非公開を選ぶかもしれない。切替が自然にできることが「最初の一通」の安心材料</li>
+      <li><strong>「私も送る」ボタンはカード表示画面の自然な位置に。</strong>自然な場所にあるだけなら圧力にはならない。押すかどうかは本人次第</li>
+      <li><strong>コンピテンシーラベルはAIが裏でつける。</strong>ユーザーに選ばせない。意識させすぎない</li>
+      <li><strong>開封演出（パァーっとする）が受け取り体験を強化。</strong>「嬉しい」を増幅する装置。ただし河野さんのように無反応の人もいる。演出が長くなるならスキップ可能に</li>
+      <li><strong>組織の植物は全員で一つ。</strong>個人の実績ではなく「みんなで育てている」感覚。送る頻度が低い人にプレッシャーを与えない</li>
+      <li><strong>「送ってみませんか？」系のナッジは入れない。</strong>河野さんの無関心を不快に変え、森山さんも引く</li>
+      <li><strong>個人の利用頻度を可視化しない。ランキングを作らない。</strong>中西さんの善意の声かけが森山さんへの圧力にならないよう構造的に緩和する</li>
+      <li><strong>初見で迷わない導線。</strong>中西さんは直感的に使い始めたい。UIが複雑だと最初の勢いが削がれる</li>
+      <li><strong>業務ツール上にアプリの入口を配置。</strong>案件管理・デスクネッツへのリンク配置で「わざわざアプリを開く」ハードルを下げる。技術メンバーと要相談</li>
+    </ul>
+  </div>
+
+  <div class="insight in-coral mb24">
+    <h3>通知設計</h3>
+    <ul>
+      <li><strong>カード受信時（メール）。</strong>全ペルソナ共通の唯一のトリガー。森山さんと河野さんが行動を起こす起点</li>
+      <li><strong>月1回の集計通知（メール）。</strong>「今月のありがとうまとめ」で自分がもらったカードとコンピテンシーの傾向を伝える。森山さんにとっては思い出すきっかけ。河野さんはスルーするが、それでいい</li>
+      <li><strong>木のレベルアップ通知（メール）。</strong>組織の植物が成長した際に届く。中西さんはChatworkで共有する話題にする。森山さんにとっても思い出すきっかけになる。忘れるリスクの方が高いので、きっかけは多めに用意する</li>
+      <li><strong>催促通知は絶対に入れない。</strong>「まだカードを送っていません」「最近使っていません」系は全ペルソナに逆効果</li>
+      <li><strong>メール通知なのでストレスは低い。</strong>不要ならスルーすればいいだけ。河野さんも、不要なメールには慣れているので問題にならない</li>
+    </ul>
+  </div>
+
+  <h3 class="mb12">MVP後の最優先追加機能</h3>
+  <div class="changelog mb24">
+    <div class="changelog-item">
+      <span class="changelog-badge cb-move">MVP後 → 最優先</span>
+      <p><strong>リアクション機能</strong> — 中西さんの送りっぱなし問題を解決し、森山さんの主な参加手段になる。「プロダクトの進化がユーザーに正のフィードバックを返す」最初の具体例。MVP直後の着手が望ましい</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-move">MVP後 → 最優先</span>
+      <p><strong>投稿後の編集・公開/非公開変更</strong> — 森山さんへの安心感を提供。「送った後でも直せる」「やっぱり非公開にしたい」に対応することで、最初の一通のハードルが下がる</p>
+    </div>
+  </div>
+
+  <h3 class="mb12">ローンチ戦略</h3>
+  <div class="changelog mb24">
+    <div class="changelog-item">
+      <span class="changelog-badge cb-launch">LAUNCH</span>
+      <p><strong>導入効果を定量的・定性的に伝える</strong> — 「なんのためにやるのか」への明確な答えを用意する。コミュニケーション改善・心理的安全性向上・離職率低下など、森山さんが「時間を使う価値がある」と納得できる根拠を示す</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-launch">LAUNCH</span>
+      <p><strong>「若手に送ってあげてください」の声かけ</strong> — 森山さんの面倒見のよさに訴える自然なコミュニケーション。強制ではなく、先輩としての気持ちを引き出す</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-launch">LAUNCH</span>
+      <p><strong>管理職を送る側に巻き込む</strong> — 送る側の層を厚くし、カードが届かない人が出にくい構造を作る。送る側が特定の誰かに依存して枯れないようにする</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-launch">LAUNCH</span>
+      <p><strong>開発チームが率先してカードを送る</strong> — 最初の「体験」を中西さんタイプの自発的行動に頼らず、意図的に作り出す。ベータ期間中にチーム内でカードを送り合い、タイムラインを温めておく</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-launch">LAUNCH</span>
+      <p><strong>森山さんを意図的に頼る＆巻き込む</strong> — 開発中に技術的な相談をしたり、ベータ版のフィードバックをお願いしたり、森山さんの面倒見のよさを頼る場面を意図的に作る。「若手に頼られた」「自分も関わった」という経験が、完成版への愛着に繋がる。リリース時に「あ、あれが完成したのか」と思い出すきっかけにもなる</p>
+    </div>
+  </div>
+
+  <h3 class="mb12">リスクと対策</h3>
+  <div class="g2 mb24">
+    <div class="co co-coral">
+      <svg class="co-i" style="color:var(--coral)"><use href="#i-warning"/></svg>
+      <p><strong>納得感を作れるか問題</strong><br>森山さんを動かす土台は「なんのためにやるのか」への納得感。導入効果を説得力のある形で提示できなければ、面倒見のよさも受取体験も機能しない。どんな根拠を、どう伝えるかの準備が必要</p>
+    </div>
+    <div class="co co-orange">
+      <svg class="co-i" style="color:var(--orange)"><use href="#i-warning"/></svg>
+      <p><strong>送る側が枯れる問題</strong><br>中西さん・開発チーム・管理職が送る側の中心。中西さんの楽しさが枯れる、開発チームが多忙になる、管理職が挫折する——いずれかが起きると送る側が薄くなり、森山さんや河野さんにカードが届かなくなる。送る側の層を厚く保ち続ける運用が必要</p>
+    </div>
+  </div>
+
+  <div class="g2 mb24">
+    <div class="co co-yellow">
+      <svg class="co-i" style="color:var(--yellow)"><use href="#i-warning"/></svg>
+      <p><strong>植物の成長上限問題</strong><br>組織の植物が成長しきった後、中西さんの「次のレベル」への好奇心が消える。対策として「ありがとうの森」——木が成長しきったら新しい木が植えられ、過去の木は森として残る——を将来機能として検討する</p>
+    </div>
+    <div class="co co-purple">
+      <svg class="co-i" style="color:var(--purple)"><use href="#i-lightbulb"/></svg>
+      <p><strong>成功の定義を間違えない</strong><br>全員がアクティブに送り合う状態は理想であって、必須ではない。河野さんのように「受け取る人」として存在するだけでもエコシステムは成立する。利用率だけをKPIにしない</p>
+    </div>
+  </div>
+
+  <div class="g2 mb24">
+    <div class="co co-mint">
+      <svg class="co-i" style="color:var(--mint)"><use href="#i-flag"/></svg>
+      <p><strong>エコシステムの維持条件</strong><br>中西さんの楽しさを個人の性格頼みにしない。開発チームがユーザーの行動データ・フィードバックを受け取り、プロダクトを進化させ続けることが循環の条件。継続的な開発リソースの確保が前提</p>
+    </div>
+    <div class="co co-sky">
+      <svg class="co-i" style="color:var(--sky)"><use href="#i-flag"/></svg>
+      <p><strong>善意の圧力問題</strong><br>中西さんが「みんなも書こうよ」と声をかけることで、森山さんが引いてしまうリスク。アプリ側では利用頻度の非可視化・ランキング非作成で構造的に緩和するが、完全には防げない。運用上の注意点として認識しておく</p>
+    </div>
+  </div>
+
+    <h3 class="mb12">将来的な検討項目</h3>
+  <div class="changelog mb24">
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>ありがとうの森</strong> — 木が成長しきった後、新しい木が植えられ、過去の木は「森」として残る。組織の感謝の歴史が可視化される</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>コンピテンシーの分布で花が変わる</strong> — 木が成長した際に、蓄積されたコンピテンシーの分布によって異なる花が咲く。「うちの組織は協働の花が多いな」のように、組織の特徴が植物に反映される</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>組織全体のレポート</strong> — 組織全体の利用状況・コンピテンシー分布・カード数の推移などをまとめたレポートを定期配信。「動いている感」を伝え、導入効果の実感を支える</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>バッジシステム</strong> — 受け取った・送ったコンピテンシーの種類や回数に応じてバッジを付与。自分だけに見える設計にしてプレッシャーを回避</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>ストリーク（連続記録）</strong> — 送信・受信の連続日数や週数を記録。自分だけに見える設計で、個人の小さな達成感を提供</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>個人貢献度の可視化</strong> — 組織の木の成長に対する自分の貢献を自分だけに見える形で表示。全体への寄与感を提供しつつ、他者との比較は発生させない</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-add">FUTURE</span>
+      <p><strong>レベルアップ時の演出強化</strong> — 木が成長する瞬間のアニメーションを追加し、楽しさ・達成感を強化する</p>
+    </div>
+  </div>
+
+  <h3 class="mb12">リリース後の検証ポイント</h3>
+  <div class="changelog mb24">
+    <div class="changelog-item">
+      <span class="changelog-badge cb-verify">VERIFY</span>
+      <p><strong>納得感は行動に繋がっているか</strong> — 導入効果の説明を受けた森山さんタイプのユーザーが、実際に「時間を使う価値がある」と感じてアプリを利用しているか。説明の内容・伝え方・タイミングの効果を検証する</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-verify">VERIFY</span>
+      <p><strong>「面倒見のよさ」は動機として機能しているか</strong> — 「若手に送ってあげて」の声かけが、実際に森山さんタイプの送信行動に繋がっているか。面倒見のよさに訴えるアプローチの有効性を確認する</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-verify">VERIFY</span>
+      <p><strong>受け取り体験は「嬉しい」を生んでいるか</strong> — 開封演出、メッセージの内容、カードのデザイン。これらが森山さんタイプに「嬉しい」と感じてもらえているか。3つの動機の③が機能しているかの確認</p>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-badge cb-verify">VERIFY</span>
+      <p><strong>通知頻度は適切か</strong> — カード受信・月次集計・レベルアップの3種類の通知が「思い出すきっかけ」として機能しているか。多すぎてストレスになっていないか、少なすぎて忘れられていないか</p>
+    </div>
+  </div>
+
+  </div>
 
 </div>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: document.querySelector('.tab-nav').offsetTop - 20, behavior: 'smooth' });
+  });
+});
+</script>
+
 </body>
 </html>
