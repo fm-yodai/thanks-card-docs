@@ -62,7 +62,7 @@
     },
     {
       "title": "ペルソナ & ユーザージャーニーマップ",
-      "path": "./docs/ペルソナ&ユーザージャーニーマップ.html",
+      "path": "./docs/persona-user-journey.html",
       "group": "project",
       "icon": "👤",
       "badges": ["UX", "DESIGN"],
