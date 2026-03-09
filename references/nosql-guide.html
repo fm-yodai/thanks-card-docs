@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoSQLデータベース入門 — RDBとの違いから DynamoDB 実践まで</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F7F6F2;--card:#FFFFFF;--text:#1E1E2E;--sub:#555568;--muted:#999AAF;--warm:#E07A4B;--warm-light:#FFF3ED;--warm-border:#FDDCCC;--blue:#4A7ADB;--blue-light:#EDF3FE;--blue-border:#C5D8F8;--green:#3CA868;--green-light:#EEFAF2;--green-border:#B8E6C9;--purple:#7B5FC2;--purple-light:#F3EFFC;--purple-border:#CDBFEF;--pink:#C9506E;--pink-light:#FDF0F3;--pink-border:#F0C4CF;--yellow:#C49A1A;--yellow-light:#FDF8EA;--yellow-border:#EFE0A8;--border:#E8E7E3;--r:14px;--rs:10px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.8}
+
+  .wrap{max-width:820px;margin:0 auto;padding:48px 32px 80px}
+
+  /* header */
+  .doc-header{text-align:center;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+  .doc-header h1{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:28px;line-height:1.4;margin-bottom:8px}
+  .doc-sub{font-size:14px;color:var(--sub);margin-bottom:16px}
+  .doc-meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .doc-chip{padding:5px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;font-size:12px;color:var(--sub);font-weight:500}
+
+  /* toc */
+  .toc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;margin-bottom:40px}
+  .toc h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:var(--sub)}
+  .toc ol{padding-left:20px}
+  .toc li{font-size:13.5px;color:var(--sub);margin-bottom:4px}
+  .toc a{color:var(--blue);text-decoration:none;font-weight:500}
+  .toc a:hover{text-decoration:underline}
+  .toc .toc-sec{font-weight:700;color:var(--text);margin-top:10px}
+
+  /* section */
+  .sec{margin-bottom:48px}
+  .sec-tag{display:inline-flex;align-items:center;gap:6px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:6px;margin-bottom:10px}
+  .sec-tag.st-warm{background:var(--warm-light);color:var(--warm)}
+  .sec-tag.st-blue{background:var(--blue-light);color:var(--blue)}
+  .sec-tag.st-green{background:var(--green-light);color:var(--green)}
+  .sec-tag.st-purple{background:var(--purple-light);color:var(--purple)}
+  .sec-tag.st-yellow{background:var(--yellow-light);color:var(--yellow)}
+  .sec-tag.st-pink{background:var(--pink-light);color:var(--pink)}
+  .sec h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:22px;line-height:1.45;margin-bottom:8px}
+  .sec h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:17px;margin-bottom:6px;margin-top:24px}
+  .sec p{font-size:14px;color:var(--sub);line-height:1.85;margin-bottom:12px}
+
+  /* card */
+  .cd{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .cd-bar{height:4px;border-radius:var(--r) var(--r) 0 0;margin:-20px -22px 16px -22px}
+  .cd-bar.cb-warm{background:linear-gradient(90deg,var(--warm),#F2A07A)}
+  .cd-bar.cb-blue{background:linear-gradient(90deg,var(--blue),#7BA2EC)}
+  .cd-bar.cb-green{background:linear-gradient(90deg,var(--green),#6CC98B)}
+  .cd-bar.cb-purple{background:linear-gradient(90deg,var(--purple),#A68FD8)}
+  .cd-bar.cb-yellow{background:linear-gradient(90deg,var(--yellow),#D4B44A)}
+  .cd-bar.cb-pink{background:linear-gradient(90deg,var(--pink),#DE8199)}
+  .cd-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+  .cd h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+  .cd p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:8px}
+  .cd p:last-child{margin-bottom:0}
+  .cd .emoji{font-size:20px;margin-bottom:8px;display:block}
+
+  /* callout */
+  .co{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--rs);margin-bottom:14px}
+  .co.co-warm{background:var(--warm-light);border:1px solid var(--warm-border)}
+  .co.co-blue{background:var(--blue-light);border:1px solid var(--blue-border)}
+  .co.co-green{background:var(--green-light);border:1px solid var(--green-border)}
+  .co.co-purple{background:var(--purple-light);border:1px solid var(--purple-border)}
+  .co.co-yellow{background:var(--yellow-light);border:1px solid var(--yellow-border)}
+  .co.co-pink{background:var(--pink-light);border:1px solid var(--pink-border)}
+  .co-i{font-size:18px;flex-shrink:0;margin-top:1px}
+  .co p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:0}
+  .co strong{color:var(--text)}
+
+  /* grid */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+
+  /* comparison table */
+  .cmp-table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;font-size:13px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:var(--card)}
+  .cmp-table thead th{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;padding:14px 16px;text-align:left;border-bottom:2px solid var(--border)}
+  .cmp-table thead th:first-child{background:var(--bg);color:var(--sub);width:22%}
+  .cmp-table thead th.th-ddb{background:var(--green-light);color:var(--green)}
+  .cmp-table thead th.th-rds{background:var(--blue-light);color:var(--blue)}
+  .cmp-table tbody td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--sub);line-height:1.7;vertical-align:top}
+  .cmp-table tbody tr:last-child td{border-bottom:none}
+  .cmp-table tbody td:first-child{font-weight:600;color:var(--text);background:var(--bg)}
+
+  /* flow diagram */
+  .flow{display:flex;flex-direction:column;gap:0;margin:20px 0 24px;align-items:center}
+  .flow-row{display:flex;align-items:center;gap:12px;width:100%}
+  .flow-q{flex:1;padding:14px 18px;border-radius:var(--rs);font-size:13px;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--text)}
+  .flow-ans{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+  .flow-ans.fa-green{background:var(--green)}
+  .flow-ans.fa-blue{background:var(--blue)}
+  .flow-down{font-size:18px;color:var(--muted);padding:4px 0}
+
+  /* diagram */
+  .diagram{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:14px;overflow-x:auto}
+  .diagram-title{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:14px;margin-bottom:16px;text-align:center;color:var(--text)}
+  .pk-row{display:flex;align-items:stretch;margin-bottom:12px;gap:0}
+  .pk-label{min-width:110px;padding:12px 14px;background:var(--green);color:#fff;font-size:12px;font-weight:700;border-radius:var(--rs) 0 0 var(--rs);display:flex;align-items:center;justify-content:center;text-align:center}
+  .pk-items{display:flex;flex:1;gap:0}
+  .pk-item{flex:1;padding:10px 12px;background:var(--green-light);border:1px solid var(--green-border);font-size:11px;color:var(--sub);text-align:center;display:flex;flex-direction:column;justify-content:center}
+  .pk-item:last-child{border-radius:0 var(--rs) var(--rs) 0}
+  .pk-item strong{color:var(--text);font-size:12px;display:block;margin-bottom:2px}
+
+  /* divider */
+  .divider{height:1px;background:var(--border);margin:48px 0}
+
+  /* footer */
+  .doc-footer{text-align:center;padding-top:32px;border-top:1px solid var(--border);margin-top:48px}
+  .doc-footer p{font-size:12px;color:var(--muted)}
+
+  @media(max-width:640px){
+    .wrap{padding:32px 18px 60px}
+    .g2,.g3{grid-template-columns:1fr}
+    .cmp-table{font-size:11.5px}
+    .cmp-table thead th,.cmp-table tbody td{padding:10px 12px}
+    .flow-row{flex-direction:column;gap:6px;align-items:stretch}
+    .flow-ans{text-align:center}
+    .pk-row{flex-direction:column}
+    .pk-label{border-radius:var(--rs) var(--rs) 0 0;min-width:auto}
+    .pk-items{flex-direction:column}
+    .pk-item:last-child{border-radius:0 0 var(--rs) var(--rs)}
+    .doc-header h1{font-size:22px}
+  }
+  @media print{
+    body{background:#fff}
+    .wrap{padding:24px}
+    .cd,.co{break-inside:avoid}
+    .cmp-table{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== HEADER ===== -->
+<div class="doc-header">
+  <h1>NoSQLデータベース入門<br>RDBとの違いから DynamoDB 実践まで</h1>
+  <p class="doc-sub">ありがとうカードプロジェクトのDB選定を見据えた基礎知識ガイド</p>
+  <div class="doc-meta">
+    <span class="doc-chip">対象: RDB経験者</span>
+    <span class="doc-chip">所要時間: 20分</span>
+    <span class="doc-chip">Sprint 0 参考資料</span>
+  </div>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li class="toc-sec">基礎知識</li>
+    <li><a href="#sec1">NoSQLとは何か — RDBとの思考モデルの違い</a></li>
+    <li><a href="#sec2">NoSQLの主要カテゴリ</a></li>
+    <li style="margin-top:10px" class="toc-sec">DynamoDB を知る</li>
+    <li><a href="#sec3">DynamoDBの基本概念</a></li>
+    <li><a href="#sec4">テーブル設計パターン — シングルテーブル vs テーブル分割</a></li>
+    <li style="margin-top:10px" class="toc-sec">プロジェクトへの適用</li>
+    <li><a href="#sec5">DynamoDB vs RDS PostgreSQL — ありがとうカードでの比較</a></li>
+    <li><a href="#sec6">「いつNoSQLを選ぶべきか」判断フロー</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!--  Section 1: NoSQLとは何か                                       -->
+<!-- ============================================================ -->
+<div class="sec" id="sec1">
+  <div class="sec-tag st-warm">SECTION 01</div>
+  <h2>NoSQLとは何か — RDBとの思考モデルの違い</h2>
+  <p>NoSQLを学ぶ第一歩は、RDBとの<strong>設計思想の違い</strong>を理解することです。技術的な差異の前に、まず「どう考えてデータを扱うか」という思考モデルの違いを押さえましょう。</p>
+
+  <h3>RDBの基本的な考え方（おさらい）</h3>
+  <p>RDB（リレーショナルデータベース）は、皆さんが業務で使い慣れたデータベースです。改めて特徴を整理します。</p>
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <h4>RDB の思考モデル：「データをどう正規化するか」</h4>
+    <p><strong>テーブル設計：</strong>データを正規化し、重複を排除して整理する。ユーザー、カード、リアクションを別々のテーブルに分ける。</p>
+    <p><strong>JOIN：</strong>必要なときにテーブルを結合してデータを取得する。複雑なクエリもSQLで柔軟に書ける。</p>
+    <p><strong>ACID特性：</strong>トランザクションの原子性・一貫性・独立性・永続性を保証。データの整合性が非常に高い。</p>
+    <p><strong>スキーマ：</strong>テーブル構造を事前に定義。すべてのレコードが同じカラム構成を持つ。</p>
+  </div>
+
+  <h3>NoSQL の基本的な考え方</h3>
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>NoSQL の思考モデル：「データをどうアクセスするか」</h4>
+    <p><strong>非正規化：</strong>データの重複を許容し、アクセスに最適な形で保存する。読み取りが高速になる。</p>
+    <p><strong>アクセスパターン駆動設計：</strong>「どんなクエリが来るか」を先に決め、それに合わせてデータ構造を設計する。</p>
+    <p><strong>結果整合性：</strong>即座に全ノードが一致しなくても、最終的に整合する。その代わり高い可用性とスケーラビリティを得る。</p>
+    <p><strong>水平スケーリング：</strong>サーバーを追加するだけで処理能力を向上できる。RDBの垂直スケーリング（サーバーの性能を上げる）とは対照的。</p>
+  </div>
+
+  <h3>思考モデルの比較</h3>
+  <div class="g2">
+    <div class="cd" style="text-align:center">
+      <span class="emoji">🗃️</span>
+      <h4 style="color:var(--blue)">RDB の発想</h4>
+      <p style="font-size:13px">「データをきれいに整理しよう」<br>→ 正規化してテーブルに分ける<br>→ 必要なときにJOINで結合<br>→ <strong>どんなクエリにも対応できる</strong></p>
+    </div>
+    <div class="cd" style="text-align:center">
+      <span class="emoji">⚡</span>
+      <h4 style="color:var(--green)">NoSQL の発想</h4>
+      <p style="font-size:13px">「データを速く取り出せるようにしよう」<br>→ アクセスパターンを先に列挙<br>→ パターンに最適化した構造で保存<br>→ <strong>想定クエリが超高速になる</strong></p>
+    </div>
+  </div>
+
+  <div class="co co-warm">
+    <div class="co-i">💡</div>
+    <p><strong>大事なポイント：</strong>NoSQLはRDBの「代替」ではなく、<strong>異なるトレードオフの選択</strong>です。RDBは「柔軟なクエリ」を得る代わりに「スケーラビリティ」を犠牲にし、NoSQLは「スケーラビリティ」を得る代わりに「クエリの柔軟性」を犠牲にします。どちらが優れているかではなく、プロジェクトの要件に合う方を選びます。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 2: NoSQLの主要カテゴリ                                  -->
+<!-- ============================================================ -->
+<div class="sec" id="sec2">
+  <div class="sec-tag st-blue">SECTION 02</div>
+  <h2>NoSQLの主要カテゴリ</h2>
+  <p>NoSQLと一口に言っても、データの持ち方によって大きく4つのカテゴリに分かれます。それぞれ得意な用途が異なります。</p>
+
+  <div class="g2">
+    <div class="cd">
+      <div class="cd-bar cb-green"></div>
+      <div class="cd-num">CATEGORY 01</div>
+      <h4>KVS（Key-Value Store）</h4>
+      <p><strong>代表：</strong>Redis, DynamoDB（シンプルモード）</p>
+      <p>最もシンプルなNoSQL。キーを指定して値を一発で取得する。辞書やハッシュマップのイメージ。読み書きが極めて高速。</p>
+      <p><strong>用途：</strong>セッション管理、キャッシュ、設定値の保存</p>
+    </div>
+    <div class="cd">
+      <div class="cd-bar cb-purple"></div>
+      <div class="cd-num">CATEGORY 02</div>
+      <h4>ドキュメントDB</h4>
+      <p><strong>代表：</strong>MongoDB, Firestore</p>
+      <p>JSONライクなドキュメント単位でデータを管理。各ドキュメントが異なる構造を持てる（スキーマレス）。ドキュメント内の属性で柔軟にクエリ可能。</p>
+      <p><strong>用途：</strong>Webアプリのデータ全般、CMS、カタログ</p>
+    </div>
+    <div class="cd">
+      <div class="cd-bar cb-yellow"></div>
+      <div class="cd-num">CATEGORY 03</div>
+      <h4>ワイドカラムストア</h4>
+      <p><strong>代表：</strong>Cassandra, HBase</p>
+      <p>大量の列（カラム）を持つデータを効率的に格納。行ごとに異なるカラムを持てる。大規模な時系列データやIoTデータの処理に強い。</p>
+      <p><strong>用途：</strong>時系列データ、IoT、ログ分析</p>
+    </div>
+    <div class="cd">
+      <div class="cd-bar cb-pink"></div>
+      <div class="cd-num">CATEGORY 04</div>
+      <h4>グラフDB</h4>
+      <p><strong>代表：</strong>Neo4j, Amazon Neptune</p>
+      <p>ノード（点）とエッジ（線）で関係性を表現。「AさんはBさんの友達で、BさんはCさんの上司」といった複雑な関係のたどりが得意。</p>
+      <p><strong>用途：</strong>SNS、レコメンドエンジン、不正検知</p>
+    </div>
+  </div>
+
+  <div class="co co-green">
+    <div class="co-i">💡</div>
+    <p><strong>DynamoDBの位置付け：</strong>DynamoDBは<strong>「KVS + ドキュメントDBのハイブリッド」</strong>です。パーティションキー（PK）とソートキー（SK）でKVSとして高速にアクセスしつつ、各アイテムの属性はスキーマレスでドキュメントDB的に柔軟な構造を持てます。この「いいとこ取り」がDynamoDBの大きな特徴です。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 3: DynamoDBの基本概念                                   -->
+<!-- ============================================================ -->
+<div class="sec" id="sec3">
+  <div class="sec-tag st-green">SECTION 03</div>
+  <h2>DynamoDBの基本概念</h2>
+  <p>DynamoDBを使いこなすための基本概念を、身近な例え話を交えて解説します。</p>
+
+  <h3>パーティションキー（PK）とソートキー（SK）</h3>
+  <p>DynamoDBのテーブル設計の核となる概念です。図書館に例えると理解しやすくなります。</p>
+
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>図書館に例えるPK/SK</h4>
+    <p><strong>パーティションキー（PK）= 図書館の棚番号</strong><br>PKの値によって、データがどの「棚」（パーティション）に保存されるかが決まります。同じPKを持つデータは必ず同じパーティションに格納されます。</p>
+    <p><strong>ソートキー（SK）= その棚の中の本の並び順</strong><br>同じ棚（PK）の中で、SKの値によって順番に並びます。範囲検索（「2024年1月〜3月のカード」など）ができるのはこのおかげです。</p>
+    <p><strong>PKだけのテーブル：</strong>棚番号だけで本を管理。1つの棚に1冊だけ。シンプルだが範囲検索ができない。</p>
+    <p><strong>PK + SK の複合キーテーブル：</strong>棚番号 + 並び順で管理。1つの棚に複数の本を並べられ、順番で探せる。</p>
+  </div>
+
+  <!-- PK/SK visual diagram -->
+  <div class="diagram">
+    <div class="diagram-title">PK/SK によるデータ配置のイメージ</div>
+    <div class="pk-row">
+      <div class="pk-label">PK: USER#001<br><span style="font-size:10px;opacity:.8">（田中さん）</span></div>
+      <div class="pk-items">
+        <div class="pk-item"><strong>SK: CARD#2024-01-15</strong>お疲れ様カード</div>
+        <div class="pk-item"><strong>SK: CARD#2024-02-10</strong>ありがとうカード</div>
+        <div class="pk-item"><strong>SK: CARD#2024-03-05</strong>助かったカード</div>
+      </div>
+    </div>
+    <div class="pk-row">
+      <div class="pk-label">PK: USER#002<br><span style="font-size:10px;opacity:.8">（鈴木さん）</span></div>
+      <div class="pk-items">
+        <div class="pk-item"><strong>SK: CARD#2024-01-20</strong>感謝カード</div>
+        <div class="pk-item"><strong>SK: CARD#2024-04-01</strong>応援カード</div>
+        <div class="pk-item" style="background:var(--bg);border:1px dashed var(--border);color:var(--muted);font-style:italic"><strong style="color:var(--muted)">SK: ...</strong>追加可能</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:-8px;margin-bottom:20px">同じPKのアイテムは同じパーティションに格納され、SK順にソートされる</p>
+
+  <h3>GSI（Global Secondary Index）</h3>
+  <div class="cd">
+    <div class="cd-bar cb-purple"></div>
+    <h4>「別の角度から本を探すための索引」</h4>
+    <p>元のテーブルは「ユーザーID（PK）→ 送信日時（SK）」で検索できるよう設計されています。しかし「部署ごとのカード一覧が見たい」となったらどうでしょう？ 元のキー構成では対応できません。</p>
+    <p><strong>GSIの役割：</strong>元テーブルとは異なるPK/SKの組み合わせで検索できる「セカンダリインデックス」を作成します。</p>
+    <p><strong>例：</strong></p>
+    <p>• 元テーブル: PK=ユーザーID, SK=送信日時 → 「田中さんのカード一覧」を取得</p>
+    <p>• GSI-1: PK=部署, SK=送信日時 → 「開発部のカードを新しい順に」取得</p>
+    <p>• GSI-2: PK=受信者ID, SK=送信日時 → 「鈴木さんが受け取ったカード」を取得</p>
+    <p style="font-size:12px;color:var(--muted)">※ GSIは最大20個まで作成可能。ただし増えるほどコストも増えるため、本当に必要なアクセスパターンに絞る。</p>
+  </div>
+
+  <h3>キャパシティモード</h3>
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">💰</span>
+      <h4>オンデマンドモード</h4>
+      <p><strong>使った分だけ課金。</strong>事前のキャパシティ設定が不要。トラフィックの予測が難しい場合や、小規模アプリに最適。</p>
+      <p style="color:var(--green);font-weight:600;font-size:12px">60名規模のありがとうカードプロジェクトではオンデマンド一択。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⚙️</span>
+      <h4>プロビジョンドモード</h4>
+      <p><strong>事前にキャパシティを予約。</strong>安定したトラフィックがある場合にコスト最適化できる。Auto Scalingとの組み合わせも可能。</p>
+      <p style="color:var(--muted);font-size:12px">大規模サービスでトラフィックパターンが予測可能な場合向き。</p>
+    </div>
+  </div>
+
+  <h3>WCU/RCU（キャパシティユニット）</h3>
+  <div class="cd">
+    <div class="cd-bar cb-yellow"></div>
+    <h4>読み書きの「通貨単位」</h4>
+    <p><strong>WCU（Write Capacity Unit）：</strong>1 WCU = 最大1KBのアイテムを1秒に1回書き込む能力。</p>
+    <p><strong>RCU（Read Capacity Unit）：</strong>1 RCU = 最大4KBのアイテムを1秒に1回読み込む能力（強い整合性読み込み）。結果整合性読み込みなら0.5 RCUで済む。</p>
+    <p><strong>オンデマンドモードでは：</strong>WCU/RCUは自動管理されるため、意識する必要はほぼありません。課金はリクエスト単位（100万リクエストあたり約$1.25）で計算されます。</p>
+  </div>
+
+  <div class="co co-purple">
+    <div class="co-i">🔑</div>
+    <p><strong>最大のハードル：</strong>RDBの「まずテーブルを設計して、後からクエリを考える」から、<strong>「まずアクセスパターンを列挙してから、テーブルを設計する」</strong>への思考転換です。DynamoDBでは「このデータにどうアクセスするか？」が設計のスタート地点になります。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 4: テーブル設計パターン                                   -->
+<!-- ============================================================ -->
+<div class="sec" id="sec4">
+  <div class="sec-tag st-purple">SECTION 04</div>
+  <h2>テーブル設計パターン — シングルテーブル vs テーブル分割</h2>
+  <p>DynamoDBのテーブル設計には大きく2つのアプローチがあります。どちらにもメリット・デメリットがあり、チームのスキルやプロジェクトの特性に応じて選択します。</p>
+
+  <h3>シングルテーブル設計</h3>
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <h4>全エンティティを1テーブルに格納するパターン</h4>
+    <p>ユーザー、カード、リアクションなど、すべてのエンティティを1つのDynamoDBテーブルに入れます。PK/SKのプレフィクスでエンティティタイプを表現します。</p>
+    <p><strong>例：</strong><br>
+      • PK=USER#001, SK=PROFILE → ユーザー情報<br>
+      • PK=USER#001, SK=CARD#2024-01-15 → カード情報<br>
+      • PK=CARD#abc, SK=REACTION#user002 → リアクション情報</p>
+  </div>
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">✅</span>
+      <h4>メリット</h4>
+      <p>• トランザクション操作が容易（同一テーブル内）<br>• 1回のクエリで関連データをまとめて取得可能<br>• テーブル管理が1つで済む<br>• DynamoDBの性能を最大限に活かせる</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⚠️</span>
+      <h4>デメリット</h4>
+      <p>• 学習コストが高い<br>• PK/SK設計が複雑になりがち<br>• データの可読性が低い（コンソールで見づらい）<br>• 設計ミスの影響範囲が大きい</p>
+    </div>
+  </div>
+
+  <h3>テーブル・パー・エンティティ（マルチテーブル）設計</h3>
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <h4>エンティティごとにテーブルを分けるパターン</h4>
+    <p>RDB的な感覚で、エンティティごとに個別のテーブルを作成します。各テーブルのPK/SK設計がシンプルになります。</p>
+    <p><strong>例：</strong><br>
+      • Users テーブル: PK=USER#001<br>
+      • Cards テーブル: PK=CARD#abc, SK=送信日時<br>
+      • Reactions テーブル: PK=CARD#abc, SK=USER#002</p>
+  </div>
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">✅</span>
+      <h4>メリット</h4>
+      <p>• 直感的で学習コストが低い<br>• 各テーブルのPK/SK設計がシンプル<br>• データの可読性が高い<br>• RDB経験者が理解しやすい</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">⚠️</span>
+      <h4>デメリット</h4>
+      <p>• 複数テーブルにまたがるトランザクションが複雑化<br>• テーブル数が増える<br>• 関連データの一括取得には複数回クエリが必要<br>• テーブルごとのGSI管理が必要</p>
+    </div>
+  </div>
+
+  <h3>比較表</h3>
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="th-ddb" style="background:var(--warm-light);color:var(--warm)">シングルテーブル</th>
+        <th class="th-rds">マルチテーブル</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>学習コスト</td>
+        <td>高い（PK/SKプレフィクス設計の理解が必要）</td>
+        <td>低い（RDB的な感覚で始められる）</td>
+      </tr>
+      <tr>
+        <td>データ可読性</td>
+        <td>低い（異なるエンティティが混在）</td>
+        <td>高い（テーブルごとに整理）</td>
+      </tr>
+      <tr>
+        <td>トランザクション</td>
+        <td>容易（同一テーブル内で完結）</td>
+        <td>複雑化の可能性（テーブルをまたぐ場合）</td>
+      </tr>
+      <tr>
+        <td>パフォーマンス</td>
+        <td>最適化しやすい（1回のクエリで関連取得）</td>
+        <td>複数クエリが必要になる場合がある</td>
+      </tr>
+      <tr>
+        <td>向いているケース</td>
+        <td>アクセスパターンが明確、経験者がいる</td>
+        <td>NoSQL初心者が多い、エンティティ間の関連が少ない</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="co co-purple">
+    <div class="co-i">🔧</div>
+    <p><strong>ElectroDB について：</strong>ElectroDB はどちらの方式もサポートしています。<strong>service 機能</strong>で複数テーブルをまとめて管理できるため、テーブル分割でも開発体験は損なわれにくいです。TypeScriptとの親和性も高く、型安全なデータアクセスが可能です。</p>
+  </div>
+
+  <div class="co co-warm">
+    <div class="co-i">💡</div>
+    <p><strong>ありがとうカードプロジェクトでは：</strong>60名規模のアプリケーションでは、シングルテーブルのパフォーマンスメリットはほぼ出ません（データ量が少ないため）。<strong>チームの学習コストを優先してテーブル分割を選ぶのも合理的</strong>な判断です。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 5: DynamoDB vs RDS PostgreSQL                        -->
+<!-- ============================================================ -->
+<div class="sec" id="sec5">
+  <div class="sec-tag st-yellow">SECTION 05</div>
+  <h2>DynamoDB vs RDS PostgreSQL — ありがとうカードでの比較</h2>
+  <p>ありがとうカードプロジェクトの文脈で、DynamoDBとRDS PostgreSQLを多角的に比較します。</p>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>比較軸</th>
+        <th class="th-ddb">DynamoDB</th>
+        <th class="th-rds">RDS PostgreSQL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>月額コスト</td>
+        <td><strong>~$1</strong>（オンデマンド、60名規模）</td>
+        <td><strong>$15〜30</strong>（db.t4g.micro 最小構成）</td>
+      </tr>
+      <tr>
+        <td>運用負荷</td>
+        <td>フルマネージド（パッチ・バックアップ自動、サーバーレス）</td>
+        <td>パッチ適用・ストレージ管理・インスタンス監視が必要</td>
+      </tr>
+      <tr>
+        <td>スケーラビリティ</td>
+        <td>自動水平スケール（テーブルサイズ・トラフィック無制限）</td>
+        <td>垂直スケール（インスタンスサイズ変更、ダウンタイムあり）</td>
+      </tr>
+      <tr>
+        <td>学習コスト</td>
+        <td>高い（PK/SK設計・アクセスパターン駆動の思考転換が必要）</td>
+        <td>低い（SQL・正規化はチーム全員が既知）</td>
+      </tr>
+      <tr>
+        <td>柔軟なクエリ</td>
+        <td>制約あり（事前設計したアクセスパターンのみ効率的）</td>
+        <td>高い（SQLで自由にJOIN・集計・サブクエリ）</td>
+      </tr>
+      <tr>
+        <td>分析（OLAP）</td>
+        <td>Export to S3 + Athena で分析（ETLが必要）</td>
+        <td>直接SQLクエリで分析可能（ただしOLTPへの負荷に注意）</td>
+      </tr>
+      <tr>
+        <td>外販対応</td>
+        <td>マルチテナント（PKプレフィクスで分離）</td>
+        <td>スキーマ分離 or DB分離</td>
+      </tr>
+      <tr>
+        <td>サーバーレス親和性</td>
+        <td>ネイティブ（HTTP API、コールドスタート影響なし）</td>
+        <td>Aurora Serverless v2 対応可（コスト高め、接続管理が必要）</td>
+      </tr>
+      <tr>
+        <td>AI/エージェント親和性</td>
+        <td>構造がシンプルでAIが理解しやすい</td>
+        <td>SQL生成でAIを活用しやすい（Text-to-SQL）</td>
+      </tr>
+      <tr>
+        <td>ジュニア学習価値</td>
+        <td>モダンクラウドDB経験（キャリアの幅を広げる）</td>
+        <td>業界標準SQLスキル強化（即戦力の深化）</td>
+      </tr>
+      <tr>
+        <td>変更容易性</td>
+        <td>属性追加・新エンティティ追加は容易（スキーマレス）。GSIもオンライン追加可能。<strong>ただしPK/SKの構造変更は既存データのマイグレーションが必要で最もコスト高</strong></td>
+        <td>ALTER TABLE でカラム追加・型変更が可能。マイグレーションツール（Prisma Migrate 等）でスキーマ変更を管理。<strong>大規模テーブルのカラム追加はロックの考慮が必要</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="co co-purple">
+    <div class="co-i">🔄</div>
+    <p><strong>変更容易性の本質的な違い：</strong>RDBは<strong>「スキーマの変更は手間だが、クエリの変更は自由」</strong>。DynamoDBは<strong>「属性の追加は自由だが、アクセスパターンの変更は困難」</strong>。つまり、開発中に「このデータも取りたい」とクエリを追加したくなった場合、RDBならSQLを書くだけで済みますが、DynamoDBではGSI追加やテーブル設計の見直しが必要になることがあります。アクセスパターンがどの程度固まっているかが、DynamoDB採用の重要な判断基準です。</p>
+  </div>
+
+  <h3>プロダクトが継続的に進化する場合の影響</h3>
+  <p>ありがとうカードのようなプロダクトは、運用開始後に「こんなデータも見たい」「この機能も欲しい」と要件が膨らんでいきます。この進化に対して、DynamoDBとRDSで影響の出方が異なります。</p>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>進化シナリオ</th>
+        <th class="th-ddb">DynamoDB</th>
+        <th class="th-rds">RDS PostgreSQL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>新しい属性の追加<br><span style="font-size:11px;color:var(--muted)">例: カードにタグ・公開範囲を追加</span></td>
+        <td>スキーマレスなのでそのまま書き込むだけ。<strong>ただし新属性での検索にはGSI追加が必要</strong></td>
+        <td>ALTER TABLE + CREATE INDEX で対応。60名規模ならロックも一瞬</td>
+      </tr>
+      <tr>
+        <td>エンティティ関係の複雑化<br><span style="font-size:11px;color:var(--muted)">例: コメント・スレッド、OKR連携</span></td>
+        <td>新エンティティのPK/SK設計が必要。関係が増えるほど設計の見直しが累積的に難しくなる</td>
+        <td>新テーブル + 外部キーで自然に拡張。<strong>JOINで関連データを一度に取得できるのがRDBの本領</strong></td>
+      </tr>
+      <tr>
+        <td>分析要求の増加<br><span style="font-size:11px;color:var(--muted)">例: 部署間交流分析、コンピテンシー偏り</span></td>
+        <td colspan="2" style="text-align:center;background:var(--green-light);color:var(--text)"><strong>OLTP/OLAP分離で対応 — DB選定に依存しない</strong>（後述）</td>
+      </tr>
+      <tr>
+        <td>外販・マルチテナント化<br><span style="font-size:11px;color:var(--muted)">例: 他社への提供、テナント分離</span></td>
+        <td><strong>PKプレフィクスで論理分離。テナント増加のコスト影響が極めて小さい</strong>（従量課金）</td>
+        <td>スキーマ分離 or DB分離。テナント数に比例してコネクション管理・コストが複雑化</td>
+      </tr>
+      <tr>
+        <td>リアルタイム連携<br><span style="font-size:11px;color:var(--muted)">例: カード受信通知、ダッシュボード更新</span></td>
+        <td><strong>DynamoDB Streams でデータ変更を即キャプチャ</strong>。Lambda連携がサーバーレスと自然に統合</td>
+        <td>LISTEN/NOTIFY や論理レプリケーションで対応可能。サーバーレス構成との相性はやや悪い</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="co co-green">
+    <div class="co-i">📊</div>
+    <p><strong>OLTP/OLAP分離の考え方：</strong>「分析の柔軟性」はDB選定から切り離して設計できます。DynamoDB・RDSのどちらを採用しても、<strong>ETLでデータをS3（Parquet形式）にエクスポート</strong>し、Athena・Python・BIツール等で自由に分析する構成にすれば、OLTP側のDB制約に縛られません。つまり「DynamoDBだとアドホック分析ができない」という懸念は、OLAP層を分離することで解消できます。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>OLTP/OLAP分離アーキテクチャ</h4>
+    <p>アプリケーションが扱うリアルタイムの読み書き（OLTP）と、集計・分析（OLAP）を分離する設計パターンです。</p>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg);padding:16px 20px;border-radius:8px;line-height:2;margin-top:8px">
+      <span style="color:var(--green);font-weight:700">[OLTP層]</span> DynamoDB or RDS<br>
+      &nbsp;&nbsp;　↓　ETL（定期 or CDC）<br>
+      <span style="color:var(--blue);font-weight:700">[データレイク]</span> S3（Parquet形式）<br>
+      &nbsp;&nbsp;　↓　クエリエンジン<br>
+      <span style="color:var(--purple);font-weight:700">[OLAP層]</span> Athena / Python / BIツール
+    </p>
+    <p style="margin-top:10px">この構成なら、OLTP側のDBがDynamoDBでもRDSでも、Parquet化されたデータに対して<strong>SQLで自由にJOIN・集計・フィルタ</strong>ができます。「部署間カード交流分析」「コンピテンシー偏り分析」「送信頻度低下の検知」といった後出しの分析要求にも、OLTP側の設計変更なしで対応可能です。外販時も、テナントごとのParquetパーティションを分けることで分析基盤を共通化できます。</p>
+  </div>
+
+  <div class="co co-purple">
+    <div class="co-i">💡</div>
+    <p><strong>この分離が意味すること：</strong>DynamoDBの最大の弱点とされる「柔軟なクエリが苦手」は、OLTP層の制約です。OLAP層を別途設計すれば、分析の柔軟性はDB選定に依存しなくなります。結果として、DB選定の判断基準は<strong>「OLTP用途での適合性」</strong>（コスト・運用負荷・サーバーレス親和性・スケーラビリティ）に絞り込めます。この観点では、DynamoDBの優位性がより明確になります。</p>
+  </div>
+
+  <div class="co co-warm">
+    <div class="co-i">💰</div>
+    <p><strong>コスト差が大きい：</strong>RDS の最小構成でも月 $15〜30 かかり、<strong>50 USD 予算の30〜60%</strong>を占めます。DynamoDB なら月 $1 以下で済み、AI API やその他サービスに予算を回せます。限られた予算の中で、DB以外の機能（AI分析、通知機能など）にどれだけ投資できるかが変わってきます。</p>
+  </div>
+
+  <div class="co co-blue">
+    <div class="co-i">🎓</div>
+    <p><strong>学習価値のトレードオフ：</strong>「普段の業務で使っているDB」がチーム全員 RDB（MySQL/PostgreSQL）なら、RDS を選ぶことで<strong>「業務直結スキルの強化」</strong>が得られます。一方、DynamoDB を選ぶと<strong>「普段触れないモダンDB体験」</strong>が得られます。どちらの学習価値を優先するかはチームの意向次第です。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 6: 判断フロー                                          -->
+<!-- ============================================================ -->
+<div class="sec" id="sec6">
+  <div class="sec-tag st-pink">SECTION 06</div>
+  <h2>「いつNoSQLを選ぶべきか」判断フロー</h2>
+  <p>プロジェクトのDB選定で迷ったときに使える判断フローです。上から順に質問に答えていくことで、RDBとNoSQLのどちらが適しているかの目安が得られます。</p>
+
+  <div class="flow">
+    <div class="flow-row">
+      <div class="flow-q">❶ アクセスパターンは事前に明確か？</div>
+      <div class="flow-ans fa-blue">No → RDB（柔軟なクエリが必要）</div>
+    </div>
+    <div class="flow-down">↓ Yes</div>
+    <div class="flow-row">
+      <div class="flow-q">❷ データ間のリレーションが複雑か？</div>
+      <div class="flow-ans fa-blue">Yes → RDB（JOINが必要）</div>
+    </div>
+    <div class="flow-down">↓ No</div>
+    <div class="flow-row">
+      <div class="flow-q">❸ 水平スケーリングが必要か？</div>
+      <div class="flow-ans fa-green">Yes → NoSQL</div>
+    </div>
+    <div class="flow-down">↓ No でも...</div>
+    <div class="flow-row">
+      <div class="flow-q">❹ サーバーレス・フルマネージドを重視するか？</div>
+      <div class="flow-ans fa-green">Yes → NoSQL（DynamoDB）</div>
+    </div>
+    <div class="flow-down">↓ No でも...</div>
+    <div class="flow-row">
+      <div class="flow-q">❺ 予算制約が厳しいか？</div>
+      <div class="flow-ans fa-green">Yes → DynamoDB（無料枠 + 従量課金）</div>
+    </div>
+    <div class="flow-down">↓ No でも...</div>
+    <div class="flow-row">
+      <div class="flow-q">❻ チームにNoSQL経験者がいるか？</div>
+      <div class="flow-ans fa-blue">No → RDB or テーブル分割DynamoDB</div>
+    </div>
+  </div>
+
+  <h3>ありがとうカードプロジェクトの場合</h3>
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>判断フローを当てはめると</h4>
+    <p><strong>❶ アクセスパターンは明確か → Yes</strong><br>タイムライン表示、マイページ（送受信一覧）、カード詳細の3パターンが中心。事前に列挙しやすい。</p>
+    <p><strong>❷ データリレーションは複雑か → No</strong><br>ユーザー → カード → リアクションのシンプルな構造。複雑なJOINは不要。</p>
+    <p><strong>❸ 水平スケーリングは必要か → 現時点では不要</strong><br>60名規模ではスケーリングの心配はない。ただし外販を見据えるなら将来的に有利。</p>
+    <p><strong>❹ サーバーレスを重視するか → Yes</strong><br>AWS Lambda + API Gateway のサーバーレス構成を前提としている。</p>
+    <p><strong>❺ 予算制約は厳しいか → Yes</strong><br>月50 USDの制約の中で、DBコストは最小化したい。</p>
+    <p><strong>❻ NoSQL経験者はいるか → 少ない</strong><br>→ テーブル分割方式 + ElectroDB で学習コストを軽減。</p>
+  </div>
+
+  <div class="co co-green">
+    <div class="co-i">✅</div>
+    <p><strong>結論：</strong>ありがとうカードプロジェクトにとって<strong>DynamoDB は合理的な選択</strong>です。アクセスパターンが明確でリレーションがシンプル、予算制約が厳しく、サーバーレス構成との親和性も高い。DynamoDBの弱点とされる「柔軟な分析クエリ」は、<strong>ETLによるOLTP/OLAP分離</strong>（S3 Parquet + Athena等）で補完できるため、DB選定の障壁にはなりません。テーブル設計方式（シングルテーブル vs テーブル分割）は、チームのスキルレベルと学習目標に合わせて<strong>Sprint 0 で議論して決定</strong>しましょう。</p>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="doc-footer">
+  <p>ありがとうカード プロジェクト — NoSQLデータベース入門ガイド v1</p>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>
