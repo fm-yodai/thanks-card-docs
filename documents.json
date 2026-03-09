@@ -232,6 +232,33 @@
       "order": 4
     },
     {
+      "title": "技術選定 & アーキテクチャ設計ノート",
+      "path": "./docs/architecture-techselection.html",
+      "group": "sprint0",
+      "icon": "🏗️",
+      "badges": ["ARCH", "TECH"],
+      "color": "sky",
+      "description": "技術選定の「なぜ」と実装レベルの「どうするか」をまとめた統合設計ノートです。",
+      "meta": [
+        "📄 全11セクション"
+      ],
+      "order": 8
+    },
+    {
+      "title": "NoSQLデータベース入門",
+      "path": "./references/nosql-guide.html",
+      "group": "knowledge",
+      "icon": "🗄️",
+      "badges": ["INFO", "DB"],
+      "color": "mint",
+      "description": "RDBとの違いからDynamoDB実践まで。DB選定の判断材料となるNoSQL基礎知識ガイドです。",
+      "meta": [
+        "📄 入門ガイド",
+        "⏱ 約20分"
+      ],
+      "order": 5
+    },
+    {
       "title": "夜も眠れない問題 ワークショップ",
       "path": "./work/sleepless-problems-workshop.html",
       "group": "sprint0",

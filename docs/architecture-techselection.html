@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprint 0 — 統合設計ノート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F5;
+    --bg-warm: #FFF8F0;
+    --bg-card: #FFFFFF;
+    --bg-code: #1E2330;
+    --text: #1A1A1A;
+    --text-sub: #4A4A4A;
+    --text-muted: #8A8A8A;
+    --border: #E8E4DF;
+    --border-light: #F0ECE7;
+    --accent: #C8773A;
+    --accent-light: #F5E6D4;
+    --sky: #3D82AA;
+    --sky-light: #E4EFF7;
+    --mint: #4E9E7A;
+    --mint-light: #DFF0E8;
+    --coral: #B85C5C;
+    --coral-light: #F5E4E4;
+    --purple: #6E5FA0;
+    --purple-light: #EAE6F5;
+    --yellow: #A88A38;
+    --yellow-light: #F5EDD8;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(155deg, #141C28 0%, #1D2E42 50%, #263553 100%);
+    color: white;
+    padding: 80px 40px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -100px; right: -80px;
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(200,119,58,0.13), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -40px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(61,130,170,0.1), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 980px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent);
+    background: rgba(200,119,58,0.15); padding: 5px 14px; border-radius: 20px; margin-bottom: 22px;
+  }
+  .hero h1 { font-size: clamp(26px, 4.5vw, 42px); font-weight: 900; line-height: 1.25; margin-bottom: 14px; letter-spacing: -0.025em; }
+  .hero h1 span { color: var(--accent); }
+  .hero-desc { font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.6); max-width: 640px; line-height: 1.9; }
+  .hero-meta { margin-top: 30px; display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-meta-item { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .hero-meta-item strong { color: rgba(255,255,255,0.82); font-weight: 500; }
+
+  /* TOC */
+  .toc {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 26px 30px;
+    margin: 32px auto; max-width: 980px; box-shadow: var(--shadow-sm);
+  }
+  .toc-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .toc-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 500; color: var(--text-sub);
+    padding: 9px 12px; border-radius: var(--radius-sm);
+    background: var(--bg); text-decoration: none; transition: background 0.15s;
+  }
+  .toc-item:hover { background: var(--border-light); color: var(--text); }
+  .toc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* MAIN */
+  .main { max-width: 980px; margin: 0 auto; padding: 8px 24px 100px; }
+  .section { margin-bottom: 72px; opacity: 0; transform: translateY(14px); animation: fadeUp 0.5s ease forwards; }
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.10s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.20s; }
+  .section:nth-child(5) { animation-delay: 0.25s; }
+  .section:nth-child(6) { animation-delay: 0.30s; }
+  .section:nth-child(7) { animation-delay: 0.35s; }
+  .section:nth-child(8) { animation-delay: 0.40s; }
+  .section:nth-child(9) { animation-delay: 0.45s; }
+  .section:nth-child(10) { animation-delay: 0.50s; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 10px; color: var(--text-muted);
+  }
+  .section-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .section h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.015em; }
+  .section-desc { color: var(--text-sub); font-size: 14px; margin-bottom: 24px; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+  .card ul { padding-left: 16px; }
+  .card li { margin-bottom: 2px; }
+  .card-grid { display: grid; gap: 14px; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 12px; }
+
+  /* BADGE */
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; margin-bottom: 8px; }
+  .badge-confirmed { background: var(--mint-light); color: var(--mint); }
+  .badge-discuss   { background: var(--yellow-light); color: var(--yellow); }
+  .badge-warn      { background: var(--coral-light); color: var(--coral); }
+  .badge-info      { background: var(--purple-light); color: var(--purple); }
+  .badge-new       { background: var(--accent-light); color: var(--accent); }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: var(--radius); padding: 18px 22px; margin-bottom: 14px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; min-width: 22px; text-align: center; margin-top: 2px; }
+  .callout p { font-size: 13px; line-height: 1.7; }
+  .callout strong { font-weight: 700; }
+  .callout-sky    { background: var(--sky-light);    border-left: 3px solid var(--sky); }
+  .callout-mint   { background: var(--mint-light);   border-left: 3px solid var(--mint); }
+  .callout-coral  { background: var(--coral-light);  border-left: 3px solid var(--coral); }
+  .callout-warm   { background: var(--accent-light); border-left: 3px solid var(--accent); }
+  .callout-purple { background: var(--purple-light); border-left: 3px solid var(--purple); }
+  .callout-yellow { background: var(--yellow-light); border-left: 3px solid var(--yellow); }
+
+  /* TREE */
+  .tree {
+    background: var(--bg-code); border-radius: var(--radius);
+    padding: 24px 28px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.9;
+    margin-bottom: 14px; white-space: pre;
+  }
+  .tree .t-root  { color: rgba(255,255,255,0.9); font-weight: 600; }
+  .tree .t-dir   { color: #4EC9B0; }
+  .tree .t-file  { color: rgba(255,255,255,0.6); }
+  .tree .t-note  { color: #6A9955; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--bg-code); border-radius: var(--radius);
+    padding: 24px 28px; margin-bottom: 14px; overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.75;
+  }
+  .code-block .c-comment{ color: #6A9955; }
+  .code-block .c-key    { color: #9CDCFE; }
+  .code-block .c-val    { color: #CE9178; }
+  .code-block .c-type   { color: #4EC9B0; }
+  .code-block .c-kw     { color: #569CD6; }
+  .code-block .c-fn     { color: #DCDCAA; }
+  .code-block .c-str    { color: #CE9178; }
+  .code-block .c-num    { color: #B5CEA8; }
+  .code-block .c-head   { color: rgba(255,255,255,0.35); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+  .code-block .c-white  { color: rgba(255,255,255,0.85); }
+  .code-block .c-dim    { color: rgba(255,255,255,0.3); }
+  .code-block .c-line   { display: block; color: rgba(255,255,255,0.75); }
+  .code-block .c-indent { display: block; padding-left: 20px; }
+  .code-block .c-indent2{ display: block; padding-left: 40px; }
+  .code-block .c-indent3{ display: block; padding-left: 60px; }
+
+  /* TABLES */
+  .data-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);
+    margin-bottom: 14px;
+  }
+  .data-table th, .data-table td {
+    padding: 11px 16px; text-align: left; font-size: 12.5px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .data-table th { background: #F7F5F2; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; color: var(--text-sub); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table td { color: var(--text-sub); }
+  .data-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); }
+  .data-table .row-group td { background: #FAFAF8; font-weight: 600; color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 12.5px; }
+  .pk-val  { color: #3D82AA; font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+  .sk-val  { color: #4E9E7A; font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+  .gsi-val { color: #6E5FA0; font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+
+  /* METHOD / GUARD */
+  .method { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 4px; }
+  .method-get  { background: var(--mint-light); color: var(--mint); }
+  .method-post { background: var(--sky-light); color: var(--sky); }
+  .method-put  { background: var(--yellow-light); color: var(--yellow); }
+  .method-del  { background: var(--coral-light); color: var(--coral); }
+  .guard { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; }
+  .guard-auth  { background: var(--purple-light); color: var(--purple); }
+  .guard-admin { background: var(--coral-light); color: var(--coral); }
+  .guard-pub   { background: #F0ECE7; color: var(--text-muted); }
+
+  /* ACCESS PATTERN */
+  .ap-grid { display: grid; gap: 12px; margin-bottom: 14px; }
+  .ap-item {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px 20px;
+    display: grid; grid-template-columns: 1fr 2fr; gap: 16px;
+    align-items: start; box-shadow: var(--shadow-sm);
+  }
+  .ap-label { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.5; }
+  .ap-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .ap-query { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-sub); line-height: 1.8; }
+  .ap-query .qk { color: var(--sky); font-weight: 600; }
+  .ap-query .qv { color: var(--accent); }
+
+  /* MIDDLEWARE STACK */
+  .mw-stack {
+    background: var(--bg-code); border-radius: var(--radius); padding: 28px;
+    margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  }
+  .mw-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 4px;
+  }
+  .mw-num  { font-size: 10px; color: rgba(255,255,255,0.3); min-width: 18px; text-align: right; }
+  .mw-name { color: rgba(255,255,255,0.88); font-weight: 500; min-width: 180px; }
+  .mw-desc { font-size: 11px; color: rgba(255,255,255,0.38); font-family: 'Noto Sans JP', sans-serif; }
+  .mw-item.mw-common  { background: rgba(61,130,170,0.12); }
+  .mw-item.mw-auth    { background: rgba(110,95,160,0.15); }
+  .mw-item.mw-role    { background: rgba(184,92,92,0.12); }
+  .mw-item.mw-handler { background: rgba(78,158,122,0.12); }
+  .mw-arrow { color: rgba(255,255,255,0.18); font-size: 12px; text-align: center; margin: 2px 0; padding-left: 26px; display: block; }
+
+  /* FLOW */
+  .flow { background: var(--bg-code); border-radius: var(--radius); padding: 28px; margin-bottom: 14px; overflow-x: auto; }
+  .flow-label  { font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .flow-row    { display: flex; align-items: center; gap: 0; margin-bottom: 8px; flex-wrap: wrap; }
+  .flow-step   { padding: 9px 16px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 500; color: white; white-space: nowrap; }
+  .flow-arrow  { color: rgba(255,255,255,0.28); font-size: 16px; margin: 0 6px; }
+  .flow-indent { margin-left: 24px; padding-left: 16px; border-left: 2px solid rgba(255,255,255,0.1); margin-bottom: 8px; }
+  .fs-user   { background: #555; }
+  .fs-front  { background: var(--sky); }
+  .fs-api    { background: var(--accent); }
+  .fs-queue  { background: var(--purple); }
+  .fs-db     { background: var(--mint); }
+  .fs-ok     { background: var(--mint); }
+  .fs-warn   { background: var(--coral); }
+  .fs-timer  { background: var(--yellow); color: #1A1A1A; }
+
+  /* STACK ITEM (tech selection) */
+  .stack-item {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px 26px; margin-bottom: 12px;
+    display: grid; grid-template-columns: 52px 1fr; gap: 20px;
+    align-items: start; box-shadow: var(--shadow-sm);
+  }
+  .stack-icon {
+    width: 52px; height: 52px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+  }
+  .stack-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .stack-item .sub { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+  .stack-item p { font-size: 13px; color: var(--text-sub); line-height: 1.75; }
+
+  /* PRINCIPLE */
+  .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .principle-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
+  .principle-num { width: 28px; height: 28px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .principle-item h3 { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
+  .principle-item p { font-size: 12.5px; color: var(--text-sub); line-height: 1.65; }
+
+  /* COST SUMMARY */
+  .cost-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .cost-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px; box-shadow: var(--shadow-sm); flex: 1; min-width: 120px; }
+  .cost-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .cost-val { font-size: 18px; font-weight: 900; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .cost-val span { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+
+  /* DIVIDER */
+  .h-divider { border: none; border-top: 1px dashed var(--border); margin: 20px 0; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 32px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+
+  @media (max-width: 768px) {
+    .hero { padding: 56px 24px 44px; }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: repeat(2, 1fr); }
+    .ap-item { grid-template-columns: 1fr; }
+    .stack-item { grid-template-columns: 1fr; gap: 12px; }
+    .principle-grid { grid-template-columns: 1fr; }
+    .hero-meta { flex-direction: column; gap: 6px; }
+    .cost-bar { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">SPRINT 0 — DESIGN NOTE</div>
+    <h1><span>技術選定</span> &amp; <span>アーキテクチャ設計</span><br>ノート</h1>
+    <p class="hero-desc">
+      技術選定の「なぜ」と、実装レベルの「どうするか」をまとめました。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">リポジトリ <strong>thanks-card/</strong></div>
+      <div class="hero-meta-item">対象 <strong>全社員 60名</strong></div>
+      <div class="hero-meta-item">予算 <strong>月 50 USD</strong></div>
+      <div class="hero-meta-item">スタック <strong>Vue 3 / Hono / DynamoDB / SST v3</strong></div>
+      <div class="hero-meta-item">更新日 <strong>2026-03-10</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="toc">
+  <div class="toc-title">目次</div>
+  <div class="toc-grid">
+    <a href="#principles" class="toc-item"><span class="toc-dot" style="background:var(--accent)"></span>判断の大方針</a>
+    <a href="#stack" class="toc-item"><span class="toc-dot" style="background:var(--sky)"></span>技術スタック</a>
+    <a href="#monorepo" class="toc-item"><span class="toc-dot" style="background:var(--mint)"></span>モノレポ構成</a>
+    <a href="#frontend" class="toc-item"><span class="toc-dot" style="background:var(--purple)"></span>フロントエンド</a>
+    <a href="#backend" class="toc-item"><span class="toc-dot" style="background:var(--yellow)"></span>バックエンド</a>
+    <a href="#dynamodb" class="toc-item"><span class="toc-dot" style="background:var(--coral)"></span>DynamoDB設計</a>
+    <a href="#quality" class="toc-item"><span class="toc-dot" style="background:var(--sky)"></span>コード品質</a>
+    <a href="#testing" class="toc-item"><span class="toc-dot" style="background:var(--mint)"></span>テスト戦略</a>
+    <a href="#infra" class="toc-item"><span class="toc-dot" style="background:var(--accent)"></span>環境・インフラ</a>
+    <a href="#cost" class="toc-item"><span class="toc-dot" style="background:var(--yellow)"></span>コスト試算</a>
+    <a href="#olap" class="toc-item"><span class="toc-dot" style="background:var(--purple)"></span>OLAP</a>
+    <a href="#security" class="toc-item"><span class="toc-dot" style="background:var(--coral)"></span>セキュリティ</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ===== PRINCIPLES ===== -->
+  <div class="section" id="principles">
+    <div class="section-label"><span class="dot" style="background:var(--accent)"></span>PRINCIPLES</div>
+    <h2>判断の大方針</h2>
+    <p class="section-desc">技術選定・設計判断のすべてはこの3原則から導出される。</p>
+
+    <div class="principle-grid">
+      <div class="principle-item">
+        <div class="principle-num">1</div>
+        <h3>学びの方向性</h3>
+        <p>ジュニアメンバーが「普段シニアに任せてしまう領域」を経験できるか。言語・FWの学習コストは抑え、インフラやアーキテクチャの学びにリソースを振る。</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">2</div>
+        <h3>月 50 USD の予算制約</h3>
+        <p>インフラ＋AI APIコストをこの枠内に収める。フルマネージド・サーバーレス・無料枠の活用を優先し、運用負荷も最小化する。</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">3</div>
+        <h3>外販への備え</h3>
+        <p>マルチテナント設計・REST互換APIなど、MVP段階から外販フェーズへの移行コストを最小に抑える構造を選択する。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STACK ===== -->
+  <div class="section" id="stack">
+    <div class="section-label"><span class="dot" style="background:var(--sky)"></span>CORE STACK</div>
+    <h2>技術スタック</h2>
+    <p class="section-desc">全選定を一覧で参照できるサマリー。各項目の詳細は後続セクションで補足する。</p>
+
+    <table class="data-table" style="font-family:'Noto Sans JP',sans-serif;">
+      <thead>
+        <tr>
+          <th style="width:120px">カテゴリ</th>
+          <th style="width:220px">選定</th>
+          <th style="width:110px">ステータス</th>
+          <th>選定理由</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">言語</td><td>TypeScript（フルスタック）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">学習コスト低・型共有・AIエージェント親和</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">フロント FW</td><td>Vue 3 + S3 / CloudFront</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">社内標準・静的配信でサーバー不要・SSTでAWS統一管理</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">UI ライブラリ</td><td>shadcn-vue + 独自コンポーネント</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">ヘッドレスで自由度高・Tailwind CSS 前提</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">CSS</td><td>Tailwind CSS</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">shadcn-vue 前提・AIエージェント親和・一貫性</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">ルーティング</td><td>createRouter（手書き）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">透明性が高くジュニアに分かりやすい。ナビゲーションガードの挙動が明示的</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">状態管理</td><td>Pinia + TanStack Query</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">UI状態は Pinia、サーバー状態は TanStack Query で役割を明確に分離</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">バックエンド</td><td>Hono on AWS Lambda</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">TSファースト・Web標準APIベース・サーバーレスで運用負荷小</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">API スタイル</td><td>Hono RPC（hono/client）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">REST 互換で外販可・型安全・追加ライブラリ不要</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">データベース</td><td>DynamoDB</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">月 $1 以下・フルマネージド・サーバーレス親和。テーブル設計方式は検討中（下記参照）</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">DB クライアント</td><td>ElectroDB</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">Single Table Design 支援・型推論・SST 推奨</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">認証</td><td>Cognito + Google OAuth</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">AWS統一・IAM一元管理・5万ユーザー無料。フロントSDKは検討中（下記参照）</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">AI API</td><td>Amazon Bedrock（モデル使い分け）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">AWS統一・IAM認証・用途別最適化</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">Linter</td><td>Oxlint + ESLint（eslint-plugin-vue）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">高速Rust製 + Vue テンプレート対応の両立</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">Formatter</td><td>Prettier（将来 Oxfmt 移行検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vue SFC 対応が安定・段階的移行可能</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">テスト</td><td>Vitest（E2E は MVP 後半で選定）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vite + Vue + TS にゼロコンフィグ</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">CI/CD</td><td>GitHub Actions + SST</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">GitHub内で完結・ジュニアのCI/CD実践学習になる</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">モノレポ</td><td>pnpm workspace（→ Turborepo 検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">シンプルスタート・CIが遅くなったら段階的に強化</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">Git 規約</td><td>Conventional Commits + ブランチ命名</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">採用目的は Sprint 0 でチームと合意（検討中）</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">環境分離</td><td>SST ステージ（→ アカウント分離検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">素早く立ち上げ・外販時に移行</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-warm">
+      <div class="callout-icon">🤖</div>
+      <p><strong>Bedrock MVPスコープ：</strong>カード文面提案（Sonnet級ストリーミング）はMVP後に検討。MVPでは コンテンツフィルタ + コンピテンシー自動判定 のみ実装する。</p>
+    </div>
+
+    <div class="callout callout-yellow">
+      <div class="callout-icon">💬</div>
+      <p><strong>DynamoDB のチーム確認：</strong>RDS PostgreSQL との比較は別資料を参照。普段の業務で使っているDBは何か？ モダン体験（DynamoDB）と業務直結スキル（RDS）、どちらを優先したいかをSprint 0で議論する。</p>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">🗄️</div>
+      <p><strong>テーブル設計方式の検討：</strong>シングルテーブル設計（全エンティティを1テーブルに集約）はDynamoDBのベストプラクティスだが、ジュニアメンバーが多いチームには学習コストが高い。<strong>テーブル・パー・エンティティ方式</strong>（ElectroDB のサービス機能で複数テーブルを管理）も選択肢。60名規模ならJOIN不要でテーブル分割のほうが理解しやすい面もある。Sprint 0 でチームのDynamoDB経験を確認し、方式を決定する。</p>
+    </div>
+  </div>
+
+  <!-- ===== MONOREPO ===== -->
+  <div class="section" id="monorepo">
+    <div class="section-label"><span class="dot" style="background:var(--mint)"></span>MONOREPO</div>
+    <h2>モノレポ構成</h2>
+    <p class="section-desc">pnpm workspaces による構成。型・DBエンティティ・共通設定をパッケージとして分離し、フロント・バック間で一元管理する。</p>
+
+    <div class="tree"><span class="t-root">thanks-card/</span>                         <span class="t-note">← リポジトリルート</span>
+├── <span class="t-dir">apps/</span>
+│   ├── <span class="t-dir">web/</span>                             <span class="t-note">← Vue 3 + Vite（shadcn-vue / Tailwind CSS）</span>
+│   │   └── <span class="t-dir">src/</span>
+│   │       ├── <span class="t-dir">pages/</span>                   <span class="t-note">← ルート対応ページコンポーネント</span>
+│   │       ├── <span class="t-dir">features/</span>                <span class="t-note">← 機能単位のコンポーネント群</span>
+│   │       ├── <span class="t-dir">components/</span>              <span class="t-note">← 汎用UIコンポーネント（shadcn-vue + 独自）</span>
+│   │       ├── <span class="t-dir">composables/</span>             <span class="t-note">← Vue Composables（useAuth等）</span>
+│   │       ├── <span class="t-dir">stores/</span>                  <span class="t-note">← Pinia stores（UI状態のみ）</span>
+│   │       ├── <span class="t-dir">queries/</span>                 <span class="t-note">← TanStack Query定義（サーバー状態）</span>
+│   │       ├── <span class="t-dir">router/</span>                  <span class="t-note">← Vue Router設定・ナビゲーションガード</span>
+│   │       ├── <span class="t-dir">api/</span>                     <span class="t-note">← Hono RPCクライアント生成・fetchラッパー</span>
+│   │       └── <span class="t-dir">layouts/</span>                 <span class="t-note">← AppLayout / AuthLayout</span>
+│   │
+│   ├── <span class="t-dir">api/</span>                             <span class="t-note">← Hono バックエンド（Lambda）</span>
+│   │   └── <span class="t-dir">src/</span>
+│   │       ├── <span class="t-dir">routes/</span>                  <span class="t-note">← ルート定義（cards / users / admin）</span>
+│   │       ├── <span class="t-dir">middleware/</span>              <span class="t-note">← auth / logging / error ミドルウェア</span>
+│   │       ├── <span class="t-dir">handlers/</span>               <span class="t-note">← SQS / EventBridge Lambda ハンドラー</span>
+│   │       ├── <span class="t-dir">services/</span>               <span class="t-note">← Bedrock / SES アクセス層</span>
+│   │       └── <span class="t-dir">lib/</span>                     <span class="t-note">← DynamoDBクライアント等のシングルトン</span>
+│   
+├── <span class="t-dir">packages/</span>
+│   ├── <span class="t-dir">shared/</span>                          <span class="t-note">← Zodスキーマ・共通型定義・定数（最重要）</span>
+│   │   └── <span class="t-dir">src/</span>
+│   │       ├── <span class="t-dir">schemas/</span>                 <span class="t-note">← card / user / competency のZodスキーマ</span>
+│   │       └── <span class="t-file">index.ts</span>                 <span class="t-note">← 全スキーマ・型のエクスポート</span>
+│   │
+│   ├── <span class="t-dir">db/</span>                              <span class="t-note">← ElectroDBエンティティ定義・DBヘルパー</span>
+│   │   └── <span class="t-dir">src/</span>
+│   │       ├── <span class="t-dir">entities/</span>               <span class="t-note">← Card / User / Reaction エンティティ</span>
+│   │       └── <span class="t-file">index.ts</span>
+│   │
+│   └── <span class="t-dir">config/</span>                          <span class="t-note">← tsconfig / ESLint / Oxlint / Prettier 共通設定</span>
+│
+├── <span class="t-dir">infra/</span>                               <span class="t-note">← SST v3 (Ion) IaC</span>
+│   └── <span class="t-file">sst.config.ts</span>
+│
+├── <span class="t-dir">etl/</span>                                 <span class="t-note">← Python ETL（pnpm管理外・独立）</span>
+├── <span class="t-file">pnpm-workspace.yaml</span>
+└── <span class="t-file">package.json</span>                         <span class="t-note">← ルートスクリプト（lint / typecheck / test）</span></div>
+
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <h3>📦 packages/shared</h3>
+        <p>Zodスキーマ・共通型定義・定数。<strong>フロントとバック両方で使うものだけ</strong>を入れる。apps/web（フォームバリデーション）・apps/api（リクエスト/レスポンス検証）から参照。</p>
+      </div>
+      <div class="card">
+        <h3>🗄️ packages/db</h3>
+        <p>ElectroDBエンティティ定義・DBヘルパー。apps/api（データ操作）から参照。infra（テーブル定義の参照）からも参照できるよう独立パッケージとして分離する。</p>
+      </div>
+      <div class="card">
+        <h3>⚙️ packages/config</h3>
+        <p>tsconfig・ESLint / Oxlint / Prettier 共通設定。全パッケージから extends で参照。設定の二重管理を防ぐ。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🔗</div>
+      <p><strong>型共有の仕組み：</strong>packages/shared に Zod スキーマを定義し、<code>z.infer&lt;&gt;</code> で TypeScript 型を自動導出。apps/api はスキーマでリクエスト検証・レスポンス型定義、apps/web は Hono RPC クライアントの型推論を通じて同じ型を参照する。スキーマを1箇所変更するだけでバックエンド・フロントエンド両方で型エラーが検出される。</p>
+    </div>
+  </div>
+
+  <!-- ===== FRONTEND ===== -->
+  <div class="section" id="frontend">
+    <div class="section-label"><span class="dot" style="background:var(--purple)"></span>FRONTEND</div>
+    <h2>フロントエンド設計</h2>
+    <p class="section-desc">Vue 3 + shadcn-vue + Tailwind CSS + createRouter。ルーティング設計・状態管理の役割分担・カードステータス表示の方針を定義する。</p>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">UI ライブラリ構成</h3>
+    <div class="card-grid card-grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🧩 shadcn-vue</h3>
+        <p>Radix Vue ベースのヘッドレスUI。Button / Input / Dialog 等の基本UIは shadcn-vue で統一し、カード表示など独自性の高いUIは自前コンポーネントで構築する。Tailwind CSS との親和性が高く、デザインの自由度が大きい。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🎨 Tailwind CSS</h3>
+        <p>shadcn-vue の前提構成。ユーティリティファーストでスタイルの一貫性を保ちやすく、ジュニアメンバーにも直感的。AIコーディングエージェントとの相性も良い。</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">ルーティング設計</h3>
+
+    <table class="data-table" style="margin-bottom:24px">
+      <thead>
+        <tr>
+          <th>パス</th>
+          <th>ガード</th>
+          <th>ページ</th>
+          <th>概要</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>/login</td>
+          <td><span class="guard guard-pub">PUBLIC</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">LoginPage</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Googleログインボタンのみ。ログイン済みなら /timeline にリダイレクト</td>
+        </tr>
+        <tr>
+          <td>/timeline</td>
+          <td><span class="guard guard-auth">AUTH</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">TimelinePage</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">全社公開カードの時系列一覧。無限スクロール</td>
+        </tr>
+        <tr>
+          <td>/cards/new</td>
+          <td><span class="guard guard-auth">AUTH</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">CardNewPage</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">カード送信フォーム。宛先選択・メッセージ入力・公開設定</td>
+        </tr>
+        <tr>
+          <td>/my</td>
+          <td><span class="guard guard-auth">AUTH</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">MyPage</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">受信一覧・送信一覧・コンピテンシーレーダーチャート・バッジ・ストリーク</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-mint" style="margin-bottom:24px">
+      <div class="callout-icon">👤</div>
+      <p><strong>ユーザー管理方針：</strong>管理者向けのユーザー管理Web UIは作らない。Cognito Post-Confirmation トリガーで初回 Google OAuth ログイン時に DynamoDB UserProfile を自動作成する。MVPでは Google OAuth で取得できる情報（名前・メール・アイコン）のみで運用し、部署情報は保持しない。宛先検索は名前・メールのファジーマッチで実装する。将来的に部署フィールドを任意項目として追加する可能性がある。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">状態管理方針（Pinia + TanStack Query）</h3>
+
+    <div class="callout callout-purple" style="margin-bottom:14px">
+      <div class="callout-icon">📐</div>
+      <p><strong>設計原則：「UIの状態はPinia、サーバーの状態はTanStack Query」と役割を明確に分離する。</strong>この境界をチーム全体で理解してもらうことが重要。フォルダ構造でも <code>stores/</code>（Pinia）と <code>queries/</code>（TanStack Query）を分けて視覚的に明示する。</p>
+    </div>
+
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <div class="badge badge-info">Pinia で管理</div>
+        <h3>🔑 authStore</h3>
+        <p>Cognitoセッション・JWTトークン・ユーザー情報・isAdminフラグ。アプリ全体で参照するため Pinia で管理。ページリロード時に Cognito SDK で復元する。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-info">Pinia で管理</div>
+        <h3>🖥️ UI状態</h3>
+        <p>モーダルの開閉・フォーム入力中の一時データ・サイドバー展開状態など、サーバーと無関係なUI固有の状態。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-new">TanStack Query で管理</div>
+        <h3>🃏 サーバー状態</h3>
+        <p>カード一覧・ユーザー情報・レーダーチャートデータなど、APIから取得するすべてのデータ。キャッシュ・再取得・楽観的更新を TanStack Query が担う。</p>
+      </div>
+    </div>
+
+    <hr class="h-divider">
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">カードステータス表示 — ポーリング設計</h3>
+
+    <div class="callout callout-coral">
+      <div class="callout-icon">⚠️</div>
+      <p><strong>Lambda + API Gateway の制約：SSEは現実的でない。</strong>API Gateway HTTP API の接続時間上限は 29 秒。AIワークフローの完了まで数分かかる可能性があるため、SSEで「処理中→公開」をプッシュし続けることは構造的に不可能。WebSocket API を使えば可能だが、コネクション管理 Lambda・DynamoDB 接続テーブルが必要になりアーキテクチャが大きく複雑化する。</p>
+    </div>
+
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>採用：TanStack Query の refetchInterval によるステータス条件付きポーリング。</strong>カードの <code>status === 'processing'</code> の間だけ 8 秒間隔でポーリング。<code>refetchInterval</code> に関数を渡すことで、<code>status</code> が <code>published</code> または <code>blocked</code> に変わった時点でポーリングが自動停止する。カスタム composable を自作せず TanStack Query のネイティブ機能で完結するため、実装コスト・テスタビリティ共に優れている。</p>
+    </div>
+
+    <div class="code-block"><span class="c-head">queries/useCardQuery.ts — TanStack Query によるポーリング実装</span><span class="c-kw">export function</span> <span class="c-fn">useCardQuery</span>(<span class="c-key">cardId</span>: <span class="c-type">string</span>) {
+  <span class="c-kw">return</span> <span class="c-fn">useQuery</span>({
+    <span class="c-key">queryKey</span>: [<span class="c-str">'cards'</span>, cardId],
+    <span class="c-key">queryFn</span>: () => api.cards[<span class="c-str">':id'</span>].<span class="c-fn">$get</span>({ param: { id: cardId } }),
+
+    <span class="c-comment">// status が 'processing' の間だけ 8 秒ポーリング。</span>
+    <span class="c-comment">// published / blocked になると refetchInterval が false を返し自動停止する。</span>
+    <span class="c-key">refetchInterval</span>: (<span class="c-key">query</span>) =>
+      query.state.data?.status === <span class="c-str">'processing'</span> ? <span class="c-num">8000</span> : <span class="c-kw">false</span>,
+  })
+}
+
+<span class="c-comment">// 利用側 — TimelinePage / CardModal / MyPage で共通利用</span>
+<span class="c-kw">const</span> { <span class="c-key">data</span>: card } = <span class="c-fn">useCardQuery</span>(cardId)</div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">💡</div>
+      <p><strong>UX上の注意：</strong>カードモーダルを開いた際に <code>status === 'processing'</code> なら「コンピテンシー分析中…」のスピナーをバッジ欄に表示。タイムラインのカード一覧では処理中ラベルを薄いグレーで表示し、完了時に色付きバッジへ自然に切り替わる。TanStack Query のキャッシュにより、同じカードIDを複数箇所で参照しても API リクエストは重複しない。</p>
+    </div>
+  </div>
+
+  <!-- ===== BACKEND ===== -->
+  <div class="section" id="backend">
+    <div class="section-label"><span class="dot" style="background:var(--yellow)"></span>BACKEND</div>
+    <h2>バックエンド設計</h2>
+    <p class="section-desc">Lambda関数の粒度・Honoルート構成・ミドルウェアスタックを定義する。</p>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Lambda 関数の粒度</h3>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="badge badge-confirmed">採用：HTTPリクエスト用</div>
+        <h3>🏗️ モノリシック Hono Lambda</h3>
+        <p>全HTTPルートを1つのHonoアプリ・1つのLambda関数に集約。Hono RPCの型推論がシンプルに機能し、コールドスタートの管理箇所が1つになる。SST v3 の Api コンストラクタで定義。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">採用：非同期ワーカー用</div>
+        <h3>⚙️ 専用 Lambda（非同期処理）</h3>
+        <p>SQSコンシューマ・EventBridgeトリガー・ETLは別Lambdaとして分離。HTTPリクエストとは完全に独立したスケーリングができ、タイムアウトも個別設定可能。</p>
+      </div>
+    </div>
+
+    <table class="data-table" style="margin-bottom:24px">
+      <thead>
+        <tr>
+          <th>Lambda 関数</th>
+          <th>トリガー</th>
+          <th>タイムアウト</th>
+          <th>役割</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>api</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">API Gateway HTTP API</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sky)">30s</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">全HTTPルート（Hono）</td>
+        </tr>
+        <tr>
+          <td>aiWorker</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">DynamoDB Streams</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">5 min</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Streams受信 → Bedrockフィルタ + コンピテンシー判定</td>
+        </tr>
+        <tr>
+          <td>notifier</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">EventBridge（毎朝9:00 / 月初）</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">5 min</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">日次まとめメール・月次サマリー（SES）</td>
+        </tr>
+        <tr>
+          <td>etl</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">EventBridge（月初 / オンデマンド）</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--coral)">15 min</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Python Lambda（pnpm管理外）。DynamoDB → S3(Parquet) → QuickSight</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-yellow">
+      <div class="callout-icon">💬</div>
+      <p><strong>Step Functions の導入検討：</strong>現在のMVPフローは「フィルタ判定 → OK/NG分岐 → DB更新」とシンプルなため、aiWorker Lambda 内の if 分岐で十分対応可能。Step Functions を導入すると状態遷移の可視化・個別ステップのリトライ制御が得られるが、アーキテクチャの複雑性・コストが増加する。将来的に人間によるレビューステップの追加や複数AIモデルの並列実行が必要になった場合に導入を検討する。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Hono API ルート構成</h3>
+
+    <table class="data-table" style="margin-bottom:24px">
+      <thead>
+        <tr>
+          <th>エンドポイント</th>
+          <th>メソッド</th>
+          <th>ガード</th>
+          <th>概要</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>/cards</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">タイムライン取得（cursor-based pagination）</td></tr>
+        <tr><td>/cards</td><td><span class="method method-post">POST</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">カード送信（DynamoDB書き込み + SQSキュー投入）</td></tr>
+        <tr><td>/cards/:id</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">カード単体取得（ポーリング用）</td></tr>
+        <tr><td>/users/me</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">自分のプロフィール・バッジ・ストリーク取得</td></tr>
+        <tr><td>/users/me/cards/received</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">受信カード一覧（マイページ）</td></tr>
+        <tr><td>/users/me/cards/sent</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">送信カード一覧（マイページ）</td></tr>
+        <tr><td>/users/me/radar</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">レーダーチャートデータ取得（?month=2026-03）</td></tr>
+        <tr><td>/users</td><td><span class="method method-get">GET</span></td><td><span class="guard guard-auth">AUTH</span></td><td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">ユーザー一覧（宛先選択用）</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">ミドルウェアスタック</h3>
+    <p style="font-size:13px;color:var(--text-sub);margin-bottom:14px">リクエストが内側に向かって通過する順序。</p>
+
+    <div class="mw-stack">
+      <div class="mw-item mw-common">
+        <span class="mw-num">1</span>
+        <span class="mw-name">errorHandler()</span>
+        <span class="mw-desc">未捕捉エラーを { error, message, requestId } 形式で JSON 化して返す（最外層で全体を捕捉）</span>
+      </div>
+      <span class="mw-arrow">↓</span>
+      <div class="mw-item mw-common">
+        <span class="mw-num">2</span>
+        <span class="mw-name">cors()</span>
+        <span class="mw-desc">許可オリジンを app.example.com に限定（環境変数で切り替え）</span>
+      </div>
+      <span class="mw-arrow">↓</span>
+      <div class="mw-item mw-common">
+        <span class="mw-num">3</span>
+        <span class="mw-name">requestId()</span>
+        <span class="mw-desc">X-Request-ID ヘッダーを付与。ログの突き合わせに使用</span>
+      </div>
+      <span class="mw-arrow">↓</span>
+      <div class="mw-item mw-common">
+        <span class="mw-num">4</span>
+        <span class="mw-name">logger()</span>
+        <span class="mw-desc">JSON 構造化ログ { timestamp, event, userId, requestId, latencyMs }</span>
+      </div>
+      <span class="mw-arrow">↓</span>
+      <div class="mw-item mw-auth">
+        <span class="mw-num">5</span>
+        <span class="mw-name">jwtAuth()</span>
+        <span class="mw-desc">Cognito の JWKS を使い JWT を検証。失敗 → 401。userId / isAdmin を ctx に格納</span>
+      </div>
+      <span class="mw-arrow">↓</span>
+      <div class="mw-item mw-common">
+        <span class="mw-num">6</span>
+        <span class="mw-name">zValidator()</span>
+        <span class="mw-desc">packages/shared の Zod スキーマでリクエストを検証。失敗 → 422</span>
+      </div>
+      <span class="mw-arrow">↓</span>
+      <div class="mw-item mw-handler">
+        <span class="mw-num">7</span>
+        <span class="mw-name">route handler</span>
+        <span class="mw-desc">実際のビジネスロジック。services/ 経由で DynamoDB / SQS / Bedrock にアクセス</span>
+      </div>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🧅</div>
+      <p><strong>オニオン構造：</strong>Hono のミドルウェアはオニオン（玉ねぎ）構造で動作する。errorHandler() を最初（最外層）に登録することで、内側の全ミドルウェア・ハンドラーで発生したエラーを捕捉できる。リクエストは外→内、レスポンスは内→外の順序で通過する。</p>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">🔐</div>
+      <p><strong>認証フロー：</strong>Cognito Hosted UI + Authorization Code Flow with PKCE を使用。JWT検証は Hono ミドルウェアで JWKS を使い公開鍵検証（jose ライブラリ）。CORS は環境変数で許可オリジンを切り替え（dev: localhost, staging/prod: 各ドメイン）。</p>
+    </div>
+
+    <div class="callout callout-yellow">
+      <div class="callout-icon">💬</div>
+      <p><strong>フロントエンド認証SDKの検討：</strong>以下の候補から Sprint 0 で選定する。<br>
+      ① <strong>amazon-cognito-identity-js</strong> — Cognito専用の軽量ライブラリ。バンドルサイズが小さくシンプル。Cognitoにロックインされる。<br>
+      ② <strong>oidc-client-ts</strong> — 汎用OIDCライブラリ。将来的にCognito以外のIdPに切り替え可能で外販対応に有利。<br>
+      ③ <strong>@aws-amplify/auth</strong> — Amplify Auth単体利用。機能が豊富だがバンドルサイズが大きい（aws-amplifyパッケージ全体で数百KB）。ツリーシェイキングで軽量化可能。<br>
+      外販への備え（方針3）を重視するなら②、シンプルさ重視なら①が有力。</p>
+    </div>
+
+    <div class="callout callout-coral">
+      <div class="callout-icon">🛡️</div>
+      <p><strong>障害対策：</strong>DynamoDB Streams → aiWorker Lambda の構成により、DB書込が成功すれば非同期処理が確実にトリガーされる（SQS投入失敗による不整合リスクを排除）。aiWorker 側では DLQ（デッドレターキュー）を設定し、3回リトライ後に失敗レコードを退避。Bedrock API 呼び出し失敗時は最大3回再試行し、それでも失敗した場合は status を 'error' に更新してDLQに記録。CloudWatch Alarms でLambdaエラー率・DLQメッセージ数を監視し、Slackまたはメールで通知。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 14px">カード送信フロー（バックエンド詳細）</h3>
+
+    <div class="flow">
+      <div class="flow-label">POST /cards — 同期処理（即レスポンス）</div>
+      <div class="flow-row">
+        <div class="flow-step fs-front">Vue フロント</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step fs-api">Hono Lambda</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step fs-api">Zod 検証</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step fs-db">DynamoDB 書込<br><small>status: 'processing'</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step fs-ok">201 Created</div>
+      </div>
+      <br>
+      <div class="flow-label">DynamoDB Streams → aiWorker Lambda（非同期・自動トリガー）</div>
+      <div class="flow-row">
+        <div class="flow-step fs-db">Streams 受信<br><small>INSERT イベント</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step fs-api">aiWorker Lambda</div>
+      </div>
+      <br>
+      <div class="flow-label">aiWorker 内部フロー</div>
+      <div class="flow-row">
+        <div class="flow-step fs-api">Bedrock フィルタ判定</div>
+      </div>
+      <div class="flow-indent">
+        <div class="flow-row">
+          <div class="flow-step fs-ok">OK</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step fs-db">DynamoDB 更新<br><small>status: 'published'</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step fs-api">Bedrock コンピテンシー判定</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step fs-db">DynamoDB 更新<br><small>competencies + RadarAgg</small></div>
+        </div>
+        <div class="flow-row" style="margin-top:6px">
+          <div class="flow-step fs-warn">NG</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step fs-db">DynamoDB 更新<br><small>status: 'blocked'</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step fs-api">SES 即時メール<br><small>管理者通知</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>DynamoDB Streams 採用理由：</strong>従来の「DynamoDB書込 → SQS投入」フローでは、SQS投入失敗時に status: 'processing' のまま永久に処理されないカードが残るリスクがあった。DynamoDB Streams を使うことで、DB書込が成功すれば自動的に Lambda がトリガーされ、トランザクション整合性の問題を構造的に排除できる。Streams の処理失敗時は自動リトライ + DLQ で対応する。</p>
+    </div>
+  </div>
+
+  <!-- ===== DYNAMODB ===== -->
+  <div class="section" id="dynamodb">
+    <div class="section-label"><span class="dot" style="background:var(--coral)"></span>DYNAMODB</div>
+    <h2>DynamoDB シングルテーブル設計</h2>
+    <p class="section-desc">全データを1テーブルに集約。PK/SKのプレフィクスでエンティティタイプを表現。DBクライアントは <strong>ElectroDB</strong> を使用し、PK/SKの組み立て・型推論・クエリビルドを宣言的に管理する。</p>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">⚙️</div>
+      <p><strong>ElectroDB について：</strong>DynamoDB 専用の ORM 的ツール。エンティティ定義をスキーマとして宣言的に書くと、PK/SK の組み立て・型推論・クエリビルドを自動化してくれる。Single Table Design のベストプラクティスに沿った設計を自然に強制し、SST ドキュメントでも推奨されている。生の AWS SDK に比べてタイプミスによるキー設計崩壊を防ぎやすい。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">テーブル定義（全アイテムタイプ）</h3>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>アイテムタイプ</th>
+          <th>PK</th>
+          <th>SK</th>
+          <th>GSI1-PK</th>
+          <th>GSI1-SK</th>
+          <th>用途</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-group"><td colspan="6">ユーザー系</td></tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">UserProfile</td>
+          <td><span class="pk-val">USER#&lt;userId&gt;</span></td>
+          <td><span class="sk-val">PROFILE</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">名前・部署・メール・ロール・通知設定</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">UserStreak</td>
+          <td><span class="pk-val">USER#&lt;userId&gt;</span></td>
+          <td><span class="sk-val">STREAK</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">currentStreak / longestStreak / lastSentDate</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">UserBadge</td>
+          <td><span class="pk-val">USER#&lt;userId&gt;</span></td>
+          <td><span class="sk-val">BADGE#&lt;competency&gt;</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">コンピテンシー別バッジレベル（1〜5等）</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">RadarAgg</td>
+          <td><span class="pk-val">USER#&lt;userId&gt;</span></td>
+          <td><span class="sk-val">RADAR#&lt;YYYY-MM&gt;</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">月別×コンピテンシー別集計 Map（付与時にインクリメント）</td>
+        </tr>
+        <tr class="row-group"><td colspan="6">カード系</td></tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">CardMetadata</td>
+          <td><span class="pk-val">CARD#&lt;cardId&gt;</span></td>
+          <td><span class="sk-val">METADATA</span></td>
+          <td><span class="gsi-val">TIMELINE#&lt;YYYY-MM&gt;</span></td>
+          <td><span class="gsi-val">&lt;createdAt&gt;#&lt;cardId&gt;</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">カード本体。status / competencies / isPublic 等</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">CardSent</td>
+          <td><span class="pk-val">USER#&lt;userId&gt;</span></td>
+          <td><span class="sk-val">SENT#&lt;createdAt&gt;#&lt;cardId&gt;</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">送信一覧（降順クエリ用）</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">CardReceived</td>
+          <td><span class="pk-val">USER#&lt;recipientId&gt;</span></td>
+          <td><span class="sk-val">RECV#&lt;createdAt&gt;#&lt;cardId&gt;</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">受信一覧（降順クエリ用）</td>
+        </tr>
+        <tr class="row-group"><td colspan="6">リアクション系（MVP後） <span class="badge badge-new" style="margin:0;margin-left:8px">MVP後</span></td></tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">Reaction</td>
+          <td><span class="pk-val">CARD#&lt;cardId&gt;</span></td>
+          <td><span class="sk-val">REACTION#&lt;userId&gt;</span></td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="color:var(--text-muted)">—</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">1ユーザー1リアクション。reactionType 属性で種類管理 <span class="badge badge-new" style="margin:0">MVP後</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">🔮</div>
+      <p><strong>マルチテナント対応：</strong>外販フェーズに備え、すべての PK に <code>TENANT#&lt;tenantId&gt;|</code> プレフィクスを付与するオプションを想定しておく。MVP 段階では固定値（例：<code>TENANT#default|</code>）を使うか省略し、外販フェーズで移行スクリプトで対応する。設計上の変更は最小限に抑えられる。</p>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🔄</div>
+      <p><strong>変更容易性：</strong>ElectroDB + シングルテーブル設計は以下の変更が容易 — 属性追加（スキーマレス）、新エンティティ追加（新PK/SKパターン）、GSI追加（オンライン追加可能）。一方、PK/SKの構造変更は既存データのマイグレーションが必要で最もコスト高。このため、リアクション等のMVP後機能もエンティティ設計だけは残しておき、後から追加できるようにしている。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">主要アクセスパターン</h3>
+
+    <div class="ap-grid">
+      <div class="ap-item">
+        <div>
+          <div class="ap-label">タイムライン取得</div>
+          <div class="ap-sub">公開カードを新着順・ページネーション</div>
+        </div>
+        <div class="ap-query">
+          <span class="qk">GSI1 Query</span><br>
+          PK = <span class="qv">"TIMELINE#&lt;YYYY-MM&gt;"</span><br>
+          SK begins_with <span class="qv">"&lt;cursor&gt;"</span><br>
+          ScanIndexForward = <span class="qv">false</span>, Limit = <span class="qv">20</span><br>
+          FilterExpression: isPublic = true AND status = 'published'
+        </div>
+      </div>
+      <div class="ap-item">
+        <div>
+          <div class="ap-label">受信カード一覧</div>
+          <div class="ap-sub">マイページ・受信タブ</div>
+        </div>
+        <div class="ap-query">
+          <span class="qk">Main Table Query</span><br>
+          PK = <span class="qv">"USER#&lt;userId&gt;"</span><br>
+          SK begins_with <span class="qv">"RECV#"</span><br>
+          ScanIndexForward = <span class="qv">false</span>, Limit = <span class="qv">20</span>
+        </div>
+      </div>
+      <div class="ap-item">
+        <div>
+          <div class="ap-label">レーダーチャート集計</div>
+          <div class="ap-sub">月別×コンピテンシー5種（最も重要）</div>
+        </div>
+        <div class="ap-query">
+          <span class="qk">Main Table GetItem</span><br>
+          PK = <span class="qv">"USER#&lt;userId&gt;"</span><br>
+          SK = <span class="qv">"RADAR#2026-03"</span><br>
+          → Map属性 { ownership:3, challenge:1, ... }
+        </div>
+      </div>
+      <div class="ap-item">
+        <div>
+          <div class="ap-label">カード単体取得</div>
+          <div class="ap-sub">ポーリング・モーダル表示</div>
+        </div>
+        <div class="ap-query">
+          <span class="qk">Main Table GetItem</span><br>
+          PK = <span class="qv">"CARD#&lt;cardId&gt;"</span><br>
+          SK = <span class="qv">"METADATA"</span><br>
+          → O(1) 高速取得
+        </div>
+      </div>
+      <div class="ap-item">
+        <div>
+          <div class="ap-label">リアクション一覧</div>
+          <div class="ap-sub">カード単体のリアクション全取得</div>
+        </div>
+        <div class="ap-query">
+          <span class="qk">Main Table Query</span><br>
+          PK = <span class="qv">"CARD#&lt;cardId&gt;"</span><br>
+          SK begins_with <span class="qv">"REACTION#"</span>
+        </div>
+      </div>
+      <div class="ap-item">
+        <div>
+          <div class="ap-label">RadarAgg 更新</div>
+          <div class="ap-sub">コンピテンシー付与時（Write-time）</div>
+        </div>
+        <div class="ap-query">
+          <span class="qk">Main Table UpdateItem</span><br>
+          PK = <span class="qv">"USER#&lt;recipientId&gt;"</span><br>
+          SK = <span class="qv">"RADAR#&lt;YYYY-MM&gt;"</span><br>
+          ADD competencies.&lt;comp&gt; 1  ← 原子的加算
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-warm">
+      <div class="callout-icon">⚡</div>
+      <p><strong>GSI パーティション分散：</strong>GSI1-PK を <code>TIMELINE#&lt;YYYY-MM&gt;</code> と月単位で分割することで、全カードが1パーティションに集中するホットパーティション問題を回避する。クライアントが月をまたぐタイムラインを取得する場合は、複数月のクエリを並列実行してマージする。マルチテナント対応時は <code>TIMELINE#&lt;tenantId&gt;#&lt;YYYY-MM&gt;</code> に拡張することで、テナント分離とパーティション分散を同時に実現できる。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 14px">RadarAgg — Write-time 集計の設計詳細</h3>
+
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>Write-time aggregation を採用する理由：</strong>マイページを開くたびにカードを全件スキャンして集計（Read-time）は、将来データ量が増えるにつれてレイテンシが上昇する。一方、カードにコンピテンシーが付与された瞬間に RadarAgg アイテムを原子的加算（ADD）で更新しておけば、レーダーチャート表示は常に GetItem 1回で完了する。60名×12ヶ月の集計アイテムは合計 720 件程度で管理コストも低い。</p>
+    </div>
+
+    <div class="code-block"><span class="c-head">packages/db/src/entities/radarAgg.ts — ElectroDB による RadarAgg 更新</span><span class="c-comment">// ElectroDB エンティティ定義（packages/db 内で一元管理）</span>
+<span class="c-kw">export const</span> <span class="c-key">RadarAggEntity</span> = <span class="c-kw">new</span> <span class="c-fn">Entity</span>({
+  <span class="c-key">model</span>:      { entity: <span class="c-str">'radarAgg'</span>, version: <span class="c-str">'1'</span>, service: <span class="c-str">'thanksCard'</span> },
+  <span class="c-key">attributes</span>: {
+    <span class="c-key">userId</span>:       { type: <span class="c-str">'string'</span> },
+    <span class="c-key">yearMonth</span>:    { type: <span class="c-str">'string'</span> },  <span class="c-comment">// e.g. "2026-03"</span>
+    <span class="c-key">competencies</span>: { type: <span class="c-str">'map'</span> },    <span class="c-comment">// { ownership: 5, challenge: 3, ... }</span>
+  },
+  <span class="c-key">indexes</span>: {
+    <span class="c-key">primary</span>: {
+      <span class="c-key">pk</span>: { field: <span class="c-str">'PK'</span>, composite: [<span class="c-str">'userId'</span>] },
+      <span class="c-key">sk</span>: { field: <span class="c-str">'SK'</span>, composite: [<span class="c-str">'yearMonth'</span>] },
+    },
+  },
+}, { table: TABLE_NAME, client: dynamoClient })
+
+<span class="c-comment">// aiWorker 内での更新（受信者ごとにインクリメント）</span>
+<span class="c-kw">for</span> (<span class="c-kw">const</span> <span class="c-key">recipientId</span> <span class="c-kw">of</span> card.recipientIds) {
+  <span class="c-kw">await</span> RadarAggEntity.<span class="c-fn">update</span>({ userId: recipientId, yearMonth })
+    .<span class="c-fn">add</span>({ <span class="c-key">competencies</span>: { [competency]: <span class="c-num">1</span> } })  <span class="c-comment">// 原子的加算</span>
+    .<span class="c-fn">go</span>()
+}
+
+<span class="c-comment">// GET /users/me/radar?month=2026-03 はこれだけで返せる</span>
+<span class="c-kw">const</span> { <span class="c-key">data</span> } = <span class="c-kw">await</span> RadarAggEntity.<span class="c-fn">get</span>({ userId, yearMonth }).<span class="c-fn">go</span>()
+<span class="c-comment">// → { ownership:5, creative_thinking:2, challenge:3, integrity:1, collaboration:4 }</span></div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">⚡</div>
+      <p><strong>原子的加算の恩恵：</strong>DynamoDB の ADD 式は複数の aiWorker Lambda が同時に同じアイテムを更新しても競合しない。ElectroDB の <code>.add()</code> はこれをラップしており、ロック不要でスケールする設計になっている。アイテムが存在しない場合（初月）は ElectroDB が upsert として扱い、自動的に0から加算される。</p>
+    </div>
+  </div>
+
+  <!-- ===== CODE QUALITY ===== -->
+  <div class="section" id="quality">
+    <div class="section-label"><span class="dot" style="background:var(--sky)"></span>CODE QUALITY</div>
+    <h2>コード品質・開発規約</h2>
+    <p class="section-desc">Linter・Formatter・Git ワークフローの自動化。ジュニアが多いからこそルールで統一する方針。</p>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Linter / Formatter 構成</h3>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:14px">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>⚡ Oxlint</h3>
+        <p>Rust 製の高速 Linter。ESLint の 50〜100 倍高速。コミット時の lint-staged で威力を発揮。500以上のESLintルールを内蔵し、JS/TS の汎用ルールをカバー。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🔧 ESLint + eslint-plugin-vue</h3>
+        <p>Vue テンプレート固有のルールを担当。Oxlint が Vue テンプレートを完全サポートするまでの補完役。<code>eslint-plugin-oxlint</code> でルール重複を自動排除。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>✨ Prettier</h3>
+        <p>コードフォーマッター。Vue SFC の <code>&lt;template&gt;</code> / <code>&lt;style&gt;</code> を含むフォーマットが安定。将来 Oxfmt の Vue 対応が安定したら段階的に移行を検討。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🔀</div>
+      <p><strong>実行順序：</strong>oxlint（高速フィードバック）→ eslint（Vue テンプレート + 追加ルール）→ prettier（フォーマット）。コミット時は <code>lint-staged</code> で変更ファイルのみ実行し、CI では全ファイルを検査。</p>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:20px 0 14px">Git ワークフロー自動化</h3>
+
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🪝 husky + lint-staged</h3>
+        <p>Git コミット時に変更ファイルを自動で lint + format。Oxlint の高速さにより、フックがほぼ一瞬で完了し開発体験を損なわない。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🚦 CI Lint チェック必須</h3>
+        <p>PR 作成時に GitHub Actions で lint・型チェック・テストを自動実行。通過しなければマージ不可。レビューの前段階で品質を担保。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>📝 Conventional Commits</h3>
+        <p><code>feat:</code> / <code>fix:</code> / <code>docs:</code> / <code>refactor:</code> 等でコミットメッセージを統一。採用目的（ログ可読性・CHANGELOG 自動生成等）は Sprint 0 でチームと合意する。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🌿 ブランチ命名規約</h3>
+        <p><code>feature/</code> / <code>fix/</code> / <code>chore/</code> / <code>docs/</code> のプレフィックス必須。GitHub Actions でブランチ名を検証し、規約外のブランチからの PR を警告。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TESTING ===== -->
+  <div class="section" id="testing">
+    <div class="section-label"><span class="dot" style="background:var(--mint)"></span>TEST STRATEGY</div>
+    <h2>テスト戦略</h2>
+    <p class="section-desc">Sprint 0 からテストの文化を立ち上げる。Vitest を中心に、段階的にカバレッジを拡大する。</p>
+
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🧩 ユニットテスト</h3>
+        <p>Vitest で実行。ビジネスロジック（コンピテンシー判定ルール・バッジ付与条件・ストリーク計算など）を中心にカバー。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🔗 インテグレーションテスト</h3>
+        <p>API エンドポイント単位で検証。Hono の <code>testClient</code> が便利。ElectroDB のエンティティ操作もここでカバー。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-new">MVP 後半で検討</div>
+        <h3>🖥️ E2E テスト</h3>
+        <p>MVP 後半で導入を検討。ツールはその時点で選定（Playwright が有力候補）。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INFRA ===== -->
+  <div class="section" id="infra">
+    <div class="section-label"><span class="dot" style="background:var(--accent)"></span>ENVIRONMENT</div>
+    <h2>環境分離・インフラ管理</h2>
+    <p class="section-desc">MVP 段階は SST ステージで素早く立ち上げ、外販フェーズでアカウント分離に移行する段階的アプローチ。</p>
+
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🏷️ ステージ構成</h3>
+        <p><strong>dev</strong>（各開発者のローカル検証用）・<strong>staging</strong>（結合テスト・レビュー用）・<strong>prod</strong>（本番）の3段階。SST のステージ機能で環境を切り替える。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🔑 設定・シークレット管理</h3>
+        <p>SST の Config 機能 または AWS Systems Manager Parameter Store で環境変数・シークレットを管理。コードにシークレットを含めない。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warm">
+      <div class="callout-icon">📡</div>
+      <p><strong>AI API（Amazon Bedrock）用途別モデル使い分け：</strong>カード文面提案はSonnet級（表現力重視・ストリーミング対応）、コンピテンシー自動分類・コンテンツフィルターは Haiku / Nova Micro 級（定型タスク・高速応答）、感謝トレンド分析はSonnet級（月1バッチ・コスト誤差）。IAM認証でAPIキー管理が不要なため Lambda との統合がシンプル。</p>
+    </div>
+  </div>
+
+  <!-- ===== COST ===== -->
+  <div class="section" id="cost">
+    <div class="section-label"><span class="dot" style="background:var(--yellow)"></span>COST</div>
+    <h2>月額コスト試算（MVP時）</h2>
+    <p class="section-desc">60名規模・月 3,000 リクエスト程度を想定。MVPスコープ（コンテンツフィルタ + コンピテンシー自動判定のみ）での試算。予算 50 USD に対して十分な余裕がある。</p>
+
+    <div class="cost-bar">
+      <div class="cost-item">
+        <div class="cost-label">S3 + CloudFront</div>
+        <div class="cost-val">~$1</div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-label">Lambda</div>
+        <div class="cost-val">$0 <span>無料枠内</span></div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-label">DynamoDB</div>
+        <div class="cost-val">~$1</div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-label">Cognito</div>
+        <div class="cost-val">$0 <span>5万ユーザー無料</span></div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-label">Bedrock (AI API)</div>
+        <div class="cost-val">~$1 <span>フィルタ+分類のみ</span></div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-label">その他 (Route53等)</div>
+        <div class="cost-val">~$2</div>
+      </div>
+      <div class="cost-item" style="border-color:var(--accent);background:var(--accent-light)">
+        <div class="cost-label" style="color:var(--accent)">合計</div>
+        <div class="cost-val" style="color:var(--accent)">$5-7</div>
+      </div>
+    </div>
+
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>MVP試算の前提：</strong>60名・月3,000リクエスト。AIはコンテンツフィルタ＋コンピテンシー分類のみ（Haiku / Nova Micro 級で処理）。カード文面平均200文字（~100トークン）、プロンプト~500トークンの想定で月 $1 未満。文面提案（Sonnet級ストリーミング）をMVP後に追加した場合は月 $3〜5 の増加を見込む。予算 50 USD に対して7〜10倍の余裕がある。</p>
+    </div>
+  </div>
+
+  <!-- ===== OLAP ===== -->
+  <div class="section" id="olap">
+    <div class="section-label"><span class="dot" style="background:var(--purple)"></span>OLAP / ANALYTICS</div>
+    <h2>分析基盤・OLAP設計</h2>
+    <p class="section-desc">DynamoDB (OLTP) のデータを S3 (Parquet) にエクスポートし、QuickSight + 自前スクリプトで分析する構成。管理者向けのWebダッシュボードは作らない。</p>
+
+    <table class="data-table" style="margin-bottom:14px">
+      <thead>
+        <tr>
+          <th>ツール</th>
+          <th>月額コスト</th>
+          <th>メリット</th>
+          <th>デメリット</th>
+          <th>ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">QuickSight</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12px">$5〜24/ユーザー<br><span style="font-size:11px;color:var(--text-muted)">Reader: $0.30/セッション (max $5)</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">GUI でダッシュボード作成・共有が容易。S3/Athena 直接参照</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Author ライセンス $24/月が予算を圧迫。50 USD 予算の約半分</td>
+          <td><span class="badge badge-discuss" style="margin:0">検討中</span></td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">Grafana (OSS)</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12px">$0<br><span style="font-size:11px;color:var(--text-muted)">セルフホスト or ECS/Fargate</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">無料。CloudWatch Logs Insights と連携可能。豊富なプラグイン</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">セルフホストの運用負荷。サーバーレス構成と方針が異なる</td>
+          <td><span class="badge badge-discuss" style="margin:0">検討中</span></td>
+        </tr>
+        <tr>
+          <td style="font-family:'Noto Sans JP',sans-serif">Python + 静的レポート</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12px">$0<br><span style="font-size:11px;color:var(--text-muted)">Lambda or ローカル実行</span></td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">追加コストなし。pandas + matplotlib でHTML/PDF生成。柔軟</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">リアルタイム性なし。ダッシュボードのインタラクティブ操作不可</td>
+          <td><span class="badge badge-discuss" style="margin:0">検討中</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-yellow">
+      <div class="callout-icon">💬</div>
+      <p><strong>OLAP ツール選定：</strong>月 50 USD の予算制約を考慮すると、QuickSight の Author ライセンス（$24/月）は予算の約半分を占める。MVP では <strong>Python スクリプト + 静的レポート（S3 出力）</strong>が最もコスト効率が高い。管理者にインタラクティブなダッシュボードが必要になった時点で QuickSight Reader セッション課金 or Grafana を検討する。Sprint 0 でチームと分析要件を確認して決定する。</p>
+    </div>
+
+    <div class="callout callout-yellow">
+      <div class="callout-icon">⚠️</div>
+      <p><strong>ETL方式は未定：</strong>DynamoDB Export to S3（ネイティブ機能・Lambda不要）、Lambda ETL（EventBridge → Python Lambda → Scan → Parquet変換）、DynamoDB Streams（CDC・ニアリアルタイム）の3つの選択肢がある。60名規模のMVPではDynamoDB Export to S3が最もシンプルで推奨。頻度はひとまずオンデマンドで開始し、運用しながら決定する。</p>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🔍</div>
+      <p><strong>フィルタNG確認：</strong>管理者向けWeb UIは作らない。blocked カードの分析・AIプロンプト改善はOLAP側で行う。Parquetデータから status='blocked' のカードを抽出し、偽陽性の傾向分析やプロンプトチューニングに活用する。MVPではカードの復旧（blocked→published）機能は実装しない。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECURITY ===== -->
+  <div class="section" id="security">
+    <div class="section-label"><span class="dot" style="background:var(--coral)"></span>SECURITY</div>
+    <h2>セキュリティ設計</h2>
+    <p class="section-desc">認証・認可以外のセキュリティ対策方針。60名の社内利用でもセキュリティ基盤は初期から整備する。</p>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🚦 レート制限</h3>
+        <p>API Gateway のスロットリング設定でアカウント単位のレートを制限。加えて、Hono ミドルウェアでユーザー単位のカード送信頻度を制限（例：1ユーザーあたり1日20件まで）。不正利用・AI API コストの暴走を防止する。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🛡️ 入力サニタイズ / XSS対策</h3>
+        <p>カード本文はユーザー入力テキストのため、表示時に必ずエスケープする。Vue の <code>{{ }}</code> はデフォルトでHTMLエスケープされるため、<code>v-html</code> は使用禁止とする。バックエンド側でも Zod スキーマで入力長・文字種を制限する。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>🔑 権限管理（isAdmin）</h3>
+        <p>管理者フラグは Cognito のカスタム属性 or グループで管理し、JWTクレームに含める。フロントエンドの isAdmin フラグはUI表示制御のみに使用し、<strong>権限判定は必ずバックエンド（JWT検証）で行う</strong>。フロントの値を信頼しない。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-discuss">検討中</div>
+        <h3>🔥 AWS WAF</h3>
+        <p>API Gateway 前段に AWS WAF を配置し、SQLインジェクション・XSS・Bot対策のマネージドルールを適用する。WAF の追加コスト（~$5/月）と予算制約のバランスを Sprint 0 で検討する。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🔒</div>
+      <p><strong>IAM 最小権限：</strong>各 Lambda 関数の IAM ロールは必要なリソースへのアクセスのみ許可する。api Lambda は DynamoDB の読み書き、aiWorker は DynamoDB + Bedrock、notifier は SES のみ。SST v3 の <code>link</code> 機能で自動的に最小権限の IAM ポリシーが生成される。</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  ありがとうカード プロジェクト — Sprint 0 統合設計ノート v5（architecture + tech-selection + OLAP + security）
+</div>
+
+</body>
+</html>
