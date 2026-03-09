@@ -724,65 +724,60 @@
   <h2>解決案を描く</h2>
   <p class="lead">プロダクトの全体像と、ユーザーが体験するフローを描く。</p>
 
-  <div class="co co-sky mb20">
-    <svg class="icon-sm co-i" style="color:var(--sky)"><use href="#i-wrench"/></svg>
-    <p><strong>TBD</strong> — チームワークで議論して決定します。</p>
-  </div>
-
-  <div class="discuss">
-    <div class="discuss-label"><svg class="icon-sm" style="color:var(--yellow)"><use href="#i-message"/></svg> DISCUSSION POINT</div>
-    <p>
-      <strong>Q1.</strong> ユーザー（社員）がこのアプリを使う場面を具体的に想像してみよう。いつ・どこで・どんな気持ちで開く？<br>
-      <strong>Q2.</strong> 「カードを送る」までに何ステップあれば自然？ 多すぎると面倒、少なすぎると味気ない——ちょうどいいラインは？<br>
-      <strong>Q3.</strong> AIラベリングの結果をユーザーにどう見せる？ 送信前に確認させる？ 送信後にそっと付く？<br>
-      <strong>Q4.</strong> 月50 USDの予算制約の中で、どんな技術構成なら実現できそう？<br>
-      <strong>Q5.</strong> MVP で「これだけは絶対に動いていないといけない」コア機能は何？
-    </p>
-  </div>
-
-  <!--
   <h3 class="mb12">ユーザー体験フロー</h3>
   <div class="sol-flow mb24">
-    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-user"/></svg><h4>ログイン</h4><p>Google認証<br>(@freemind.co.jp)</p></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-user"/></svg><h4>ログイン</h4><p>Amazon Cognito<br>で認証</p></div>
     <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
-    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-pen"/></svg><h4>カード作成</h4><p>宛先を選び<br>メッセージ入力<br>(100文字以内)</p></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-pen"/></svg><h4>カード作成</h4><p>宛先を選び<br>メッセージ入力</p></div>
     <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
-    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-cpu"/></svg><h4>AIラベリング</h4><p>生成AIが<br>コンピテンシーを<br>自動判定</p></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-cpu"/></svg><h4>AIラベリング</h4><p>コンピテンシーを<br>自動判定</p></div>
     <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
-    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-send"/></svg><h4>送信</h4><p>匿名/実名<br>公開/非公開<br>を選択して送信</p></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-send"/></svg><h4>送信</h4><p>カードが保存される<br>非同期で通知</p></div>
     <div class="sol-arr"><svg class="icon-sm" style="color:var(--text-muted)"><use href="#i-arrow-right"/></svg></div>
-    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-list"/></svg><h4>タイムライン</h4><p>公開カードを<br>全社で閲覧<br>いいねできる</p></div>
+    <div class="sol-step"><svg class="icon-sol" style="color:var(--text-sub)"><use href="#i-list"/></svg><h4>タイムライン</h4><p>タイムラインで<br>ありがとうが見える</p></div>
   </div>
 
-  <h3 class="mb12">システム概要</h3>
+  <h3 class="mb12">システム構成</h3>
   <div class="g2 mb20">
     <div class="cd">
       <svg class="icon-card" style="color:var(--sky)"><use href="#i-cloud"/></svg>
-      <h3>インフラ：AWS</h3>
-      <p>月額 50 USD の予算制約の中で構成。詳細な構成は Sprint 0 で決定。</p>
+      <h3>Frontend：Vue.js + TypeScript</h3>
+      <p>S3 + CloudFrontで配信。カード送信・タイムライン・レポートの3画面構成。</p>
     </div>
     <div class="cd">
       <svg class="icon-card" style="color:var(--purple)"><use href="#i-gear"/></svg>
-      <h3>技術スタック：Sprint 0 で決定</h3>
-      <p>言語・フレームワーク・CI/CD はメンバーによる技術選定もプロジェクトの学びの一環。</p>
+      <h3>Backend：Hono on Lambda</h3>
+      <p>API Gateway + Lambda上のHonoでREST APIを提供。サーバーレスで運用コストを最小化。</p>
     </div>
     <div class="cd">
       <svg class="icon-card" style="color:var(--mint)"><use href="#i-lock"/></svg>
-      <h3>認証：Google OAuth</h3>
-      <p>会社ドメイン(@freemind.co.jp) の Google アカウントによるログイン。</p>
+      <h3>データ：DynamoDB</h3>
+      <p>ユーザー・カード・部署マスタを管理。サーバーレス構成でスケーリングも自動。</p>
     </div>
     <div class="cd">
       <svg class="icon-card" style="color:var(--orange)"><use href="#i-phone"/></svg>
+      <h3>AI：Amazon Bedrock</h3>
+      <p>感謝メッセージから5つのコンピテンシーを自動判定。AWS内で完結しコスト管理が容易。</p>
+    </div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--coral)"><use href="#i-lock"/></svg>
+      <h3>認証：Amazon Cognito</h3>
+      <p>社員のログインを管理。既存の社内アカウント基盤と連携。</p>
+    </div>
+    <div class="cd">
+      <svg class="icon-card" style="color:var(--yellow)"><use href="#i-phone"/></svg>
       <h3>対応端末：レスポンシブ</h3>
-      <p>PC・スマートフォン両対応必須。通勤中・休憩中など業務外の利用も想定。</p>
+      <p>PC・スマートフォン両対応。MVPでは社内ネットワークのみだが、外販を見据えてモバイルファーストに。</p>
     </div>
   </div>
 
   <div class="co co-sky">
     <svg class="icon-sm co-i" style="color:var(--sky)"><use href="#i-wrench"/></svg>
-    <p><strong>MVP のコア機能：</strong>カード送受信 → AIラベリング → 不適切コンテンツフィルタ → タイムライン → マイカード一覧 → いいね → 通知</p>
+    <p><strong>制約条件：</strong>インフラ予算 月50 USD ｜ 利用者 全社60名（4部署）｜ サーバーレス構成でコスト最適化</p>
   </div>
-  -->
 </div>
 </div>
 
