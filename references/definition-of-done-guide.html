@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Definition of Done（DoD）入門ガイド — 「完成」の定義がチームを変える</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F7F6F2;--card:#FFFFFF;--text:#1E1E2E;--sub:#555568;--muted:#999AAF;--warm:#E07A4B;--warm-light:#FFF3ED;--warm-border:#FDDCCC;--blue:#4A7ADB;--blue-light:#EDF3FE;--blue-border:#C5D8F8;--green:#3CA868;--green-light:#EEFAF2;--green-border:#B8E6C9;--purple:#7B5FC2;--purple-light:#F3EFFC;--purple-border:#CDBFEF;--pink:#C9506E;--pink-light:#FDF0F3;--pink-border:#F0C4CF;--yellow:#C49A1A;--yellow-light:#FDF8EA;--yellow-border:#EFE0A8;--border:#E8E7E3;--r:14px;--rs:10px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.8}
+
+  .wrap{max-width:820px;margin:0 auto;padding:48px 32px 80px}
+
+  /* header */
+  .doc-header{text-align:center;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+  .doc-header h1{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:28px;line-height:1.4;margin-bottom:8px}
+  .doc-sub{font-size:14px;color:var(--sub);margin-bottom:16px}
+  .doc-meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .doc-chip{padding:5px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;font-size:12px;color:var(--sub);font-weight:500}
+
+  /* toc */
+  .toc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;margin-bottom:40px}
+  .toc h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:var(--sub)}
+  .toc ol{padding-left:20px}
+  .toc li{font-size:13.5px;color:var(--sub);margin-bottom:4px}
+  .toc a{color:var(--blue);text-decoration:none;font-weight:500}
+  .toc a:hover{text-decoration:underline}
+  .toc .toc-sec{font-weight:700;color:var(--text);margin-top:10px}
+
+  /* section */
+  .sec{margin-bottom:48px}
+  .sec-tag{display:inline-flex;align-items:center;gap:6px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:6px;margin-bottom:10px}
+  .sec-tag.st-warm{background:var(--warm-light);color:var(--warm)}
+  .sec-tag.st-blue{background:var(--blue-light);color:var(--blue)}
+  .sec-tag.st-green{background:var(--green-light);color:var(--green)}
+  .sec-tag.st-purple{background:var(--purple-light);color:var(--purple)}
+  .sec-tag.st-yellow{background:var(--yellow-light);color:var(--yellow)}
+  .sec-tag.st-pink{background:var(--pink-light);color:var(--pink)}
+  .sec h2{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:22px;line-height:1.45;margin-bottom:8px}
+  .sec h3{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:17px;margin-bottom:6px;margin-top:24px}
+  .sec p{font-size:14px;color:var(--sub);line-height:1.85;margin-bottom:12px}
+
+  /* card */
+  .cd{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+  .cd-bar{height:4px;border-radius:var(--r) var(--r) 0 0;margin:-20px -22px 16px -22px}
+  .cd-bar.cb-warm{background:linear-gradient(90deg,var(--warm),#F2A07A)}
+  .cd-bar.cb-blue{background:linear-gradient(90deg,var(--blue),#7BA2EC)}
+  .cd-bar.cb-green{background:linear-gradient(90deg,var(--green),#6CC98B)}
+  .cd-bar.cb-purple{background:linear-gradient(90deg,var(--purple),#A68FD8)}
+  .cd-bar.cb-yellow{background:linear-gradient(90deg,var(--yellow),#D4B44A)}
+  .cd-bar.cb-pink{background:linear-gradient(90deg,var(--pink),#DE8199)}
+  .cd-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+  .cd h4{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+  .cd p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:8px}
+  .cd p:last-child{margin-bottom:0}
+  .cd .emoji{font-size:20px;margin-bottom:8px;display:block}
+
+  /* callout */
+  .co{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--rs);margin-bottom:14px}
+  .co.co-warm{background:var(--warm-light);border:1px solid var(--warm-border)}
+  .co.co-blue{background:var(--blue-light);border:1px solid var(--blue-border)}
+  .co.co-green{background:var(--green-light);border:1px solid var(--green-border)}
+  .co.co-purple{background:var(--purple-light);border:1px solid var(--purple-border)}
+  .co.co-yellow{background:var(--yellow-light);border:1px solid var(--yellow-border)}
+  .co.co-pink{background:var(--pink-light);border:1px solid var(--pink-border)}
+  .co-i{font-size:18px;flex-shrink:0;margin-top:1px}
+  .co p{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:0}
+  .co strong{color:var(--text)}
+
+  /* grid */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+
+  /* comparison table */
+  .cmp-table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;font-size:13px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:var(--card)}
+  .cmp-table thead th{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;font-size:13px;padding:14px 16px;text-align:left;border-bottom:2px solid var(--border)}
+  .cmp-table thead th:first-child{background:var(--bg);color:var(--sub);width:28%}
+  .cmp-table thead th.th-green{background:var(--green-light);color:var(--green)}
+  .cmp-table thead th.th-pink{background:var(--pink-light);color:var(--pink)}
+  .cmp-table tbody td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--sub);line-height:1.7;vertical-align:top}
+  .cmp-table tbody tr:last-child td{border-bottom:none}
+  .cmp-table tbody td:first-child{font-weight:600;color:var(--text);background:var(--bg)}
+
+  /* checklist */
+  .checklist{list-style:none;padding:0;margin-bottom:12px}
+  .checklist li{position:relative;padding:8px 0 8px 28px;font-size:13px;color:var(--sub);line-height:1.7;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:"";position:absolute;left:0;top:12px;width:16px;height:16px;border:2px solid var(--border);border-radius:4px;background:var(--card)}
+
+  /* divider */
+  .divider{height:1px;background:var(--border);margin:48px 0}
+
+  /* footer */
+  .doc-footer{text-align:center;padding-top:32px;border-top:1px solid var(--border);margin-top:48px}
+  .doc-footer p{font-size:12px;color:var(--muted)}
+
+  @media(max-width:640px){
+    .wrap{padding:32px 18px 60px}
+    .g2,.g3{grid-template-columns:1fr}
+    .cmp-table{font-size:11.5px}
+    .cmp-table thead th,.cmp-table tbody td{padding:10px 12px}
+    .doc-header h1{font-size:22px}
+  }
+  @media print{
+    body{background:#fff}
+    .wrap{padding:24px}
+    .cd,.co{break-inside:avoid}
+    .cmp-table{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== HEADER ===== -->
+<div class="doc-header">
+  <h1>Definition of Done（DoD）入門<br>「完成」の定義がチームを変える</h1>
+  <p class="doc-sub">スクラムにおける品質の共通言語 — DoDの基礎知識から運用のコツまで</p>
+  <div class="doc-meta">
+    <span class="doc-chip">対象: 開発チーム全員</span>
+    <span class="doc-chip">所要時間: 15分</span>
+    <span class="doc-chip">一般知識ガイド</span>
+  </div>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li class="toc-sec">基礎知識</li>
+    <li><a href="#sec1">DoDとは何か — 「完成」を定義する理由</a></li>
+    <li><a href="#sec2">DoD と受け入れ基準（Acceptance Criteria）の違い</a></li>
+    <li style="margin-top:10px" class="toc-sec">DoDの設計</li>
+    <li><a href="#sec3">DoDに含める典型的な項目</a></li>
+    <li><a href="#sec4">良いDoDの特徴 — チェックポイント</a></li>
+    <li style="margin-top:10px" class="toc-sec">運用と改善</li>
+    <li><a href="#sec5">DoDの作り方 — チームで合意するプロセス</a></li>
+    <li><a href="#sec6">よくあるアンチパターンと対策</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!--  Section 1: DoDとは何か                                         -->
+<!-- ============================================================ -->
+<div class="sec" id="sec1">
+  <div class="sec-tag st-warm">SECTION 01</div>
+  <h2>DoDとは何か — 「完成」を定義する理由</h2>
+  <p>「この機能、できました！」—— チームメンバーの言う「できた」は、本当に全員にとって同じ意味でしょうか？</p>
+
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <h4>Definition of Done（DoD）とは</h4>
+    <p>DoDは、プロダクトバックログアイテム（PBI）が<strong>「完成」と見なされるために満たすべき条件のチェックリスト</strong>です。スクラムガイドでは「プロダクトのインクリメントの品質基準を作成する正式な記述」と定義されています。</p>
+    <p><strong>ポイント：</strong>DoDは個々のユーザーストーリーに固有のものではなく、<strong>すべてのPBIに共通して適用される品質基準</strong>です。「このストーリー特有の条件」はAcceptance Criteria（受け入れ基準）で定義します。</p>
+  </div>
+
+  <h3>なぜDoDが必要なのか</h3>
+  <div class="g2">
+    <div class="cd">
+      <span class="emoji">🤝</span>
+      <h4>「完成」の認識を揃える</h4>
+      <p>「コードを書いた」「テストした」「デプロイした」—— メンバーごとに「できた」の基準が違うと、スプリントレビューで「動かない」「品質が低い」といった問題が頻発します。DoDは<strong>全員の「完成」を同じラインに揃える</strong>ための共通言語です。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">📊</span>
+      <h4>透明性を確保する</h4>
+      <p>DoDがないと、スプリントの進捗が「なんとなく進んでいる」状態になります。DoDがあれば、<strong>各PBIがどの段階にあるかを誰もが客観的に判断</strong>できます。「90%できている」のような曖昧な表現がなくなります。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">🛡️</span>
+      <h4>技術的負債を防ぐ</h4>
+      <p>「テストは後で書く」「ドキュメントは最後にまとめて」—— こうした先送りが技術的負債の温床になります。DoDに品質基準を含めることで、<strong>負債の発生を毎スプリント単位で防止</strong>できます。</p>
+    </div>
+    <div class="cd">
+      <span class="emoji">🚀</span>
+      <h4>リリース可能な状態を維持する</h4>
+      <p>スクラムの目標は「スプリントごとにリリース可能なインクリメントを作る」こと。DoDはその品質ゲートとして機能し、<strong>いつでもリリースできる状態を維持</strong>するためのガードレールです。</p>
+    </div>
+  </div>
+
+  <div class="co co-warm">
+    <div class="co-i">💡</div>
+    <p><strong>スクラムガイド 2020 より：</strong>「Doneの定義はインクリメントの品質を保証するための正式な記述である。プロダクトバックログアイテムがDoneの定義を満たしたとき、インクリメントが誕生する。」—— DoDを満たさないものはインクリメントとして認められず、スプリントレビューでも「完成」として扱えません。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 2: DoD vs Acceptance Criteria                         -->
+<!-- ============================================================ -->
+<div class="sec" id="sec2">
+  <div class="sec-tag st-blue">SECTION 02</div>
+  <h2>DoD と受け入れ基準（Acceptance Criteria）の違い</h2>
+  <p>DoDと受け入れ基準は混同されやすいですが、<strong>適用範囲と目的が異なります</strong>。両方を正しく使い分けることで、品質管理が格段に明確になります。</p>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="th-green">DoD（Definition of Done）</th>
+        <th class="th-pink">受け入れ基準（AC）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>適用範囲</td>
+        <td><strong>全PBIに共通</strong>で適用される</td>
+        <td><strong>個別のPBIごと</strong>に定義される</td>
+      </tr>
+      <tr>
+        <td>定義者</td>
+        <td>開発チーム全体（スクラムチーム）</td>
+        <td>プロダクトオーナー + 開発チーム</td>
+      </tr>
+      <tr>
+        <td>内容の例</td>
+        <td>コードレビュー済み、テスト通過、CI通過</td>
+        <td>「ユーザーはカードに絵文字を添付できる」</td>
+      </tr>
+      <tr>
+        <td>変更頻度</td>
+        <td>レトロスペクティブで定期的に見直し</td>
+        <td>PBIごとに毎回新しく定義</td>
+      </tr>
+      <tr>
+        <td>目的</td>
+        <td>品質の最低ラインを保証する</td>
+        <td>機能の振る舞いを明確にする</td>
+      </tr>
+      <tr>
+        <td>たとえると</td>
+        <td>レストランの衛生基準（全メニュー共通）</td>
+        <td>レシピ（各メニュー固有の仕上がり）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <h4>「完成」の判定フロー</h4>
+    <p>あるPBIが「完成」かどうかは、以下の<strong>両方</strong>を満たしている必要があります：</p>
+    <p style="font-family:'Noto Sans JP',sans-serif;font-size:13px;background:var(--bg);padding:16px 20px;border-radius:8px;line-height:2.2;margin-top:8px">
+      <span style="color:var(--pink);font-weight:700">1.</span> 受け入れ基準（AC）を満たしている<br>
+      &nbsp;&nbsp;　→ そのPBI固有の要件が正しく実装されている<br>
+      <span style="color:var(--green);font-weight:700">2.</span> DoD を満たしている<br>
+      &nbsp;&nbsp;　→ 品質基準（レビュー、テスト、CI等）をクリアしている<br>
+      <span style="font-weight:700;color:var(--text)">= 「完成」（Done）</span>
+    </p>
+  </div>
+
+  <div class="co co-blue">
+    <div class="co-i">💡</div>
+    <p><strong>よくある誤解：</strong>「受け入れ基準に書いてあることを全部満たせばDone」と思いがちですが、それだけでは不十分です。受け入れ基準は機能の正しさを確認するものであり、DoDはプロダクト全体の品質を保つためのものです。<strong>受け入れ基準 + DoD の両方を満たして初めて「Done」</strong>です。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 3: DoDに含める典型的な項目                               -->
+<!-- ============================================================ -->
+<div class="sec" id="sec3">
+  <div class="sec-tag st-green">SECTION 03</div>
+  <h2>DoDに含める典型的な項目</h2>
+  <p>DoDの項目はチームやプロジェクトの状況に応じて異なりますが、多くのスクラムチームで採用されている<strong>一般的なカテゴリ</strong>を紹介します。</p>
+
+  <h3>コード品質</h3>
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <h4>コードの品質を担保する項目</h4>
+    <p><strong>コードレビュー：</strong>少なくとも1名のチームメンバーによるレビューと承認。コードの可読性、設計の妥当性、セキュリティ上の問題がないかを確認します。</p>
+    <p><strong>コーディング規約：</strong>チームで合意したコーディングスタイルに準拠していること。Linter/Formatterによる自動チェックを推奨します。</p>
+    <p><strong>型安全性：</strong>TypeScript等の型付き言語を使う場合、型エラーがゼロであること。型のany使用が適切に管理されていること。</p>
+  </div>
+
+  <h3>テスト</h3>
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <h4>テストの充実度に関する項目</h4>
+    <p><strong>単体テスト：</strong>新しいロジックに対するテストが書かれ、パスしていること。テストカバレッジの閾値はチームで決定します。</p>
+    <p><strong>結合テスト / E2Eテスト：</strong>主要なユーザーフローが正常に動作することを自動テストまたは手動テストで確認。</p>
+    <p><strong>既存テストの維持：</strong>既存のテストが全てパスしていること（リグレッションがないこと）。</p>
+  </div>
+
+  <h3>CI/CD・デプロイ</h3>
+  <div class="cd">
+    <div class="cd-bar cb-purple"></div>
+    <h4>ビルドとデプロイに関する項目</h4>
+    <p><strong>CIパイプライン：</strong>すべてのCIチェック（ビルド、テスト、Lint）がグリーンであること。</p>
+    <p><strong>デプロイ確認：</strong>ステージング環境（開発環境）にデプロイし、実際に動作確認を行っていること。</p>
+    <p><strong>ロールバック可能性：</strong>問題発生時にすぐに前のバージョンに戻せる状態であること。</p>
+  </div>
+
+  <h3>ドキュメント</h3>
+  <div class="cd">
+    <div class="cd-bar cb-yellow"></div>
+    <h4>ドキュメンテーションに関する項目</h4>
+    <p><strong>API仕様：</strong>新しいAPIエンドポイントや変更がある場合、仕様書（OpenAPI等）が更新されていること。</p>
+    <p><strong>README / 手順書：</strong>セットアップ手順や設定値の変更が必要な場合、ドキュメントが更新されていること。</p>
+    <p><strong>変更の記録：</strong>何をなぜ変えたかが、コミットメッセージやPR説明で追跡可能であること。</p>
+  </div>
+
+  <h3>UX・デザイン</h3>
+  <div class="cd">
+    <div class="cd-bar cb-pink"></div>
+    <h4>ユーザー体験に関する項目</h4>
+    <p><strong>デザインガイドライン準拠：</strong>チームのデザインシステムやカラー・タイポグラフィのルールに沿っていること。</p>
+    <p><strong>レスポンシブ対応：</strong>主要なデバイス（PC・スマートフォン）で表示が崩れないこと。</p>
+    <p><strong>アクセシビリティ：</strong>基本的なアクセシビリティ（キーボード操作、適切なコントラスト等）が確保されていること。</p>
+  </div>
+
+  <div class="co co-green">
+    <div class="co-i">💡</div>
+    <p><strong>全部入れる必要はない：</strong>上記はあくまで「よくある項目」の一覧です。チームの状況、プロジェクトの規模、メンバーのスキルレベルに合わせて<strong>「今のチームに本当に必要なもの」だけを選ぶ</strong>ことが大切です。多すぎるDoDは形骸化の原因になります。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 4: 良いDoDの特徴                                       -->
+<!-- ============================================================ -->
+<div class="sec" id="sec4">
+  <div class="sec-tag st-purple">SECTION 04</div>
+  <h2>良いDoDの特徴 — チェックポイント</h2>
+  <p>DoDを作ったら、以下の5つの観点で「良いDoDになっているか」をチーム全員で確認しましょう。</p>
+
+  <div class="g2">
+    <div class="cd">
+      <div class="cd-bar cb-green"></div>
+      <div class="cd-num">CHECK 01</div>
+      <h4>客観的に判定できるか</h4>
+      <p>「きれいなコード」「十分なテスト」のような<strong>主観的な表現はNG</strong>です。「ESLintのエラーがゼロ」「主要フローのE2Eテストがパス」のように、<strong>誰が見ても同じ判定ができる</strong>記述にします。</p>
+    </div>
+    <div class="cd">
+      <div class="cd-bar cb-blue"></div>
+      <div class="cd-num">CHECK 02</div>
+      <h4>チーム全員が合意しているか</h4>
+      <p>DoDはスクラムマスターやリーダーが一方的に決めるものではありません。<strong>チーム全員が「これなら守れる」「これは必要」と納得</strong>していることが重要です。</p>
+    </div>
+    <div class="cd">
+      <div class="cd-bar cb-warm"></div>
+      <div class="cd-num">CHECK 03</div>
+      <h4>現実的に達成可能か</h4>
+      <p>理想を詰め込みすぎると、結局誰も守らなくなります。今のチームのスキル・リソースで<strong>毎スプリント確実に守れるライン</strong>から始め、徐々に引き上げるのが王道です。</p>
+    </div>
+    <div class="cd">
+      <div class="cd-bar cb-purple"></div>
+      <div class="cd-num">CHECK 04</div>
+      <h4>定期的に見直す仕組みがあるか</h4>
+      <p>DoDは不変のルールではなく、<strong>チームの成長とともに進化する生きたドキュメント</strong>です。レトロスペクティブのたびに「このDoDは適切か」を振り返り、必要に応じて更新します。</p>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-yellow"></div>
+    <div class="cd-num">CHECK 05</div>
+    <h4>すぐに参照できるか</h4>
+    <p>DoDが「どこかのドキュメントの奥に埋もれている」状態では意味がありません。<strong>スプリントプランニングやデイリースクラムでサッと参照できる場所</strong>に置くことが大切です。タスクボードの横に貼る、開発ガイドに掲載するなど、チームの目に触れる場所に置きましょう。</p>
+  </div>
+
+  <div class="co co-purple">
+    <div class="co-i">🔑</div>
+    <p><strong>5項目のうち最も重要なのは「チーム全員の合意」です。</strong>完璧な項目リストよりも、全員が「自分たちのDoD」として当事者意識を持てることのほうが、はるかに効果的です。リーダーが作ったDoDを「渡す」のではなく、チーム全員で「作る」プロセスが不可欠です。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 5: DoDの作り方                                         -->
+<!-- ============================================================ -->
+<div class="sec" id="sec5">
+  <div class="sec-tag st-yellow">SECTION 05</div>
+  <h2>DoDの作り方 — チームで合意するプロセス</h2>
+  <p>DoDをチームで策定する際の具体的なステップを紹介します。60〜90分のワークショップとして実施するのがおすすめです。</p>
+
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <div class="cd-num">STEP 01</div>
+    <h4>「完成」の認識を共有する（10分）</h4>
+    <p>最初に「あなたにとって、PBIが『完成した』とはどういう状態ですか？」をチーム全員に聞きます。付箋やオンラインボードに書き出して共有。<strong>認識のズレを可視化</strong>するのが目的です。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <div class="cd-num">STEP 02</div>
+    <h4>候補項目を洗い出す（15分）</h4>
+    <p>カテゴリ別（コード品質、テスト、デプロイ、ドキュメント、UXなど）に「DoDに入れたい項目」をブレインストーミングします。この段階では取捨選択せず、<strong>すべてのアイデアを出し切る</strong>ことが大切です。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-green"></div>
+    <div class="cd-num">STEP 03</div>
+    <h4>優先度をつけて絞り込む（20分）</h4>
+    <p>洗い出した項目を「<strong>必須</strong>（毎回必ず満たす）」「<strong>推奨</strong>（できれば満たす）」「<strong>将来</strong>（今は難しいが将来は入れたい）」の3段階に分類します。最初のDoDには「必須」だけを入れます。</p>
+    <p><strong>判断基準：</strong>「この項目を外したら、深刻な品質問題が起きるか？」—— 答えがYesなら必須です。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-purple"></div>
+    <div class="cd-num">STEP 04</div>
+    <h4>表現を具体化する（15分）</h4>
+    <p>各項目を<strong>客観的に判定可能な表現</strong>に書き直します。</p>
+    <p>
+      <span style="color:var(--pink)">NG：</span>「テストが十分に書かれている」<br>
+      <span style="color:var(--green)">OK：</span>「新規ロジックに対する単体テストが追加され、CI上で全テストがパスしている」
+    </p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-yellow"></div>
+    <div class="cd-num">STEP 05</div>
+    <h4>全員で合意・公開する（10分）</h4>
+    <p>最終的なDoDリストを全員で読み上げ、「これで合意できるか」を確認します。1人でも「これは守れない」という声があれば調整します。合意できたら、<strong>チーム全員が参照できる場所に公開</strong>します。</p>
+  </div>
+
+  <div class="co co-yellow">
+    <div class="co-i">📅</div>
+    <p><strong>見直しのタイミング：</strong>DoDはレトロスペクティブで定期的に見直します。「このDoDの項目で形骸化しているものはないか」「追加すべき項目はないか」をチームで振り返り、<strong>2〜3スプリントに1回は更新の可否を検討</strong>するのがおすすめです。チームの成長に合わせてDoDも進化させましょう。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!--  Section 6: よくあるアンチパターンと対策                            -->
+<!-- ============================================================ -->
+<div class="sec" id="sec6">
+  <div class="sec-tag st-pink">SECTION 06</div>
+  <h2>よくあるアンチパターンと対策</h2>
+  <p>DoDの策定・運用でよく見られる失敗パターンと、その回避策を紹介します。</p>
+
+  <div class="cd">
+    <div class="cd-bar cb-pink"></div>
+    <h4>アンチパターン 1: 理想を詰め込みすぎる</h4>
+    <p><strong>症状：</strong>DoDの項目が10個以上あり、すべてを満たすのに膨大な工数がかかる。結果としてスプリントで完成するPBIが激減し、チームのモチベーションが低下する。</p>
+    <p><strong>対策：</strong>最初は<strong>5〜8項目程度</strong>に絞り、「今のチームが確実に守れるライン」から始める。慣れてきたらレトロスペクティブで項目を追加していく段階的アプローチが有効。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-warm"></div>
+    <h4>アンチパターン 2: 形骸化した「飾りのDoD」</h4>
+    <p><strong>症状：</strong>DoDは存在するが、誰もチェックしていない。「一応Doneにしたけど、レビューはまだ」のような状態が常態化する。</p>
+    <p><strong>対策：</strong>DoDの確認を<strong>プルリクエストのテンプレート</strong>にチェックリストとして埋め込む。自動化できる項目（CI、Lint）は自動化し、人力チェックの負荷を減らす。スプリントレビューで「DoDを満たしていないものはデモしない」ルールを徹底する。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-blue"></div>
+    <h4>アンチパターン 3: リーダーだけが決めた「押し付けDoD」</h4>
+    <p><strong>症状：</strong>スクラムマスターやテックリードが「これがDoDです」と一方的に決定。メンバーの当事者意識が薄く、「やらされ感」でモチベーションが低下する。</p>
+    <p><strong>対策：</strong>叩き台は用意しつつも、<strong>必ずチーム全員でワークショップ</strong>を実施して合意形成する。全員が「自分たちで決めたルール」と感じられることが、運用の鍵。</p>
+  </div>
+
+  <div class="cd">
+    <div class="cd-bar cb-purple"></div>
+    <h4>アンチパターン 4: 一度作ったら更新しない</h4>
+    <p><strong>症状：</strong>プロジェクト初期に作ったDoDがそのまま最後まで使われ、チームの成長や技術スタックの変化に追いつかない。</p>
+    <p><strong>対策：</strong>DoDは<strong>生きたドキュメント</strong>として扱う。レトロスペクティブの定期アジェンダに「DoD見直し」を入れておく。チームが成長したら項目を追加し、不要になった項目は削除する勇気を持つ。</p>
+  </div>
+
+  <div class="co co-pink">
+    <div class="co-i">🔑</div>
+    <p><strong>最大のアンチパターンは「DoDがないこと」です。</strong>完璧なDoDを目指す必要はありません。不完全でも、チームで合意した「完成の基準」があるだけで、品質のばらつきは大幅に減ります。まずは小さく始めて、<strong>スプリントを回しながら育てていく</strong>のが最善のアプローチです。</p>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="doc-footer">
+  <p>ありがとうカード プロジェクト — Definition of Done 入門ガイド v1</p>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>

@@ -141,6 +141,20 @@
       "order": 2
     },
     {
+      "title": "Definition of Done（DoD）",
+      "path": "./docs/definition-of-done.html",
+      "group": "dev",
+      "icon": "✅",
+      "badges": ["GUIDE", "AGILE"],
+      "color": "coral",
+      "description": "PBIが「完成」と見なされるための品質基準チェックリスト。必須6項目＋推奨4項目＋将来4項目の3段階構成。チーム議論用の叩き台です。",
+      "meta": [
+        "📄 叩き台（DRAFT）",
+        "📋 必須6項目（案）"
+      ],
+      "order": 4
+    },
+    {
       "title": "議事録テンプレート",
       "path": "",
       "group": "dev",
@@ -217,6 +231,20 @@
         "📄 テンプレート"
       ],
       "order": 5
+    },
+    {
+      "title": "Definition of Done（DoD）入門",
+      "path": "./references/definition-of-done-guide.html",
+      "group": "knowledge",
+      "icon": "✅",
+      "badges": ["INFO", "AGILE"],
+      "color": "coral",
+      "description": "「完成の定義」とは何か、なぜ必要なのか、どう作り運用するかを解説した一般知識ガイドです。",
+      "meta": [
+        "📄 入門ガイド",
+        "⏱ 約15分"
+      ],
+      "order": 6
     },
     {
       "title": "開発手法の比較（スクラム・カンバン・ウォーターフォール）",
