@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLTP vs OLAP — ありがとうカード 技術基礎ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F5; --bg-warm: #FFF8F0; --bg-card: #FFFFFF; --bg-code: #2B2D30;
+    --text: #1A1A1A; --text-sub: #4A4A4A; --text-muted: #8A8A8A;
+    --border: #E8E4DF; --border-light: #F0ECE7;
+    --accent: #D4854A; --accent-light: #F5E6D4;
+    --sky: #4A90B8; --sky-light: #E8F2F8;
+    --mint: #5BA88C; --mint-light: #E4F2EC;
+    --coral: #C96B6B; --coral-light: #F8E8E8;
+    --purple: #7B6BA8; --purple-light: #EDE8F5;
+    --yellow: #C4A24E; --yellow-light: #FBF5E4;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 20px;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  /* Hero */
+  .hero { background: linear-gradient(160deg, #2E254A 0%, #453A6B 40%, #5A4F80 100%); color: white; padding: 72px 40px 56px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(circle, rgba(123,107,168,0.2), transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 920px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #B8A8E0; background: rgba(184,168,224,0.15); padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 900; line-height: 1.3; margin-bottom: 14px; letter-spacing: -0.02em; }
+  .hero h1 span { color: #B8A8E0; }
+  .hero-desc { font-size: 14.5px; font-weight: 300; color: rgba(255,255,255,0.7); max-width: 620px; line-height: 1.9; }
+
+  /* Main */
+  .main { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* Anchor banner */
+  .anchor-banner { background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin: -28px 0 48px; position: relative; z-index: 2; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .anchor-banner-icon { font-size: 32px; }
+  .anchor-banner-text h2 { font-size: 14px; font-weight: 700; color: var(--purple); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .anchor-banner-text p { font-size: 13px; color: var(--text-sub); }
+
+  /* Section */
+  .section { margin-bottom: 56px; }
+  .section-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .section-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .section h2 { font-size: 22px; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .section-desc { color: var(--text-sub); font-size: 14px; margin-bottom: 24px; line-height: 1.8; }
+
+  /* Cards */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .card-grid { display: grid; gap: 16px; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  /* Callout */
+  .callout { border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; display: flex; gap: 14px; align-items: flex-start; }
+  .callout-icon { font-size: 18px; min-width: 24px; text-align: center; margin-top: 1px; }
+  .callout p { font-size: 13.5px; line-height: 1.7; }
+  .callout strong { font-weight: 700; }
+  .co-warm { background: var(--accent-light); border: 1px solid #E8D0B8; }
+  .co-sky { background: var(--sky-light); border: 1px solid #C8DDE8; }
+  .co-mint { background: var(--mint-light); border: 1px solid #B8D8C8; }
+  .co-coral { background: var(--coral-light); border: 1px solid #E0C0C0; }
+  .co-purple { background: var(--purple-light); border: 1px solid #CCC0E0; }
+  .co-yellow { background: var(--yellow-light); border: 1px solid #E0D8B8; }
+
+  /* Split panel */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+  .split-panel { padding: 28px; }
+  .split-panel:first-child { border-right: 1px solid var(--border); }
+  .split-panel .split-tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .split-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .split-panel p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .split-oltp { background: var(--sky-light); }
+  .split-oltp .split-tag { color: var(--sky); }
+  .split-olap { background: var(--purple-light); }
+  .split-olap .split-tag { color: var(--purple); }
+
+  /* Table */
+  .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 580px; }
+  thead th { background: #F7F5F2; font-weight: 700; font-size: 11.5px; letter-spacing: 0.5px; color: var(--text-sub); text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  tbody td { padding: 12px 18px; border-bottom: 1px solid var(--border-light); color: var(--text-sub); line-height: 1.7; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  td.t-label { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  /* Diagram */
+  .diagram { background: var(--bg-code); border-radius: var(--radius); padding: 36px 32px; margin-bottom: 20px; overflow-x: auto; }
+  .diagram-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: rgba(255,255,255,0.3); text-transform: uppercase; text-align: center; margin-bottom: 14px; }
+  .dia-row { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 10px; flex-wrap: wrap; }
+  .dia-step { padding: 10px 18px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 600; color: white; white-space: nowrap; text-align: center; min-width: 100px; }
+  .dia-step small { display: block; font-size: 10px; font-weight: 400; opacity: 0.75; margin-top: 2px; }
+  .dia-arrow { color: rgba(255,255,255,0.25); font-size: 18px; margin: 0 6px; font-family: 'JetBrains Mono', monospace; }
+  .ds-sky { background: var(--sky); }
+  .ds-purple { background: var(--purple); }
+  .ds-accent { background: var(--accent); }
+  .ds-mint { background: var(--mint); }
+  .ds-yellow { background: var(--yellow); }
+  .ds-coral { background: var(--coral); }
+  .ds-dark { background: #555; }
+  .dia-divider { border: none; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0; }
+  .dia-section-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 10px; text-align: center; }
+
+  /* Code block */
+  .code-block { background: var(--bg-code); border-radius: var(--radius-sm); padding: 20px 24px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #D4D4D4; line-height: 1.7; overflow-x: auto; margin-bottom: 16px; white-space: pre; }
+  .code-block .cm { color: #6A9955; }
+  .code-block .kw { color: #569CD6; }
+  .code-block .fn { color: #DCDCAA; }
+  .code-block .str { color: #CE9178; }
+  .code-block .num { color: #B5CEA8; }
+
+  /* Example scenario */
+  .scenario { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 20px; position: relative; }
+  .scenario::before { content: '💡'; position: absolute; top: -14px; left: 24px; font-size: 22px; background: var(--bg); padding: 0 8px; }
+  .scenario h3 { font-size: 14px; font-weight: 700; color: var(--purple); margin-bottom: 8px; letter-spacing: 0.5px; }
+  .scenario p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+
+  /* Tag */
+  .tag-good { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: var(--mint-light); color: var(--mint); }
+  .tag-caution { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: var(--coral-light); color: var(--coral); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero { padding: 56px 24px 44px; }
+    .anchor-banner { margin: -20px 16px 36px; padding: 20px 24px; }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .split { grid-template-columns: 1fr; }
+    .split-panel:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">TECH FOUNDATIONS — 01</div>
+    <h1>OLTP vs <span>OLAP</span></h1>
+    <p class="hero-desc">
+      「なぜ同じデータベースで全部やらないの？」——この疑問に答えるための基礎知識。
+      ありがとうカードのアーキテクチャで採用したOLTP/OLAP分離設計の背景を理解しよう。
+    </p>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="anchor-banner">
+    <div class="anchor-banner-icon">🏗️</div>
+    <div class="anchor-banner-text">
+      <h2>アーキテクチャ設計ノートとの関連</h2>
+      <p>設計ノートの「分析アーキテクチャ」セクションでは、OLTP（アプリ内リアルタイム）とOLAP（バッチ集計）の二層構成を採用しています。この資料ではその判断の背景にある一般的な考え方を解説します。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--sky)"></div> CONCEPT</div>
+    <h2>そもそもOLTPとOLAPって何？</h2>
+    <p class="section-desc">どちらもデータベースの「使い方」のパターンです。同じデータを扱うけれど、目的がまったく違います。</p>
+
+    <div class="split">
+      <div class="split-panel split-oltp">
+        <div class="split-tag">OLTP — Online Transaction Processing</div>
+        <h3>🔄 日々の業務処理</h3>
+        <p>
+          「カードを送る」「いいねする」「ログインする」など、ユーザーが1件ずつ行う操作を処理するためのデータベースの使い方。
+        </p>
+        <p style="margin-top:12px;">
+          <strong>特徴：</strong>1回のクエリで扱うデータは少量（1件〜数十件）。レスポンス速度が命。1秒以内に返ってこないとユーザーが待たされる。
+        </p>
+      </div>
+      <div class="split-panel split-olap">
+        <div class="split-tag">OLAP — Online Analytical Processing</div>
+        <h3>📊 分析・集計処理</h3>
+        <p>
+          「先月のカード送受信を部署別に集計」「コンピテンシーの分布を全社で可視化」など、大量のデータをまとめて分析する使い方。
+        </p>
+        <p style="margin-top:12px;">
+          <strong>特徴：</strong>1回のクエリで数千〜数万件を横断的にスキャン。処理に数秒〜数分かかっても許容される。
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h3>ありがとうカードでの具体例</h3>
+      <p>
+        <strong>OLTP：</strong>「田中さんがカードを送る」→ カードを1件INSERT → コンピテンシータグを紐づけ → 完了。数十ミリ秒で終わる。<br>
+        <strong>OLAP：</strong>「先月、営業部から開発部に送られたカードのコンピテンシー分布は？」→ カードテーブルの全件スキャン → ユーザーの部署情報と結合 → コンピテンシー別にGROUP BY → ヒートマップ用のマトリクスを生成。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--coral)"></div> PROBLEM</div>
+    <h2>なぜ1つのDBで両方やると問題になるの？</h2>
+    <p class="section-desc">「60名規模だし、1つのDBで十分では？」——今は確かにそうです。でも、分離設計にする理由は規模だけではありません。</p>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>⚡ 負荷の衝突</h3>
+        <p>OLAP の重い集計クエリ（全テーブルスキャン、複数JOIN）が走っている間、OLTP の軽い操作（カード送信）が遅くなる可能性があります。月次レポートのバッチ実行中にアプリが重くなる、というのは典型的なパターンです。</p>
+      </div>
+      <div class="card">
+        <h3>📐 データの持ち方が違う</h3>
+        <p>OLTP は「行単位」でデータを読み書きします（カード1件のINSERT/SELECT）。一方、OLAP は「列単位」で大量データを集計するのが得意です。同じデータでも、最適な格納形式がまったく違います。</p>
+      </div>
+      <div class="card">
+        <h3>🔧 関心の分離</h3>
+        <p>アプリ開発チームと分析チームでは、DBに求めるものが違います。アプリ側は「速いレスポンス」「安全なトランザクション」、分析側は「自由なクエリ」「大量データの高速スキャン」。責務を分けた方が、それぞれに最適化できます。</p>
+      </div>
+      <div class="card">
+        <h3>🌱 将来への備え</h3>
+        <p>今は60名でも、外販を視野に入れた場合にユーザー数が拡大する可能性があります。最初からOLTPとOLAPを分離しておけば、規模が変わっても構造を変えずに対応できます。</p>
+      </div>
+    </div>
+
+    <div class="callout co-warm">
+      <span class="callout-icon">💡</span>
+      <p><strong>大事なポイント：</strong>60名規模の今、負荷の衝突は現実にはほぼ起きません。分離する一番の理由は「関心の分離」と「データの持ち方の違い」です。そして、分離設計そのものを構築する経験がメンバーの学びになるという点も大きいです。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--accent)"></div> ROW vs COLUMN</div>
+    <h2>行指向 vs 列指向</h2>
+    <p class="section-desc">OLTPとOLAPで「データの持ち方」が違う、とはどういうことかを具体的に見てみましょう。</p>
+
+    <p style="font-size:14px;color:var(--text-sub);margin-bottom:16px;">例として、こんなテーブルがあるとします：</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>card_id</th><th>sender</th><th>receiver</th><th>competency</th><th>message</th></tr></thead>
+        <tbody>
+          <tr><td>001</td><td>田中</td><td>鈴木</td><td>協働</td><td>急な対応ありがとう！</td></tr>
+          <tr><td>002</td><td>佐藤</td><td>田中</td><td>誠実</td><td>丁寧なレビューに感謝</td></tr>
+          <tr><td>003</td><td>山田</td><td>佐藤</td><td>挑戦への意欲</td><td>新しい提案、素晴らしい</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:20px;">
+      <div class="card" style="border-left:4px solid var(--sky);">
+        <h3>📋 行指向ストレージ（RDB / DynamoDB）</h3>
+        <p>データを<strong>行単位</strong>でまとめて保存します。<br><span style="font-size:12px;color:var(--text-muted);">※ DynamoDB は厳密にはKey-Value/ドキュメントストアですが、「1アイテム（行）を丸ごと読み書きする」点で行指向と同じ特性を持ちます。</span></p>
+<div class="code-block" style="margin-top:12px;font-size:11.5px;"><span class="cm">// ディスク上のイメージ</span>
+[001, 田中, 鈴木, 協働, 急な対応…]
+[002, 佐藤, 田中, 誠実, 丁寧な…]
+[003, 山田, 佐藤, 挑戦, 新しい…]</div>
+        <p>「card_id=001 のカードを全部取得」が高速。OLTPに最適。</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--purple);">
+        <h3>📊 列指向ストレージ（Parquet）</h3>
+        <p>データを<strong>列単位</strong>でまとめて保存します。</p>
+<div class="code-block" style="margin-top:12px;font-size:11.5px;"><span class="cm">// ディスク上のイメージ</span>
+card_id:    [001, 002, 003]
+sender:     [田中, 佐藤, 山田]
+receiver:   [鈴木, 田中, 佐藤]
+competency: [協働, 誠実, 挑戦]
+message:    [急な対応…, 丁寧な…, 新しい…]</div>
+        <p>「competency列だけ全件読み取ってGROUP BY」が高速。OLAPに最適。</p>
+      </div>
+    </div>
+
+    <div class="callout co-purple">
+      <span class="callout-icon">📦</span>
+      <p><strong>Parquet とは：</strong>Apache Parquet はオープンソースの列指向ファイルフォーマットです。データを列ごとに圧縮して保存するため、「特定の列だけ読む」集計クエリが非常に高速。AWS Athena、Python Polars/Pandas など多くのツールが対応しています。今回のETLパイプラインでは、DynamoDB/RDSからデータを抽出してParquet形式でS3に書き出します。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--mint)"></div> ETL PIPELINE</div>
+    <h2>ETLパイプラインという橋渡し</h2>
+    <p class="section-desc">OLTP と OLAP を分離するとき、「OLTP側のデータをOLAP側に持っていく仕組み」が必要です。これがETLパイプラインです。</p>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:20px;">
+      <div class="card" style="text-align:center;">
+        <h3 style="justify-content:center;">Extract</h3>
+        <p style="font-size:36px;margin:8px 0;">📥</p>
+        <p>OLTPのDB（DynamoDB/RDS）からデータを<strong>抽出</strong>する</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h3 style="justify-content:center;">Transform</h3>
+        <p style="font-size:36px;margin:8px 0;">⚙️</p>
+        <p>分析しやすい形に<strong>変換</strong>する（フラット化、集計、結合）</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h3 style="justify-content:center;">Load</h3>
+        <p style="font-size:36px;margin:8px 0;">📤</p>
+        <p>OLAP側のストレージ（S3 / Parquet）に<strong>書き出す</strong></p>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-label">ありがとうカードの ETL パイプライン（実装方式は検討中）</div>
+      <div class="dia-row">
+        <div class="dia-step ds-dark">トリガー<small>オンデマンド or 定期</small></div>
+        <div class="dia-arrow">→</div>
+        <div class="dia-step ds-sky">Extract<small>OLTP DB から抽出</small></div>
+        <div class="dia-arrow">→</div>
+        <div class="dia-step ds-accent">Transform<small>フラット化 + 集計</small></div>
+        <div class="dia-arrow">→</div>
+        <div class="dia-step ds-purple">Load<small>S3 に Parquet</small></div>
+      </div>
+
+      <hr class="dia-divider">
+
+      <div class="dia-section-label">Transform で生成するサマリーテーブル</div>
+      <div class="dia-row" style="gap:8px;">
+        <div class="dia-step ds-accent" style="font-size:11px;min-width:0;padding:8px 14px;">部署間カード<br>送受信マトリクス</div>
+        <div class="dia-step ds-accent" style="font-size:11px;min-width:0;padding:8px 14px;">部署別<br>コンピテンシー分布</div>
+        <div class="dia-step ds-accent" style="font-size:11px;min-width:0;padding:8px 14px;">個人・部署・会社<br>月次サマリー</div>
+        <div class="dia-step ds-accent" style="font-size:11px;min-width:0;padding:8px 14px;">コンピテンシー<br>プロファイル</div>
+      </div>
+
+      <hr class="dia-divider">
+
+      <div class="dia-section-label">出力先</div>
+      <div class="dia-row">
+        <div class="dia-step ds-purple">S3 Parquet</div>
+        <div class="dia-arrow">→</div>
+        <div class="dia-step ds-mint">QuickSight<small>ダッシュボード</small></div>
+      </div>
+      <div class="dia-row">
+        <div class="dia-step ds-purple">S3 Parquet</div>
+        <div class="dia-arrow">→</div>
+        <div class="dia-step ds-mint">ダウンロード<small>管理者が自由分析</small></div>
+      </div>
+    </div>
+
+    <div class="callout co-purple" style="margin-bottom:20px;">
+      <span class="callout-icon">📋</span>
+      <p><strong>ETL方式の候補（Sprint 0 時点で未定）：</strong><br>
+      ① <strong>DynamoDB Export to S3</strong> — ネイティブ機能でLambda不要。60名規模のMVPでは最もシンプルで推奨。<br>
+      ② <strong>Lambda ETL</strong> — EventBridge → Python Lambda → Scan → Parquet変換。柔軟だが実装コストあり。<br>
+      ③ <strong>DynamoDB Streams</strong> — CDC方式でニアリアルタイム。MVP段階ではオーバースペック。</p>
+    </div>
+
+    <div class="scenario">
+      <h3>Transform の具体例 — 部署間ヒートマップ</h3>
+      <p>
+        カードテーブルには sender_id と receiver_id しかありません。部署情報はユーザーテーブルにあります。<br>
+        Transform では、カードデータにユーザーの部署情報を結合（JOIN）し、「営業部→開発部: 12件、開発部→DX企画部: 5件…」というマトリクスを生成します。<br>
+        この結果をParquetに書き出しておけば、QuickSightやPythonスクリプトで即座にヒートマップを描画できます。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--yellow)"></div> TECH STACK</div>
+    <h2>今回使う技術</h2>
+    <p class="section-desc">OLAP/ETL 周辺で登場する技術群の位置づけを整理します。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>技術</th><th>役割</th><th>なぜ選んだか</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="t-label">Amazon S3</td>
+            <td>Parquetファイルの保存先</td>
+            <td>ほぼ無制限の容量。コストは月数セントレベル（この規模では）</td>
+          </tr>
+          <tr>
+            <td class="t-label">Apache Parquet</td>
+            <td>列指向ファイルフォーマット</td>
+            <td>列指向で集計に最適。圧縮率が高い。業界標準のオープンフォーマット</td>
+          </tr>
+          <tr>
+            <td class="t-label">AWS Athena</td>
+            <td>S3上のParquetにSQLを投げられるサービス</td>
+            <td>サーバー不要。スキャンしたデータ量だけの従量課金（$5/TB）</td>
+          </tr>
+          <tr>
+            <td class="t-label">Python（Polars / Pandas）</td>
+            <td>ETL処理の実装言語・ライブラリ</td>
+            <td>Lambda上でのデータ変換に使用。具体的なライブラリは検討中（Polarsは高速・省メモリ、Pandasはエコシステムが豊富）</td>
+          </tr>
+          <tr>
+            <td class="t-label">Amazon QuickSight</td>
+            <td>BIダッシュボード</td>
+            <td>S3/Athenaと直接接続可能。定型レポートの可視化に使う（将来の外販向け）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout co-mint">
+      <span class="callout-icon">🎓</span>
+      <p><strong>学びの観点：</strong>ETLパイプラインの設計・構築はデータエンジニアリングの基礎です。Parquet、Athena、Polars といった技術群に実データで触れる経験は、データ分析や機械学習を志向するメンバーにとって貴重な学びになります。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--purple)"></div> SUMMARY</div>
+    <h2>まとめ</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:25%">観点</th><th style="width:37%">OLTP</th><th style="width:38%">OLAP</th></tr></thead>
+        <tbody>
+          <tr><td class="t-label">目的</td><td>日々の業務処理（読み書き）</td><td>大量データの分析・集計</td></tr>
+          <tr><td class="t-label">クエリの特徴</td><td>少量のデータを高速に</td><td>大量のデータを横断的に</td></tr>
+          <tr><td class="t-label">速度の期待値</td><td>ミリ秒単位</td><td>秒〜分単位でも許容</td></tr>
+          <tr><td class="t-label">データの持ち方</td><td>行指向（RDB / DynamoDB）</td><td>列指向（Parquet）</td></tr>
+          <tr><td class="t-label">今回の担当範囲</td><td>マイページの個人分析、カード送受信</td><td>月次レポート、部署間ヒートマップ</td></tr>
+          <tr><td class="t-label">実行タイミング</td><td>ユーザー操作のたびにリアルタイム</td><td>月初バッチ or オンデマンド</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout co-warm">
+      <span class="callout-icon">🌱</span>
+      <p><strong>覚えておきたいこと：</strong>「OLTP と OLAP を分ける」のはデータアーキテクチャの基本パターンです。規模の大小に関係なく、「業務処理」と「分析処理」の責務を分離するという考え方は、エンジニアのキャリアを通じて繰り返し出会う概念です。</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">🌱 ありがとうカード プロジェクト — 技術基礎ガイド 01: OLTP vs OLAP</footer>
+</body>
+</html>

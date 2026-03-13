@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>モノレポ運用ガイド — ありがとうカード 技術基礎ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F5; --bg-warm: #FFF8F0; --bg-card: #FFFFFF; --bg-code: #2B2D30;
+    --text: #1A1A1A; --text-sub: #4A4A4A; --text-muted: #8A8A8A;
+    --border: #E8E4DF; --border-light: #F0ECE7;
+    --accent: #D4854A; --accent-light: #F5E6D4;
+    --sky: #4A90B8; --sky-light: #E8F2F8;
+    --mint: #5BA88C; --mint-light: #E4F2EC;
+    --coral: #C96B6B; --coral-light: #F8E8E8;
+    --purple: #7B6BA8; --purple-light: #EDE8F5;
+    --yellow: #C4A24E; --yellow-light: #FBF5E4;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 20px;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  .hero { background: linear-gradient(160deg, #1E3A2F 0%, #2D5545 40%, #3A6B58 100%); color: white; padding: 72px 40px 56px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(circle, rgba(91,168,140,0.2), transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 920px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #8ED4B8; background: rgba(142,212,184,0.15); padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 900; line-height: 1.3; margin-bottom: 14px; letter-spacing: -0.02em; }
+  .hero h1 span { color: #8ED4B8; }
+  .hero-desc { font-size: 14.5px; font-weight: 300; color: rgba(255,255,255,0.7); max-width: 620px; line-height: 1.9; }
+
+  .main { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .anchor-banner { background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin: -28px 0 48px; position: relative; z-index: 2; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .anchor-banner-icon { font-size: 32px; }
+  .anchor-banner-text h2 { font-size: 14px; font-weight: 700; color: var(--mint); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .anchor-banner-text p { font-size: 13px; color: var(--text-sub); }
+
+  .section { margin-bottom: 56px; }
+  .section-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .section-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .section h2 { font-size: 22px; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .section-desc { color: var(--text-sub); font-size: 14px; margin-bottom: 24px; line-height: 1.8; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .card-grid { display: grid; gap: 16px; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .callout { border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; display: flex; gap: 14px; align-items: flex-start; }
+  .callout-icon { font-size: 18px; min-width: 24px; text-align: center; margin-top: 1px; }
+  .callout p { font-size: 13.5px; line-height: 1.7; }
+  .callout strong { font-weight: 700; }
+  .co-warm { background: var(--accent-light); border: 1px solid #E8D0B8; }
+  .co-sky { background: var(--sky-light); border: 1px solid #C8DDE8; }
+  .co-mint { background: var(--mint-light); border: 1px solid #B8D8C8; }
+  .co-coral { background: var(--coral-light); border: 1px solid #E0C0C0; }
+  .co-purple { background: var(--purple-light); border: 1px solid #CCC0E0; }
+  .co-yellow { background: var(--yellow-light); border: 1px solid #E0D8B8; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+  .split-panel { padding: 28px; }
+  .split-panel:first-child { border-right: 1px solid var(--border); }
+  .split-panel .split-tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .split-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .split-panel p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .split-a { background: var(--coral-light); }
+  .split-a .split-tag { color: var(--coral); }
+  .split-b { background: var(--mint-light); }
+  .split-b .split-tag { color: var(--mint); }
+
+  .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 540px; }
+  thead th { background: #F7F5F2; font-weight: 700; font-size: 11.5px; letter-spacing: 0.5px; color: var(--text-sub); text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  tbody td { padding: 12px 18px; border-bottom: 1px solid var(--border-light); color: var(--text-sub); line-height: 1.7; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  td.t-label { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  .code-block { background: var(--bg-code); border-radius: var(--radius-sm); padding: 20px 24px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #D4D4D4; line-height: 1.7; overflow-x: auto; margin-bottom: 16px; white-space: pre; }
+  .code-block .cm { color: #6A9955; }
+  .code-block .kw { color: #569CD6; }
+  .code-block .fn { color: #DCDCAA; }
+  .code-block .str { color: #CE9178; }
+  .code-block .num { color: #B5CEA8; }
+  .code-block .dir { color: #C586C0; }
+  .code-block .file { color: #9CDCFE; }
+  .code-block .muted { color: #6A6A6A; }
+
+  .scenario { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 20px; position: relative; }
+  .scenario::before { content: '💡'; position: absolute; top: -14px; left: 24px; font-size: 22px; background: var(--bg); padding: 0 8px; }
+  .scenario h3 { font-size: 14px; font-weight: 700; color: var(--mint); margin-bottom: 8px; letter-spacing: 0.5px; }
+  .scenario p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+
+  .danger { background: var(--bg-card); border: 2px solid var(--coral); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 20px; position: relative; }
+  .danger::before { content: '⚠️'; position: absolute; top: -14px; left: 24px; font-size: 22px; background: var(--bg); padding: 0 8px; }
+  .danger h3 { font-size: 14px; font-weight: 700; color: var(--coral); margin-bottom: 8px; letter-spacing: 0.5px; }
+  .danger p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+
+  .flow-horizontal { display: flex; align-items: stretch; gap: 0; margin-bottom: 20px; }
+  .flow-h-step { flex: 1; background: var(--bg-card); border: 1px solid var(--border); padding: 20px; text-align: center; position: relative; }
+  .flow-h-step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .flow-h-step:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+  .flow-h-step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); z-index: 1; font-size: 18px; color: var(--text-muted); background: var(--bg); padding: 2px 4px; border-radius: 50%; }
+  .flow-h-step .step-num { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--mint); margin-bottom: 6px; }
+  .flow-h-step h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .flow-h-step p { font-size: 12px; color: var(--text-sub); line-height: 1.6; }
+
+  .footer { text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 768px) {
+    .hero { padding: 56px 24px 44px; }
+    .anchor-banner { margin: -20px 16px 36px; padding: 20px 24px; }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .split { grid-template-columns: 1fr; }
+    .split-panel:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .flow-horizontal { flex-direction: column; }
+    .flow-h-step { border-radius: 0 !important; }
+    .flow-h-step:first-child { border-radius: var(--radius) var(--radius) 0 0 !important; }
+    .flow-h-step:last-child { border-radius: 0 0 var(--radius) var(--radius) !important; }
+    .flow-h-step:not(:last-child)::after { content: '↓'; right: 50%; top: auto; bottom: -14px; transform: translateX(50%); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">TECH FOUNDATIONS — 02</div>
+    <h1>モノレポ<span>運用ガイド</span></h1>
+    <p class="hero-desc">
+      フロントエンド・バックエンド・共通型定義——すべてを1つのリポジトリで管理する。
+      その理由と、チームで運用するときのルールを解説します。
+    </p>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="anchor-banner">
+    <div class="anchor-banner-icon">🏗️</div>
+    <div class="anchor-banner-text">
+      <h2>アーキテクチャ設計ノートとの関連</h2>
+      <p>設計ノートでは「リポジトリ構成: モノレポ（pnpm）」を採用し、フロント（Vue）・バック（Hono on Lambda）・共通パッケージ（型定義・DB・設定）・IaC（SST）・Python ETLを1つのリポジトリで管理します。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--sky)"></div> CONCEPT</div>
+    <h2>モノレポとは？</h2>
+    <p class="section-desc">モノレポ（Monorepo）は、複数のプロジェクトやパッケージを1つのGitリポジトリで管理する手法です。対になる概念がポリレポ（Polyrepo）で、プロジェクトごとにリポジトリを分けるやり方です。</p>
+
+    <div class="split">
+      <div class="split-panel split-a">
+        <div class="split-tag">POLYREPO（従来型）</div>
+        <h3>📦 リポジトリを分ける</h3>
+        <p>フロントエンド、バックエンド、共通ライブラリを別々のリポジトリで管理する。</p>
+<div class="code-block" style="margin-top:12px;font-size:11.5px;"><span class="muted">github.com/company/</span>
+├── <span class="dir">thankyou-frontend</span>   <span class="cm">← リポジトリ1</span>
+├── <span class="dir">thankyou-backend</span>    <span class="cm">← リポジトリ2</span>
+└── <span class="dir">thankyou-shared</span>     <span class="cm">← リポジトリ3</span></div>
+        <p style="margin-top:8px;">変更のたびに複数リポジトリ間でバージョンを合わせる必要があり、調整コストが大きい。</p>
+      </div>
+      <div class="split-panel split-b">
+        <div class="split-tag">MONOREPO（今回の方針）</div>
+        <h3>📂 1つのリポジトリにまとめる</h3>
+        <p>すべてのコードを1つのリポジトリ内で、パッケージとして分けて管理する。</p>
+<div class="code-block" style="margin-top:12px;font-size:11.5px;"><span class="muted">github.com/company/</span>
+└── <span class="dir">thankyou-card</span>        <span class="cm">← リポジトリ1つ</span>
+    ├── <span class="dir">apps/web</span>          <span class="cm"># フロント</span>
+    ├── <span class="dir">apps/api</span>          <span class="cm"># バック</span>
+    ├── <span class="dir">packages/shared</span>
+    └── <span class="dir">infra/</span></div>
+        <p style="margin-top:8px;">1回のPRでフロント・バック・型定義をまとめて変更できる。バージョンのズレが起きない。</p>
+      </div>
+    </div>
+
+    <div class="callout co-mint">
+      <span class="callout-icon">📌</span>
+      <p><strong>Google、Meta、Microsoft</strong>などの大手テック企業もモノレポを採用しています。規模が大きいから分けるのではなく、むしろ規模が大きいからこそ1つにまとめて一貫性を保つ、という考え方です。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--mint)"></div> WHY</div>
+    <h2>なぜモノレポを選んだのか</h2>
+    <p class="section-desc">ありがとうカードの特性と、チームの状況を踏まえた判断です。</p>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>🔗 型定義の共有</h3>
+        <p>フルスタックTypeScriptなので、フロントとバックで同じ型定義を使います。カードの型（Card）、ユーザーの型（User）、APIレスポンスの型などを <code>packages/shared</code> に置けば、フロントもバックも同じ型をimportできます。ポリレポだと、npm パッケージとして公開→インストールの手間が毎回発生します。</p>
+      </div>
+      <div class="card">
+        <h3>🔄 アトミックな変更</h3>
+        <p>「APIのレスポンス形式を変える」場合、バックエンドの変更とフロントエンドの変更をセットで1つのPRにできます。ポリレポだと「バック側のPRをマージ → フロント側で追従PRを作成」と2ステップになり、間にデプロイのズレが生じるリスクがあります。</p>
+      </div>
+      <div class="card">
+        <h3>🤖 AIエージェントとの相性</h3>
+        <p>AIコーディングエージェント（Claude Code, GitHub Copilot）は、コンテキストが広いほど精度が上がります。フロント・バック・型定義が同じリポジトリにあれば、エージェントがプロジェクト全体を理解した上でコードを生成できます。</p>
+      </div>
+      <div class="card">
+        <h3>🛠️ CI/CDの統一</h3>
+        <p>GitHub Actionsのワークフローを1箇所で管理できます。「frontendが変更されたらフロントだけビルド」「sharedが変更されたら両方テスト」といった条件分岐を1つのリポジトリ内で完結させられます。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--accent)"></div> STRUCTURE</div>
+    <h2>ディレクトリ構成</h2>
+    <p class="section-desc">ありがとうカードのモノレポ構成（想定）を見てみましょう。</p>
+
+<div class="code-block"><span class="dir">thankyou-card/</span>                    <span class="cm"># リポジトリルート</span>
+├── <span class="file">package.json</span>                   <span class="cm"># ルートのパッケージ定義</span>
+├── <span class="file">pnpm-workspace.yaml</span>            <span class="cm"># ワークスペース設定</span>
+├── <span class="file">turbo.json</span>                     <span class="cm"># Turborepo タスク設定（任意）</span>
+│
+├── <span class="dir">apps/</span>                          <span class="cm"># アプリケーション</span>
+│   ├── <span class="dir">web/</span>                       <span class="cm"># Vue SPA（フロントエンド）</span>
+│   │   ├── <span class="file">package.json</span>
+│   │   ├── <span class="dir">src/</span>
+│   │   └── <span class="file">vite.config.ts</span>
+│   │
+│   └── <span class="dir">api/</span>                       <span class="cm"># Hono on Lambda（バックエンド）</span>
+│       ├── <span class="file">package.json</span>
+│       ├── <span class="dir">src/</span>
+│       └── <span class="dir">functions/</span>
+│
+├── <span class="dir">packages/</span>                      <span class="cm"># 共有パッケージ</span>
+│   ├── <span class="dir">shared/</span>                    <span class="cm"># 共通型定義・ユーティリティ</span>
+│   │   ├── <span class="file">package.json</span>
+│   │   └── <span class="dir">src/</span>
+│   │       ├── <span class="file">types.ts</span>           <span class="cm"># Card, User, Competency 等</span>
+│   │       └── <span class="file">constants.ts</span>       <span class="cm"># コンピテンシーID等</span>
+│   │
+│   ├── <span class="dir">db/</span>                        <span class="cm"># DBエンティティ・アクセス層</span>
+│   │   └── <span class="file">package.json</span>
+│   │
+│   └── <span class="dir">config/</span>                    <span class="cm"># 共通設定（ESLint, TSConfig等）</span>
+│       └── <span class="file">package.json</span>
+│
+├── <span class="dir">etl/</span>                           <span class="cm"># Python ETL（pnpm管理外・独立）</span>
+│
+├── <span class="dir">infra/</span>                         <span class="cm"># SST（IaC）</span>
+│   ├── <span class="file">sst.config.ts</span>
+│   └── <span class="dir">stacks/</span>
+│
+└── <span class="dir">.github/</span>
+    └── <span class="dir">workflows/</span>                 <span class="cm"># CI/CD</span></div>
+
+    <div class="callout co-sky">
+      <span class="callout-icon">📦</span>
+      <p><strong>pnpm-workspace.yaml とは：</strong>pnpmに「このリポジトリ内のどのディレクトリがパッケージなのか」を教える設定ファイルです。これにより、<code>apps/*</code> と <code>packages/*</code> 配下の各ディレクトリが独立したnpmパッケージとして扱われ、互いに依存関係を持てるようになります。</p>
+    </div>
+
+<div class="code-block"><span class="cm"># pnpm-workspace.yaml</span>
+<span class="kw">packages</span>:
+  - <span class="str">"apps/*"</span>
+  - <span class="str">"packages/*"</span>
+  - <span class="str">"infra"</span></div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--purple)"></div> SHARED TYPES</div>
+    <h2>型の共有 — モノレポ最大の利点</h2>
+    <p class="section-desc">フロントとバックで同じ型を使えるということが、日々の開発でどれだけ楽になるかを具体例で見てみましょう。</p>
+
+    <p style="font-size:14px;color:var(--text-sub);margin-bottom:12px;"><strong>shared パッケージに型を定義（packages/shared/src/types.ts）：</strong></p>
+
+<div class="code-block"><span class="cm">// packages/shared/src/types.ts</span>
+
+<span class="kw">export interface</span> Card {
+  id: <span class="kw">string</span>;
+  senderId: <span class="kw">string</span>;
+  receiverId: <span class="kw">string</span>;
+  message: <span class="kw">string</span>;
+  competency: Competency;
+  isAnonymous: <span class="kw">boolean</span>;
+  createdAt: <span class="kw">string</span>;
+}
+
+<span class="kw">export type</span> Competency =
+  | <span class="str">"sincerity"</span>       <span class="cm">// 誠実</span>
+  | <span class="str">"ownership"</span>       <span class="cm">// 当事者意識</span>
+  | <span class="str">"collaboration"</span>   <span class="cm">// 協働</span>
+  | <span class="str">"challenge"</span>       <span class="cm">// 挑戦への意欲</span>
+  | <span class="str">"creativity"</span>;     <span class="cm">// 創造的思考</span></div>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:16px;">
+      <div class="card" style="border-left: 4px solid var(--sky);">
+        <h3>📱 フロント側で使う</h3>
+<div class="code-block" style="margin-top:8px;font-size:11.5px;"><span class="cm">// apps/web/src/components/CardList.vue</span>
+
+<span class="kw">import type</span> { Card } <span class="kw">from</span> <span class="str">"@thankyou/shared"</span>;
+
+<span class="kw">const</span> cards = <span class="fn">ref</span>&lt;Card[]&gt;([]);
+<span class="cm">// ← Card 型が効いているので</span>
+<span class="cm">//    cards[0].competency は</span>
+<span class="cm">//    必ず 5 値のどれかになる</span></div>
+      </div>
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <h3>⚡ バック側で使う</h3>
+<div class="code-block" style="margin-top:8px;font-size:11.5px;"><span class="cm">// apps/api/src/routes/cards.ts</span>
+
+<span class="kw">import type</span> { Card } <span class="kw">from</span> <span class="str">"@thankyou/shared"</span>;
+
+app.<span class="fn">get</span>(<span class="str">"/cards"</span>, <span class="kw">async</span> (c) =&gt; {
+  <span class="kw">const</span> cards: Card[] = <span class="kw">await</span> <span class="fn">getCards</span>();
+  <span class="kw">return</span> c.<span class="fn">json</span>(cards);
+  <span class="cm">// ← 同じ Card 型なので</span>
+  <span class="cm">//    フロントとズレない</span>
+});</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h3>もし型を共有していなかったら？</h3>
+      <p>
+        バック側で <code>competency</code> のフィールド名を <code>competencyTag</code> に変えたとします。ポリレポだと、フロント側はビルドが通ってしまい、本番で初めて「APIのレスポンスが変わった」と気づくことがあります。モノレポで型を共有していれば、バック側を変えた瞬間にフロント側のTypeScriptコンパイラがエラーを出してくれます。デプロイ前にバグが見つかるわけです。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--yellow)"></div> DAILY WORKFLOW</div>
+    <h2>日々の開発フロー</h2>
+    <p class="section-desc">モノレポ特有の操作を覚えておきましょう。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>やりたいこと</th><th>コマンド</th><th>補足</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="t-label">依存関係を一括インストール</td>
+            <td><code>pnpm install</code></td>
+            <td>ルートで実行。全パッケージの依存が解決される</td>
+          </tr>
+          <tr>
+            <td class="t-label">フロントだけ起動</td>
+            <td><code>pnpm --filter web dev</code></td>
+            <td><code>--filter</code> で対象パッケージを指定</td>
+          </tr>
+          <tr>
+            <td class="t-label">バックだけテスト</td>
+            <td><code>pnpm --filter api test</code></td>
+            <td>テスト対象を絞れるので速い</td>
+          </tr>
+          <tr>
+            <td class="t-label">全パッケージをビルド</td>
+            <td><code>pnpm -r build</code></td>
+            <td><code>-r</code> は再帰（recursive）。全パッケージを順に実行</td>
+          </tr>
+          <tr>
+            <td class="t-label">shared に依存を追加</td>
+            <td><code>pnpm --filter shared add zod</code></td>
+            <td>パッケージごとに依存を管理できる</td>
+          </tr>
+          <tr>
+            <td class="t-label">web → shared の依存を追加</td>
+            <td><code>pnpm --filter web add @thankyou/shared --workspace</code></td>
+            <td><code>--workspace</code> で内部パッケージを指定</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout co-yellow">
+      <span class="callout-icon">⚡</span>
+      <p><strong><code>--filter</code> を覚えよう：</strong>モノレポ開発で最もよく使うオプションです。「どのパッケージに対して操作するか」を指定します。これさえ覚えれば、ポリレポと同じ感覚で開発できます。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--coral)"></div> RULES</div>
+    <h2>チームで守るルール</h2>
+    <p class="section-desc">モノレポは便利ですが、ルールなしで運用すると混乱します。以下のルールを守りましょう。</p>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:20px;">
+      <div class="card" style="border-top:3px solid var(--mint);">
+        <h3>✅ やること</h3>
+        <p style="margin-top:8px;">
+          <strong>依存の方向を守る：</strong><code>apps/web</code> → <code>packages/shared</code> ← <code>apps/api</code> の一方向。<code>shared</code> は他のパッケージに依存しない。<br><br>
+          <strong>型変更は影響を確認：</strong><code>shared</code> の型を変えたら、フロント・バック両方のビルドが通ることを確認してからPRを出す。<br><br>
+          <strong>パッケージごとに責務を明確に：</strong>フロント固有のロジックを <code>shared</code> に入れない。バック固有のDB操作は <code>packages/db</code> に置く。
+        </p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--coral);">
+        <h3>❌ やらないこと</h3>
+        <p style="margin-top:8px;">
+          <strong>ルートに直接コードを置かない：</strong>すべてのソースコードは <code>apps/*</code>、<code>packages/*</code>、<code>infra/</code> 内に。ルートは設定ファイルだけ。<br><br>
+          <strong>パッケージ間で相対パスimportしない：</strong><code>../../api/src/...</code> のような参照はNG。必ずパッケージ名（<code>@thankyou/shared</code>）でimportする。<br><br>
+          <strong>1つのパッケージの依存を他に漏らさない：</strong>webで使うライブラリをルートに入れない。各パッケージの <code>package.json</code> で管理する。
+        </p>
+      </div>
+    </div>
+
+    <div class="danger">
+      <h3>ありがちなミス：循環依存</h3>
+      <p>
+        <code>web</code> が <code>shared</code> を参照し、<code>shared</code> が <code>web</code> を参照する——これが循環依存です。
+        ビルドが終わらなくなったり、予期しないエラーが出たりします。<br>
+        <strong>依存は必ず一方向に保つ</strong>ことを意識してください。迷ったら「このコードはどのパッケージの責務か？」と考えましょう。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 7 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--sky)"></div> CI/CD</div>
+    <h2>CI/CDとの連携</h2>
+    <p class="section-desc">モノレポでのCI/CDは「変更されたパッケージだけビルド・テストする」のが基本です。</p>
+
+    <div class="flow-horizontal">
+      <div class="flow-h-step">
+        <div class="step-num">STEP 1</div>
+        <h4>変更検出</h4>
+        <p>PRの差分から、どのパッケージが変更されたか判定</p>
+      </div>
+      <div class="flow-h-step">
+        <div class="step-num">STEP 2</div>
+        <h4>影響範囲特定</h4>
+        <p>shared が変わったらfrontend・backendも対象に</p>
+      </div>
+      <div class="flow-h-step">
+        <div class="step-num">STEP 3</div>
+        <h4>ビルド・テスト</h4>
+        <p>対象パッケージだけビルド＋テスト実行</p>
+      </div>
+      <div class="flow-h-step">
+        <div class="step-num">STEP 4</div>
+        <h4>デプロイ</h4>
+        <p>影響のあるサービスだけデプロイ</p>
+      </div>
+    </div>
+
+    <div class="callout co-warm">
+      <span class="callout-icon">🌱</span>
+      <p><strong>学びの観点：</strong>モノレポ運用はチーム開発の基礎力を鍛えます。パッケージ間の依存関係を意識する習慣、型安全な開発の恩恵、CI/CDパイプラインの設計——これらは規模の大小を問わず、プロフェッショナルなソフトウェア開発で求められるスキルです。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 8 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--purple)"></div> SUMMARY</div>
+    <h2>まとめ</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:30%">観点</th><th style="width:35%">モノレポ</th><th style="width:35%">ポリレポ</th></tr></thead>
+        <tbody>
+          <tr><td class="t-label">型の共有</td><td>import するだけ</td><td>npm パッケージとして公開→インストール</td></tr>
+          <tr><td class="t-label">変更の一貫性</td><td>1つのPRで完結</td><td>複数リポジトリにPR</td></tr>
+          <tr><td class="t-label">CI/CD</td><td>1箇所で統一管理</td><td>リポジトリごとに設定</td></tr>
+          <tr><td class="t-label">AIエージェント</td><td>全体をコンテキストとして渡せる</td><td>リポジトリごとに分断される</td></tr>
+          <tr><td class="t-label">初期セットアップ</td><td>やや複雑（pnpm workspace設定）</td><td>シンプル</td></tr>
+          <tr><td class="t-label">リポジトリの大きさ</td><td>大きくなりやすい</td><td>コンパクト</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout co-mint">
+      <span class="callout-icon">💡</span>
+      <p><strong>覚えておきたいこと：</strong>モノレポの本質は「コードの近さ = チームの結合度」です。フロント・バックが同じリポジトリにあることで、APIの変更がフロントに即反映され、型のズレがコンパイル時に検出される。この「近さ」が、小さなチームの開発速度を大きく上げてくれます。</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">🌱 ありがとうカード プロジェクト — 技術基礎ガイド 02: モノレポ運用ガイド</footer>
+</body>
+</html>

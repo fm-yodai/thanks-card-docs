@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>認証・認可ガイド — ありがとうカード 技術基礎ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F5; --bg-warm: #FFF8F0; --bg-card: #FFFFFF; --bg-code: #2B2D30;
+    --text: #1A1A1A; --text-sub: #4A4A4A; --text-muted: #8A8A8A;
+    --border: #E8E4DF; --border-light: #F0ECE7;
+    --accent: #D4854A; --accent-light: #F5E6D4;
+    --sky: #4A90B8; --sky-light: #E8F2F8;
+    --mint: #5BA88C; --mint-light: #E4F2EC;
+    --coral: #C96B6B; --coral-light: #F8E8E8;
+    --purple: #7B6BA8; --purple-light: #EDE8F5;
+    --yellow: #C4A24E; --yellow-light: #FBF5E4;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --radius: 12px; --radius-sm: 8px; --radius-lg: 20px;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  .hero { background: linear-gradient(160deg, #2A2040 0%, #3E3260 40%, #524478 100%); color: white; padding: 72px 40px 56px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(circle, rgba(196,162,78,0.15), transparent 70%); border-radius: 50%; }
+  .hero::after { content: ''; position: absolute; bottom: -60px; left: -40px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(74,144,184,0.1), transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 920px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #E0C878; background: rgba(224,200,120,0.15); padding: 5px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 900; line-height: 1.3; margin-bottom: 14px; letter-spacing: -0.02em; }
+  .hero h1 span { color: #E0C878; }
+  .hero-desc { font-size: 14.5px; font-weight: 300; color: rgba(255,255,255,0.7); max-width: 620px; line-height: 1.9; }
+
+  .main { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .anchor-banner { background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin: -28px 0 48px; position: relative; z-index: 2; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .anchor-banner-icon { font-size: 32px; }
+  .anchor-banner-text h2 { font-size: 14px; font-weight: 700; color: var(--yellow); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .anchor-banner-text p { font-size: 13px; color: var(--text-sub); }
+
+  .section { margin-bottom: 56px; }
+  .section-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .section-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .section h2 { font-size: 22px; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .section-desc { color: var(--text-sub); font-size: 14px; margin-bottom: 24px; line-height: 1.8; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .card-grid { display: grid; gap: 16px; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .callout { border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; display: flex; gap: 14px; align-items: flex-start; }
+  .callout-icon { font-size: 18px; min-width: 24px; text-align: center; margin-top: 1px; }
+  .callout p { font-size: 13.5px; line-height: 1.7; }
+  .callout strong { font-weight: 700; }
+  .co-warm { background: var(--accent-light); border: 1px solid #E8D0B8; }
+  .co-sky { background: var(--sky-light); border: 1px solid #C8DDE8; }
+  .co-mint { background: var(--mint-light); border: 1px solid #B8D8C8; }
+  .co-coral { background: var(--coral-light); border: 1px solid #E0C0C0; }
+  .co-purple { background: var(--purple-light); border: 1px solid #CCC0E0; }
+  .co-yellow { background: var(--yellow-light); border: 1px solid #E0D8B8; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+  .split-panel { padding: 28px; }
+  .split-panel:first-child { border-right: 1px solid var(--border); }
+  .split-panel .split-tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .split-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .split-panel p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+  .split-a { background: var(--yellow-light); }
+  .split-a .split-tag { color: var(--yellow); }
+  .split-b { background: var(--sky-light); }
+  .split-b .split-tag { color: var(--sky); }
+
+  .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 540px; }
+  thead th { background: #F7F5F2; font-weight: 700; font-size: 11.5px; letter-spacing: 0.5px; color: var(--text-sub); text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  tbody td { padding: 12px 18px; border-bottom: 1px solid var(--border-light); color: var(--text-sub); line-height: 1.7; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  td.t-label { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  .code-block { background: var(--bg-code); border-radius: var(--radius-sm); padding: 20px 24px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #D4D4D4; line-height: 1.7; overflow-x: auto; margin-bottom: 16px; white-space: pre; }
+  .code-block .cm { color: #6A9955; }
+  .code-block .kw { color: #569CD6; }
+  .code-block .fn { color: #DCDCAA; }
+  .code-block .str { color: #CE9178; }
+  .code-block .num { color: #B5CEA8; }
+
+  .scenario { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 20px; position: relative; }
+  .scenario::before { content: '💡'; position: absolute; top: -14px; left: 24px; font-size: 22px; background: var(--bg); padding: 0 8px; }
+  .scenario h3 { font-size: 14px; font-weight: 700; color: var(--yellow); margin-bottom: 8px; letter-spacing: 0.5px; }
+  .scenario p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+
+  .danger { background: var(--bg-card); border: 2px solid var(--coral); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 20px; position: relative; }
+  .danger::before { content: '⚠️'; position: absolute; top: -14px; left: 24px; font-size: 22px; background: var(--bg); padding: 0 8px; }
+  .danger h3 { font-size: 14px; font-weight: 700; color: var(--coral); margin-bottom: 8px; letter-spacing: 0.5px; }
+  .danger p { font-size: 13.5px; color: var(--text-sub); line-height: 1.8; }
+
+  /* Sequence diagram */
+  .seq { background: var(--bg-code); border-radius: var(--radius); padding: 36px 24px; margin-bottom: 20px; overflow-x: auto; }
+  .seq-title { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: rgba(255,255,255,0.3); text-transform: uppercase; text-align: center; margin-bottom: 20px; }
+  .seq-actors { display: flex; justify-content: space-between; max-width: 700px; margin: 0 auto 8px; }
+  .seq-actor { text-align: center; min-width: 100px; }
+  .seq-actor-box { display: inline-block; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; color: white; }
+  .sa-user { background: var(--accent); }
+  .sa-app { background: var(--sky); }
+  .sa-cognito { background: var(--purple); }
+  .sa-google { background: var(--mint); }
+  .sa-api { background: var(--yellow); }
+
+  .seq-lines { max-width: 700px; margin: 0 auto; position: relative; }
+  .seq-step { display: grid; grid-template-columns: 100px 1fr 100px 100px 100px; align-items: center; margin-bottom: 4px; min-height: 36px; }
+  .seq-step-5 { grid-template-columns: 100px 100px 100px 100px 100px; }
+  .seq-msg { font-size: 11px; color: rgba(255,255,255,0.75); font-family: 'Noto Sans JP', sans-serif; padding: 4px 8px; white-space: nowrap; }
+  .seq-arrow { height: 2px; position: relative; margin: 0 4px; }
+  .seq-arrow::after { content: ''; position: absolute; right: -1px; top: -4px; border: 5px solid transparent; }
+  .seq-arrow-r { background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.6)); }
+  .seq-arrow-r::after { border-left-color: rgba(255,255,255,0.6); }
+  .seq-arrow-l { background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4)); }
+  .seq-arrow-l::after { left: -1px; right: auto; border-right-color: rgba(255,255,255,0.6); border-left-color: transparent; }
+
+  /* Simplified flow */
+  .flow-v { max-width: 560px; margin: 0 auto 20px; }
+  .flow-v-step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 0; }
+  .flow-v-line { display: flex; flex-direction: column; align-items: center; }
+  .flow-v-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .flow-v-connector { width: 2px; height: 28px; background: var(--border); }
+  .flow-v-content { padding: 6px 0 28px; }
+  .flow-v-content h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .flow-v-content p { font-size: 13px; color: var(--text-sub); line-height: 1.7; }
+  .flow-v-content code { background: var(--bg); padding: 1px 6px; border-radius: 4px; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+
+  .footer { text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 768px) {
+    .hero { padding: 56px 24px 44px; }
+    .anchor-banner { margin: -20px 16px 36px; padding: 20px 24px; }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .split { grid-template-columns: 1fr; }
+    .split-panel:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">TECH FOUNDATIONS — 03</div>
+    <h1>認証・<span>認可</span>ガイド</h1>
+    <p class="hero-desc">
+      OAuth 2.0、トークン、Cognito——認証まわりは概念が多いけれど、一度理解すれば応用が効く。
+      ありがとうカードの認証フローを通じて、基本を押さえよう。
+    </p>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="anchor-banner">
+    <div class="anchor-banner-icon">🏗️</div>
+    <div class="anchor-banner-text">
+      <h2>アーキテクチャ設計ノートとの関連</h2>
+      <p>設計ノートでは「Amazon Cognito + Google OAuth」を採用。@freemind.co.jp のGoogleアカウントに限定した認証を実現します。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--yellow)"></div> BASICS</div>
+    <h2>認証と認可は別の概念</h2>
+    <p class="section-desc">英語だと Authentication と Authorization。似ているけれど、まったく違う概念です。</p>
+
+    <div class="split">
+      <div class="split-panel split-a">
+        <div class="split-tag">AUTHENTICATION — 認証</div>
+        <h3>🔑 「あなたは誰？」</h3>
+        <p>
+          ユーザーが本人であることを確認するプロセス。<br>
+          Googleアカウントでログインする、パスワードを入力する、指紋で認証する——これらはすべて「認証」です。
+        </p>
+        <p style="margin-top:12px;font-size:13px;">
+          <strong>例：</strong>田中さんが @freemind.co.jp のGoogleアカウントでログイン → 「あなたは田中さんですね」と確認が取れる。
+        </p>
+      </div>
+      <div class="split-panel split-b">
+        <div class="split-tag">AUTHORIZATION — 認可</div>
+        <h3>🛡️ 「何をしていい？」</h3>
+        <p>
+          認証されたユーザーに対して、「何を許可するか」を判定するプロセス。<br>
+          管理者だけがレポートを見られる、自分が送ったカードだけ削除できる——これらは「認可」です。
+        </p>
+        <p style="margin-top:12px;font-size:13px;">
+          <strong>例：</strong>田中さんはログイン済み（認証OK）。でも管理者ではないので、月次レポートの管理画面にはアクセスできない（認可NG）。
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h3>ありがとうカードでの認証・認可</h3>
+      <p>
+        <strong>認証：</strong>@freemind.co.jp のGoogleアカウントでログインできること。これは Cognito + Google OAuth が担当。<br>
+        <strong>認可：</strong>一般ユーザーはカード送受信とマイページの閲覧のみ。管理者は分析ダッシュボードにもアクセス可能。これはバックエンドの Lambda で制御します。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--accent)"></div> OAUTH 2.0</div>
+    <h2>OAuth 2.0 ってなに？</h2>
+    <p class="section-desc">「Googleでログイン」ボタンの裏側で動いている仕組みです。パスワードを直接扱わず、安全にログインを実現するための業界標準プロトコルです。</p>
+
+    <div class="callout co-warm">
+      <span class="callout-icon">🤔</span>
+      <p><strong>なぜ自前でパスワード管理しないの？</strong> — パスワードの保存は非常にリスクが高い（漏洩したら全ユーザーに被害が及ぶ）。Googleのような信頼できるサービスに認証を委託すれば、パスワード管理の責任を負わずに済みます。ユーザーも新しいパスワードを覚える必要がなく、使い慣れたGoogleアカウントでログインできます。</p>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-sub);margin-bottom:12px;">OAuthの核心は <strong>「パスワードを渡さずに、権限だけを渡す」</strong> という考え方です。</p>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:20px;">
+      <div class="card" style="text-align:center;">
+        <h3 style="justify-content:center;">🏠 リソースオーナー</h3>
+        <p>ユーザー本人。<br>「自分のGoogleアカウント情報を、ありがとうカードに渡していいよ」と許可する人。</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h3 style="justify-content:center;">📱 クライアント</h3>
+        <p>ありがとうカードのアプリ。<br>ユーザーの代わりにGoogleからプロフィール情報を取得したいアプリ。</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h3 style="justify-content:center;">🔐 認可サーバー</h3>
+        <p>Google（と Cognito）。<br>「この人は本人です」「この情報を渡してOKです」を判定するサーバー。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--sky)"></div> AUTH FLOW</div>
+    <h2>Authorization Code Flow + PKCE</h2>
+    <p class="section-desc">ありがとうカードで使う認証フローです。OAuth 2.0 の Authorization Code Flow に PKCE（Proof Key for Code Exchange）を組み合わせたパターンで、SPAのような「クライアントシークレットを安全に保持できない」環境で推奨されます。</p>
+
+    <div class="flow-v">
+
+      <div class="flow-v-step">
+        <div class="flow-v-line">
+          <div class="flow-v-dot" style="background:var(--accent-light);color:var(--accent);">1</div>
+          <div class="flow-v-connector"></div>
+        </div>
+        <div class="flow-v-content">
+          <h4>ユーザーが「Googleでログイン」を押す</h4>
+          <p>ありがとうカードのログイン画面で、ユーザーがボタンをクリック。アプリはランダムな <code>code_verifier</code> を生成し、そのハッシュ値（<code>code_challenge</code>）を添えて Cognito の認証エンドポイントにリダイレクトします。</p>
+        </div>
+      </div>
+
+      <div class="flow-v-step">
+        <div class="flow-v-line">
+          <div class="flow-v-dot" style="background:var(--purple-light);color:var(--purple);">2</div>
+          <div class="flow-v-connector"></div>
+        </div>
+        <div class="flow-v-content">
+          <h4>Cognito → Google にリダイレクト</h4>
+          <p>Cognito がGoogleの認証画面にリダイレクトします。ユーザーはGoogleの画面でログインし、「ありがとうカードにプロフィール情報を渡してよいですか？」の同意画面が表示されます。</p>
+        </div>
+      </div>
+
+      <div class="flow-v-step">
+        <div class="flow-v-line">
+          <div class="flow-v-dot" style="background:var(--mint-light);color:var(--mint);">3</div>
+          <div class="flow-v-connector"></div>
+        </div>
+        <div class="flow-v-content">
+          <h4>Google が「認可コード」を返す</h4>
+          <p>ユーザーが同意すると、Googleは<strong>認可コード</strong>（Authorization Code）をCognitoに返します。これはパスワードでもトークンでもなく、「1回だけ使える引換券」です。</p>
+        </div>
+      </div>
+
+      <div class="flow-v-step">
+        <div class="flow-v-line">
+          <div class="flow-v-dot" style="background:var(--sky-light);color:var(--sky);">4</div>
+          <div class="flow-v-connector"></div>
+        </div>
+        <div class="flow-v-content">
+          <h4>アプリが認可コード + code_verifier でトークンを取得</h4>
+          <p>アプリは認可コードと、ステップ1で生成した <code>code_verifier</code> を Cognito のトークンエンドポイントに送ります。Cognito は code_verifier のハッシュ値が code_challenge と一致するか検証し、一致すればGoogleから取得済みのユーザー情報を元に<strong>トークン</strong>を3種類発行します（詳しくは次セクション）。</p>
+        </div>
+      </div>
+
+      <div class="flow-v-step">
+        <div class="flow-v-line">
+          <div class="flow-v-dot" style="background:var(--yellow-light);color:var(--yellow);">5</div>
+          <div class="flow-v-connector" style="height:0;"></div>
+        </div>
+        <div class="flow-v-content">
+          <h4>アプリがトークンを使ってAPI呼び出し</h4>
+          <p>フロントエンドはトークンを保存し、以降のAPI呼び出しで <code>Authorization: Bearer &lt;token&gt;</code> ヘッダーに添付します。バックエンドはこのトークンを検証して、リクエストを処理します。</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout co-purple">
+      <span class="callout-icon">🔒</span>
+      <p><strong>なぜ「認可コード + PKCE」を使うの？</strong> — トークンを直接ブラウザに返すと、URLやブラウザ履歴に残ってしまうリスクがあります。代わりに1回限りの「引換券」を返し、トークンと交換するステップを挟みます。さらに PKCE を使うことで、認可コードを傍受されても <code>code_verifier</code> を持っていない攻撃者はトークンに交換できません。SPAはクライアントシークレットを安全に保持できないため、PKCEが必須です。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--purple)"></div> TOKENS</div>
+    <h2>3種類のトークン</h2>
+    <p class="section-desc">Cognito が発行するトークンは3種類あり、それぞれ役割が異なります。</p>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:20px;">
+      <div class="card" style="border-top:4px solid var(--sky);">
+        <h3>📛 ID Token</h3>
+        <p>
+          <strong>「この人は誰か」</strong>の情報。<br><br>
+          ユーザーの名前、メールアドレス、所属（@freemind.co.jp）などのプロフィール情報が含まれています。<br><br>
+          <strong>用途：</strong>フロントエンドでユーザー名を表示したり、バックエンドで「この人は誰か」を判断するのに使います。
+        </p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--mint);">
+        <h3>🎫 Access Token</h3>
+        <p>
+          <strong>「何をしていいか」</strong>の証明。<br><br>
+          API へのアクセス権を証明するトークン。バックエンドはこのトークンを検証して、リクエストを許可/拒否します。<br><br>
+          <strong>用途：</strong>API呼び出し時に <code>Authorization</code> ヘッダーに添付。有効期限は短い（通常1時間）。
+        </p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--accent);">
+        <h3>🔄 Refresh Token</h3>
+        <p>
+          <strong>「トークンを更新する」</strong>ための鍵。<br><br>
+          Access Token の有効期限が切れたとき、再ログインなしで新しい Access Token を取得するために使います。<br><br>
+          <strong>用途：</strong>バックグラウンドで自動的にトークンを更新。有効期限は長い（通常30日）。
+        </p>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h3>トークンの一生</h3>
+      <p>
+        朝、田中さんがログイン → 3種類のトークンを受け取る。<br>
+        午前中にカードを送る → Access Token をAPIに添付。問題なく処理される。<br>
+        1時間後、Access Token が期限切れ → Refresh Token を使って自動的に新しい Access Token を取得（田中さんは気づかない）。<br>
+        30日後、Refresh Token も期限切れ → 再度Googleログインが必要。
+      </p>
+    </div>
+
+    <div class="callout co-sky">
+      <span class="callout-icon">🧩</span>
+      <p><strong>JWT（JSON Web Token）とは：</strong>ID Token と Access Token は JWT 形式です。中身は Base64 エンコードされた JSON で、ヘッダー・ペイロード・署名の3パートからなります。署名があるため、改ざんを検出できます。<code>jwt.io</code> で中身をデコードして見てみると理解が深まります。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--mint)"></div> COGNITO</div>
+    <h2>Amazon Cognito の役割</h2>
+    <p class="section-desc">Cognitoは「認証の面倒なところを引き受けてくれるマネージドサービス」です。自分でOAuthの仕組みを実装するのではなく、Cognitoに任せます。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:30%">Cognitoがやること</th><th>自前でやると…</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="t-label">Google との OAuth 連携</td>
+            <td>認可コードの交換、トークンの検証、リダイレクトURLの管理を自前で実装する必要がある</td>
+          </tr>
+          <tr>
+            <td class="t-label">トークンの発行・検証</td>
+            <td>JWT の生成、署名、有効期限管理、Refresh Token のローテーションを自前で実装</td>
+          </tr>
+          <tr>
+            <td class="t-label">ユーザー情報の管理</td>
+            <td>User Pool（ユーザーDB）を自前で構築・運用する必要がある</td>
+          </tr>
+          <tr>
+            <td class="t-label">セキュリティ対策</td>
+            <td>ブルートフォース防止、CSRF対策、トークン漏洩対策を自前で実装</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout co-mint">
+      <span class="callout-icon">💰</span>
+      <p><strong>コスト：</strong>Cognito の Lite プランは月 10,000 ユーザーまで無料です。60名のありがとうカードでは、認証コストは完全にゼロです。</p>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-sub);margin-bottom:12px;"><strong>Cognito の主要コンポーネント：</strong></p>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>👥 User Pool</h3>
+        <p>ユーザーの「名簿」にあたるもの。ログイン、サインアップ、パスワードリセットなどのユーザー管理機能を提供します。今回は Google OAuth と連携し、Googleアカウントを持つユーザーが自動的に User Pool に登録されます。</p>
+      </div>
+      <div class="card">
+        <h3>🔗 Identity Provider（IdP）連携</h3>
+        <p>外部の認証プロバイダー（Google, Facebook, SAML等）と連携する機能。今回は Google を IdP として設定し、@freemind.co.jp ドメインのアカウントのみ許可するルールを設定します。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--coral)"></div> BACKEND</div>
+    <h2>バックエンドでのトークン検証</h2>
+    <p class="section-desc">フロントエンドから送られてくるトークンを、バックエンド（Lambda）でどう検証するかを見てみましょう。</p>
+
+<div class="code-block"><span class="cm">// packages/backend/src/middleware/auth.ts</span>
+<span class="cm">// 簡略化した例（jose ライブラリで JWKS 公開鍵検証）</span>
+
+<span class="kw">import</span> { <span class="fn">createRemoteJWKSet</span>, <span class="fn">jwtVerify</span> } <span class="kw">from</span> <span class="str">"jose"</span>;
+
+<span class="kw">const</span> JWKS = <span class="fn">createRemoteJWKSet</span>(
+  <span class="kw">new</span> <span class="fn">URL</span>(
+    <span class="str">"https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_XXXXXX/.well-known/jwks.json"</span>
+  )
+);
+
+<span class="cm">// Hono ミドルウェア</span>
+<span class="kw">export const</span> <span class="fn">authMiddleware</span> = <span class="kw">async</span> (c, next) =&gt; {
+  <span class="kw">const</span> token = c.req.header(<span class="str">"Authorization"</span>)
+    ?.<span class="fn">replace</span>(<span class="str">"Bearer "</span>, <span class="str">""</span>);
+
+  <span class="kw">if</span> (!token) {
+    <span class="kw">return</span> c.<span class="fn">json</span>({ error: <span class="str">"認証が必要です"</span> }, <span class="num">401</span>);
+  }
+
+  <span class="kw">try</span> {
+    <span class="cm">// JWKS 公開鍵で署名検証 + issuer・有効期限チェック</span>
+    <span class="kw">const</span> { payload } = <span class="kw">await</span> <span class="fn">jwtVerify</span>(token, JWKS, {
+      issuer: <span class="str">"https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_XXXXXX"</span>,
+    });
+    c.<span class="fn">set</span>(<span class="str">"userId"</span>, payload.sub);
+    <span class="kw">await</span> <span class="fn">next</span>();
+  } <span class="kw">catch</span> {
+    <span class="kw">return</span> c.<span class="fn">json</span>({ error: <span class="str">"トークンが無効です"</span> }, <span class="num">401</span>);
+  }
+};</div>
+
+    <div class="callout co-coral">
+      <span class="callout-icon">🔍</span>
+      <p><strong>検証で何をチェックしているか：</strong>① JWKS（JSON Web Key Set）の公開鍵でトークンの署名を検証（改ざん検出） ② 有効期限が切れていないか ③ 発行元（issuer）が自分の Cognito User Pool か。これらをすべてパスしたリクエストだけが処理されます。</p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 7 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--yellow)"></div> DOMAIN RESTRICTION</div>
+    <h2>@freemind.co.jp に限定する仕組み</h2>
+    <p class="section-desc">Googleアカウントなら誰でもログインできてしまっては困ります。@freemind.co.jp のアカウントだけに制限する方法です。</p>
+
+    <div class="card-grid card-grid-2" style="margin-bottom:20px;">
+      <div class="card" style="border-left: 4px solid var(--purple);">
+        <h3>方法① Cognito の Pre Sign-up Lambda トリガー</h3>
+        <p>ユーザーがサインアップ（初回ログイン）しようとしたタイミングで、Lambda関数が呼び出されます。この関数でメールアドレスのドメインをチェックし、@freemind.co.jp 以外であればサインアップを拒否します。</p>
+<div class="code-block" style="margin-top:12px;font-size:11.5px;"><span class="cm">// Pre Sign-up トリガー</span>
+<span class="kw">const</span> email = event.request.userAttributes.email;
+<span class="kw">if</span> (!email.<span class="fn">endsWith</span>(<span class="str">"@freemind.co.jp"</span>)) {
+  <span class="kw">throw new</span> Error(<span class="str">"許可されていないドメインです"</span>);
+}</div>
+      </div>
+      <div class="card" style="border-left: 4px solid var(--sky);">
+        <h3>方法② Google Workspace の制限</h3>
+        <p>Google側の OAuth 同意画面の設定で、組織内（@freemind.co.jp）のアカウントのみアクセスを許可する方法もあります。Cognito側と合わせて二重にチェックすることで、より安全です。</p>
+      </div>
+    </div>
+
+    <div class="danger">
+      <h3>認可は別レイヤーで実装する</h3>
+      <p>
+        「@freemind.co.jp のアカウントでログインできた」= 全機能にアクセスできる、ではありません。<br>
+        管理者のみが見られる分析ダッシュボードや、自分が送ったカードの削除権限など、<strong>認可のロジックはバックエンドのAPI側で別途実装</strong>します。
+        Cognitoの仕事は「この人は社員です」の確認まで。「この社員は何をしていいか」はアプリ側の責務です。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 8 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--sky)"></div> FULL PICTURE</div>
+    <h2>認証フロー全体像</h2>
+    <p class="section-desc">ログインからAPI呼び出しまでの全体の流れをまとめます。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:8%">#</th><th style="width:22%">アクター</th><th>やること</th></tr></thead>
+        <tbody>
+          <tr><td class="t-label">1</td><td>ユーザー</td><td>ありがとうカードの「Googleでログイン」ボタンを押す</td></tr>
+          <tr><td class="t-label">2</td><td>フロントエンド</td><td><code>code_challenge</code> を添えて Cognito の Hosted UI（認証画面URL）にリダイレクト</td></tr>
+          <tr><td class="t-label">3</td><td>Cognito</td><td>Google のログイン画面にリダイレクト</td></tr>
+          <tr><td class="t-label">4</td><td>ユーザー</td><td>Google でログイン ＋ 情報提供に同意</td></tr>
+          <tr><td class="t-label">5</td><td>Google</td><td>認可コードを Cognito に返す</td></tr>
+          <tr><td class="t-label">6</td><td>Cognito</td><td><code>code_verifier</code> を検証し、認可コード → トークンに交換。Pre Sign-upトリガーでドメインチェック</td></tr>
+          <tr><td class="t-label">7</td><td>Cognito</td><td>ID Token / Access Token / Refresh Token をフロントエンドに返す</td></tr>
+          <tr><td class="t-label">8</td><td>フロントエンド</td><td>トークンをメモリに保存。ID Token からユーザー名等を取得して表示</td></tr>
+          <tr><td class="t-label">9</td><td>フロントエンド</td><td>API呼び出し時に <code>Authorization: Bearer &lt;Access Token&gt;</code> を付与</td></tr>
+          <tr><td class="t-label">10</td><td>バックエンド</td><td>Access Token を検証 → 正当なら処理を実行</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 9 ===== -->
+  <div class="section">
+    <div class="section-label"><div class="dot" style="background:var(--purple)"></div> SUMMARY</div>
+    <h2>まとめ</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:28%">概念</th><th>一言で</th><th>今回の担当</th></tr></thead>
+        <tbody>
+          <tr><td class="t-label">認証（Authentication）</td><td>「あなたは誰？」の確認</td><td>Cognito + Google OAuth</td></tr>
+          <tr><td class="t-label">認可（Authorization）</td><td>「何をしていい？」の判定</td><td>バックエンド（Lambda）</td></tr>
+          <tr><td class="t-label">OAuth 2.0</td><td>パスワードを渡さず権限だけ渡すプロトコル</td><td>Cognito が内部で処理</td></tr>
+          <tr><td class="t-label">Authorization Code Flow + PKCE</td><td>SPA向けの安全な認証フロー（引換券＋鍵証明方式）</td><td>Cognito が自動処理</td></tr>
+          <tr><td class="t-label">ID Token</td><td>「この人は誰か」の情報</td><td>フロントでユーザー表示に使用</td></tr>
+          <tr><td class="t-label">Access Token</td><td>「APIへのアクセス権」の証明</td><td>API呼び出し時にヘッダーに添付</td></tr>
+          <tr><td class="t-label">Refresh Token</td><td>トークンを自動更新するための鍵</td><td>期限切れ時に自動使用</td></tr>
+          <tr><td class="t-label">Cognito User Pool</td><td>ユーザーの名簿 + 認証基盤</td><td>Google IdP 連携で自動管理</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout co-warm">
+      <span class="callout-icon">🌱</span>
+      <p><strong>覚えておきたいこと：</strong>認証・認可の仕組みは、ほぼすべてのWebアプリケーションで必要です。OAuth 2.0、JWT、トークンベース認証の概念は一度理解すれば、どのプロジェクトでも応用できます。今回はCognitoに多くを任せますが、その裏で何が起きているかを理解しておくことが、長期的なスキルの土台になります。</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">🌱 ありがとうカード プロジェクト — 技術基礎ガイド 03: 認証・認可ガイド</footer>
+</body>
+</html>

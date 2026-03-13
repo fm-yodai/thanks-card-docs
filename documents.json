@@ -312,6 +312,61 @@
         "🔗 Figma Make"
       ],
       "order": 6
+    },
+    {
+      "title": "OLTP vs OLAP",
+      "path": "./docs/oltp-vs-olap.html",
+      "group": "knowledge",
+      "icon": "📊",
+      "badges": ["GUIDE", "DB"],
+      "color": "purple",
+      "description": "業務処理（OLTP）と分析処理（OLAP）の違い、ETLパイプラインの基礎を解説する入門ガイド。",
+      "meta": [
+        "📄 全6セクション",
+        "⏱ 約10分"
+      ],
+      "order": 7
+    },
+    {
+      "title": "モノレポ運用ガイド",
+      "path": "./docs/monorepo-guide.html",
+      "group": "knowledge",
+      "icon": "📂",
+      "badges": ["GUIDE"],
+      "color": "mint",
+      "description": "フロント・バック・共通型定義を1つのリポジトリで管理するモノレポの考え方と運用ルールの入門ガイド。",
+      "meta": [
+        "📄 全8セクション",
+        "⏱ 約10分"
+      ],
+      "order": 8
+    },
+    {
+      "title": "認証・認可ガイド",
+      "path": "./docs/auth-guide.html",
+      "group": "knowledge",
+      "icon": "🔐",
+      "badges": ["GUIDE"],
+      "color": "purple",
+      "description": "OAuth 2.0・トークン・Cognitoの基本を、ありがとうカードの認証フローを通じて解説する入門ガイド。",
+      "meta": [
+        "📄 全9セクション",
+        "⏱ 約15分"
+      ],
+      "order": 9
+    },
+    {
+      "title": "AWS サーバーレス構成図",
+      "path": "https://app.diagrams.net/#Uhttps://fm-yodai.github.io/thanks-card-docs/docs/aws-architecture.drawio",
+      "group": "sprint0",
+      "icon": "☁️",
+      "badges": ["ARCH", "INFRA"],
+      "color": "sky",
+      "description": "MVP構成のAWSサーバーレスアーキテクチャ図。クリックするとdraw.ioで閲覧・編集できます。",
+      "meta": [
+        "🔗 draw.io"
+      ],
+      "order": 9
     }
   ]
 }
