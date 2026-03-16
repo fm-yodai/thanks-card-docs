@@ -333,7 +333,7 @@
       <div class="hero-meta-item">対象 <strong>全社員 60名</strong></div>
       <div class="hero-meta-item">予算 <strong>月 50 USD</strong></div>
       <div class="hero-meta-item">スタック <strong>Vue 3 / Hono / DynamoDB / SST v3</strong></div>
-      <div class="hero-meta-item">更新日 <strong>2026-03-10</strong></div>
+      <div class="hero-meta-item">更新日 <strong>2026-03-16</strong></div>
     </div>
   </div>
 </div>
@@ -353,6 +353,7 @@
     <a href="#cost" class="toc-item"><span class="toc-dot" style="background:var(--yellow)"></span>コスト試算</a>
     <a href="#olap" class="toc-item"><span class="toc-dot" style="background:var(--purple)"></span>OLAP</a>
     <a href="#security" class="toc-item"><span class="toc-dot" style="background:var(--coral)"></span>セキュリティ</a>
+    <a href="#expansion" class="toc-item"><span class="toc-dot" style="background:var(--accent)"></span>外販拡張</a>
   </div>
 </div>
 
@@ -407,16 +408,16 @@
         <tr><td style="font-family:'Noto Sans JP',sans-serif">状態管理</td><td>TanStack Query + composable（Pinia不使用）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">サーバー状態は TanStack Query、UIローカル状態は composable の ref で管理。Pinia不使用でシンプルに</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">バックエンド</td><td>Hono on AWS Lambda</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">TSファースト・Web標準APIベース・サーバーレスで運用負荷小</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">API スタイル</td><td>Hono RPC（hono/client）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">REST 互換で外販可・型安全・追加ライブラリ不要</td></tr>
-        <tr><td style="font-family:'Noto Sans JP',sans-serif">データベース</td><td>DynamoDB</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">月 $1 以下・フルマネージド・サーバーレス親和。テーブル設計方式は検討中（下記参照）</td></tr>
-        <tr><td style="font-family:'Noto Sans JP',sans-serif">DB クライアント</td><td>ElectroDB</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">Single Table Design 支援・型推論・SST 推奨</td></tr>
-        <tr><td style="font-family:'Noto Sans JP',sans-serif">認証</td><td>Cognito + Google OAuth</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">AWS統一・IAM一元管理・5万ユーザー無料。フロントSDKは検討中（下記参照）</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">データベース</td><td>DynamoDB</td><td><span class="badge badge-confirmed" style="margin:0">確定</span></td><td style="font-size:12px">月 $1 以下・フルマネージド・サーバーレス親和。テーブル設計方式はプロト検証後に決定（下記参照）</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">DB クライアント</td><td>ElectroDB</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">Single Table Design 支援・型推論・SST 推奨。テーブル設計方式（シングルテーブル or テーブル・パー・エンティティ）はプロト検証後に決定</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">認証</td><td>Cognito + Google OAuth</td><td><span class="badge badge-confirmed" style="margin:0">確定</span></td><td style="font-size:12px">AWS統一・IAM一元管理・5万ユーザー無料。フロントSDKは oidc-client-ts に決定（外販時のIdP切り替えに備える）</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">AI API</td><td>Amazon Bedrock（モデル使い分け）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">AWS統一・IAM認証・用途別最適化</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">Linter</td><td>Oxlint + ESLint（eslint-plugin-vue）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">高速Rust製 + Vue テンプレート対応の両立</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">Formatter</td><td>Prettier（将来 Oxfmt 移行検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vue SFC 対応が安定・段階的移行可能</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">テスト</td><td>Vitest + Playwright（MVPから導入）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vitest でユニット、Playwright で E2E。MVPから両方導入</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">CI/CD</td><td>GitHub Actions + SST</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">GitHub内で完結・ジュニアのCI/CD実践学習になる</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">モノレポ</td><td>pnpm workspace（→ Turborepo 検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">シンプルスタート・CIが遅くなったら段階的に強化</td></tr>
-        <tr><td style="font-family:'Noto Sans JP',sans-serif">Git 規約</td><td>Conventional Commits + ブランチ命名</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">採用目的は Sprint 0 でチームと合意（検討中）</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">Git 規約</td><td>Conventional Commits + ブランチ命名</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">プレフィクス推奨（強制なし）。commitlint は外販確定時に導入を検討</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">環境分離</td><td>SST ステージ（→ アカウント分離検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">素早く立ち上げ・外販時に移行</td></tr>
       </tbody>
     </table>
@@ -426,14 +427,14 @@
       <p><strong>Bedrock MVPスコープ：</strong>カード文面提案（Sonnet級ストリーミング）はMVP後に検討。MVPでは コンテンツフィルタ + コンピテンシー自動判定 のみ実装する。</p>
     </div>
 
-    <div class="callout callout-yellow">
-      <div class="callout-icon">💬</div>
-      <p><strong>DynamoDB のチーム確認：</strong>RDS PostgreSQL との比較は別資料を参照。普段の業務で使っているDBは何か？ モダン体験（DynamoDB）と業務直結スキル（RDS）、どちらを優先したいかをSprint 0で議論する。</p>
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>DynamoDB 確定：</strong>チーム全員DynamoDB未経験だが、AI支援を活用して学習しつつ進める方針で合意。サーバーレス親和・月$1以下のコスト・フルマネージドの利点を優先した。</p>
     </div>
 
     <div class="callout callout-purple">
       <div class="callout-icon">🗄️</div>
-      <p><strong>テーブル設計方式の検討：</strong>シングルテーブル設計（全エンティティを1テーブルに集約）はDynamoDBのベストプラクティスだが、ジュニアメンバーが多いチームには学習コストが高い。<strong>テーブル・パー・エンティティ方式</strong>（ElectroDB のサービス機能で複数テーブルを管理）も選択肢。60名規模ならJOIN不要でテーブル分割のほうが理解しやすい面もある。Sprint 0 でチームのDynamoDB経験を確認し、方式を決定する。</p>
+      <p><strong>テーブル設計方式 — プロト検証後に決定：</strong>シングルテーブル設計（全エンティティを1テーブルに集約）とテーブル・パー・エンティティ方式（ElectroDB のサービス機能で複数テーブルを管理）の両方をプロト検証し、チームの理解しやすさ・AI支援との相性を比較した上で決定する。チーム全員DynamoDB未経験だが、AI支援での学習を前提とするとシングルテーブルも選択肢になりうる。</p>
     </div>
   </div>
 
@@ -683,7 +684,7 @@
           <td>etl</td>
           <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">EventBridge（月初 / オンデマンド）</td>
           <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--coral)">15 min</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Python Lambda（pnpm管理外）。DynamoDB → S3(Parquet) → QuickSight</td>
+          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Python Lambda（pnpm管理外）。DynamoDB Export to S3 → marimo + polars + plotly で分析</td>
         </tr>
       </tbody>
     </table>
@@ -773,13 +774,10 @@
       <p><strong>認証フロー：</strong>Cognito Hosted UI + Authorization Code Flow with PKCE を使用。JWT検証は Hono ミドルウェアで JWKS を使い公開鍵検証（jose ライブラリ）。CORS は環境変数で許可オリジンを切り替え（dev: localhost, staging/prod: 各ドメイン）。</p>
     </div>
 
-    <div class="callout callout-yellow">
-      <div class="callout-icon">💬</div>
-      <p><strong>フロントエンド認証SDKの検討：</strong>以下の候補から Sprint 0 で選定する。<br>
-      ① <strong>amazon-cognito-identity-js</strong> — Cognito専用の軽量ライブラリ。バンドルサイズが小さくシンプル。Cognitoにロックインされる。<br>
-      ② <strong>oidc-client-ts</strong> — 汎用OIDCライブラリ。将来的にCognito以外のIdPに切り替え可能で外販対応に有利。<br>
-      ③ <strong>@aws-amplify/auth</strong> — Amplify Auth単体利用。機能が豊富だがバンドルサイズが大きい（aws-amplifyパッケージ全体で数百KB）。ツリーシェイキングで軽量化可能。<br>
-      外販への備え（方針3）を重視するなら②、シンプルさ重視なら①が有力。</p>
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>フロントエンド認証SDK — oidc-client-ts に決定：</strong>汎用OIDCライブラリを採用。方針3（外販への備え）を重視し、将来的にCognito以外のIdP（Auth0 / Keycloak等）への切り替え、ID/パスワード認証・二段階認証・パスキーの追加に認証SDK側の変更なしで対応できる。<br>
+      <strong>不採用理由：</strong>① amazon-cognito-identity-js — Cognitoにロックインされ外販時のIdP切り替えが困難。③ @aws-amplify/auth — バンドルサイズが大きく、Amplifyへの依存が増す。</p>
     </div>
 
     <div class="callout callout-coral">
@@ -1114,7 +1112,7 @@
       <div class="card">
         <div class="badge badge-confirmed">確定</div>
         <h3>📝 Conventional Commits</h3>
-        <p><code>feat:</code> / <code>fix:</code> / <code>docs:</code> / <code>refactor:</code> 等でコミットメッセージを統一。採用目的（ログ可読性・CHANGELOG 自動生成等）は Sprint 0 でチームと合意する。</p>
+        <p><code>feat:</code> / <code>fix:</code> / <code>docs:</code> / <code>refactor:</code> 等のプレフィクスを推奨（強制なし）。commitlint による自動チェックは導入せず、ゆるく運用する。外販確定時にCHANGELOG自動生成・セマンティックバージョニングが必要になったら commitlint を追加する。</p>
       </div>
       <div class="card">
         <div class="badge badge-confirmed">確定</div>
@@ -1223,54 +1221,27 @@
     <h2>分析基盤・OLAP設計</h2>
     <p class="section-desc">DynamoDB (OLTP) のデータを S3 (Parquet) にエクスポートし、QuickSight + 自前スクリプトで分析する構成。管理者向けのWebダッシュボードは作らない。</p>
 
-    <table class="data-table" style="margin-bottom:14px">
-      <thead>
-        <tr>
-          <th>ツール</th>
-          <th>月額コスト</th>
-          <th>メリット</th>
-          <th>デメリット</th>
-          <th>ステータス</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="font-family:'Noto Sans JP',sans-serif">QuickSight</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12px">$5〜24/ユーザー<br><span style="font-size:11px;color:var(--text-muted)">Reader: $0.30/セッション (max $5)</span></td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">GUI でダッシュボード作成・共有が容易。S3/Athena 直接参照</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">Author ライセンス $24/月が予算を圧迫。50 USD 予算の約半分</td>
-          <td><span class="badge badge-discuss" style="margin:0">検討中</span></td>
-        </tr>
-        <tr>
-          <td style="font-family:'Noto Sans JP',sans-serif">Grafana (OSS)</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12px">$0<br><span style="font-size:11px;color:var(--text-muted)">セルフホスト or ECS/Fargate</span></td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">無料。CloudWatch Logs Insights と連携可能。豊富なプラグイン</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">セルフホストの運用負荷。サーバーレス構成と方針が異なる</td>
-          <td><span class="badge badge-discuss" style="margin:0">検討中</span></td>
-        </tr>
-        <tr>
-          <td style="font-family:'Noto Sans JP',sans-serif">Python + 静的レポート</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12px">$0<br><span style="font-size:11px;color:var(--text-muted)">Lambda or ローカル実行</span></td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">追加コストなし。pandas + matplotlib でHTML/PDF生成。柔軟</td>
-          <td style="font-family:'Noto Sans JP',sans-serif;font-size:12.5px">リアルタイム性なし。ダッシュボードのインタラクティブ操作不可</td>
-          <td><span class="badge badge-discuss" style="margin:0">検討中</span></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="callout callout-yellow">
-      <div class="callout-icon">💬</div>
-      <p><strong>OLAP ツール選定：</strong>月 50 USD の予算制約を考慮すると、QuickSight の Author ライセンス（$24/月）は予算の約半分を占める。MVP では <strong>Python スクリプト + 静的レポート（S3 出力）</strong>が最もコスト効率が高い。管理者にインタラクティブなダッシュボードが必要になった時点で QuickSight Reader セッション課金 or Grafana を検討する。Sprint 0 でチームと分析要件を確認して決定する。</p>
+    <div class="card-grid card-grid-2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>📊 分析ツールスタック</h3>
+        <p><strong>marimo + polars + plotly</strong> でアドホックな分析スクリプトを作成し、リポジトリで管理する。追加コスト $0。marimo はリアクティブなPythonノートブックで、Jupyter より再現性・共有性が高い。polars は pandas より高速なデータフレームライブラリ。plotly でインタラクティブなチャートを生成する。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">確定</div>
+        <h3>📤 ETL（DynamoDB Export to S3）</h3>
+        <p><strong>DynamoDB Export to S3</strong>（ネイティブ機能）を採用。Lambda不要で最もシンプル。エクスポートデータはDynamoDB JSON形式（型記述子付き）のため、marimo スクリプト内で polars を使いフラット化する変換処理を含める。頻度はオンデマンドで開始し、運用しながら決定する。</p>
+      </div>
     </div>
 
-    <div class="callout callout-yellow">
-      <div class="callout-icon">⚠️</div>
-      <p><strong>ETL方式は未定：</strong>DynamoDB Export to S3（ネイティブ機能・Lambda不要）、Lambda ETL（EventBridge → Python Lambda → Scan → Parquet変換）、DynamoDB Streams（CDC・ニアリアルタイム）の3つの選択肢がある。60名規模のMVPではDynamoDB Export to S3が最もシンプルで推奨。頻度はひとまずオンデマンドで開始し、運用しながら決定する。</p>
+    <div class="callout callout-mint">
+      <div class="callout-icon">✅</div>
+      <p><strong>OLAP方針：</strong>管理者向けWebダッシュボードは作らない。ETL（DynamoDB Export to S3）のみ実装し、分析は marimo + polars + plotly によるアドホックなスクリプトで行う。分析スクリプトはリポジトリの <code>etl/</code> ディレクトリで管理する。将来インタラクティブなダッシュボードが必要になった場合は QuickSight Reader セッション課金を検討する。</p>
     </div>
 
     <div class="callout callout-sky">
       <div class="callout-icon">🔍</div>
-      <p><strong>フィルタNG確認：</strong>管理者向けWeb UIは作らない。blocked カードの分析・AIプロンプト改善はOLAP側で行う。Parquetデータから status='blocked' のカードを抽出し、偽陽性の傾向分析やプロンプトチューニングに活用する。MVPではカードの復旧（blocked→published）機能は実装しない。</p>
+      <p><strong>フィルタNG確認：</strong>管理者向けWeb UIは作らない。blocked カードの分析・AIプロンプト改善はOLAP側で行う。エクスポートデータから status='blocked' のカードを抽出し、偽陽性の傾向分析やプロンプトチューニングに活用する。MVPではカードの復旧（blocked→published）機能は実装しない。</p>
     </div>
   </div>
 
@@ -1297,9 +1268,9 @@
         <p>管理者フラグは Cognito のカスタム属性 or グループで管理し、JWTクレームに含める。フロントエンドの isAdmin フラグはUI表示制御のみに使用し、<strong>権限判定は必ずバックエンド（JWT検証）で行う</strong>。フロントの値を信頼しない。</p>
       </div>
       <div class="card">
-        <div class="badge badge-discuss">検討中</div>
+        <div class="badge badge-info">MVP後</div>
         <h3>🔥 AWS WAF</h3>
-        <p>API Gateway 前段に AWS WAF を配置し、SQLインジェクション・XSS・Bot対策のマネージドルールを適用する。WAF の追加コスト（~$5/月）と予算制約のバランスを Sprint 0 で検討する。</p>
+        <p>MVPでは不要と判断。社内60名・Google OAuth認証必須の環境ではリスクが低く、API Gatewayのスロットリング + Honoミドルウェアのレート制限で十分。外販時に~$5/月で導入を検討する。</p>
       </div>
     </div>
 
@@ -1309,10 +1280,55 @@
     </div>
   </div>
 
+  <!-- ===== FUTURE EXPANSION ===== -->
+  <div class="section" id="expansion">
+    <div class="section-label"><span class="dot" style="background:var(--accent)"></span>FUTURE EXPANSION</div>
+    <h2>外販時の拡張機能（設計上の備え）</h2>
+    <p class="section-desc">外販フェーズで必要になる機能一覧。MVP段階から拡張しやすい設計を意識する。</p>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:14px">
+      <div class="card">
+        <div class="badge badge-info">外販時</div>
+        <h3>👤 管理者向けUI</h3>
+        <p>テナント管理・ユーザー管理・コンピテンシーラベル登録・フィルタNG確認・カード復旧（blocked→published）などの管理画面。MVPでは作らないが、API設計で管理系エンドポイントの拡張余地を残す。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-info">外販時</div>
+        <h3>🏷️ コンピテンシーラベル登録</h3>
+        <p>テナントごとにコンピテンシーラベルをカスタマイズできる機能。MVPでは5つの固定ラベルだが、外販時は各企業の評価軸に合わせた設定が必要。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-info">外販時</div>
+        <h3>📊 分析ダッシュボード可視化</h3>
+        <p>管理者向けのインタラクティブな分析ダッシュボード。MVP段階の marimo アドホック分析から、QuickSight Reader セッション課金 or 管理画面内のダッシュボードへ移行。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-info">外販時</div>
+        <h3>🔐 ID/パスワード認証</h3>
+        <p>Google OAuth だけでなく、ID/パスワードでのユーザー登録・ログインに対応。oidc-client-ts の採用により、認証SDK側の変更なしで Cognito User Pool のID/パスワードフローを追加できる。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-info">外販時</div>
+        <h3>🛡️ 二段階認証 / パスキー</h3>
+        <p>TOTP（Google Authenticator等）、SMS OTP、FIDO2/WebAuthn パスキーによる多要素認証。Cognito のMFA設定 + oidc-client-ts のOIDCフローで対応可能。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-info">外販時</div>
+        <h3>🏢 マルチテナント</h3>
+        <p>DynamoDB の PK に <code>TENANT#&lt;tenantId&gt;|</code> プレフィクス付与。環境分離は SST ステージから AWSアカウント分離へ。AWS WAF の追加。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warm">
+      <div class="callout-icon">📐</div>
+      <p><strong>設計方針：</strong>外販時の拡張を見据えた設計上の備えは行うが、MVP段階ではYAGNI（You Ain't Gonna Need It）を優先する。具体的には、oidc-client-ts の採用（IdP切り替え対応）、REST互換API（Hono RPC）、DynamoDBのマルチテナントキー設計の想定など、<strong>追加コスト0で将来の拡張性を確保できる選択</strong>のみをMVP段階で行う。</p>
+    </div>
+  </div>
+
 </div>
 
 <div class="footer">
-  ありがとうカード プロジェクト — Sprint 0 統合設計ノート v5（architecture + tech-selection + OLAP + security）
+  ありがとうカード プロジェクト — Sprint 0 統合設計ノート v6（architecture + tech-selection + OLAP + security + expansion）
 </div>
 
 </body>
