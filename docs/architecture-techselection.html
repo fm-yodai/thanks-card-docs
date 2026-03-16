@@ -404,7 +404,7 @@
         <tr><td style="font-family:'Noto Sans JP',sans-serif">UI ライブラリ</td><td>shadcn-vue + 独自コンポーネント</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">ヘッドレスで自由度高・Tailwind CSS 前提</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">CSS</td><td>Tailwind CSS</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">shadcn-vue 前提・AIエージェント親和・一貫性</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">ルーティング</td><td>createRouter（手書き）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">透明性が高くジュニアに分かりやすい。ナビゲーションガードの挙動が明示的</td></tr>
-        <tr><td style="font-family:'Noto Sans JP',sans-serif">状態管理</td><td>Pinia + TanStack Query</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">UI状態は Pinia、サーバー状態は TanStack Query で役割を明確に分離</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">状態管理</td><td>TanStack Query + composable（Pinia不使用）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">サーバー状態は TanStack Query、UIローカル状態は composable の ref で管理。Pinia不使用でシンプルに</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">バックエンド</td><td>Hono on AWS Lambda</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">TSファースト・Web標準APIベース・サーバーレスで運用負荷小</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">API スタイル</td><td>Hono RPC（hono/client）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">REST 互換で外販可・型安全・追加ライブラリ不要</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">データベース</td><td>DynamoDB</td><td><span class="badge badge-discuss" style="margin:0">チーム確認</span></td><td style="font-size:12px">月 $1 以下・フルマネージド・サーバーレス親和。テーブル設計方式は検討中（下記参照）</td></tr>
@@ -413,7 +413,7 @@
         <tr><td style="font-family:'Noto Sans JP',sans-serif">AI API</td><td>Amazon Bedrock（モデル使い分け）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">AWS統一・IAM認証・用途別最適化</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">Linter</td><td>Oxlint + ESLint（eslint-plugin-vue）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">高速Rust製 + Vue テンプレート対応の両立</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">Formatter</td><td>Prettier（将来 Oxfmt 移行検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vue SFC 対応が安定・段階的移行可能</td></tr>
-        <tr><td style="font-family:'Noto Sans JP',sans-serif">テスト</td><td>Vitest（E2E は MVP 後半で選定）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vite + Vue + TS にゼロコンフィグ</td></tr>
+        <tr><td style="font-family:'Noto Sans JP',sans-serif">テスト</td><td>Vitest + Playwright（MVPから導入）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">Vitest でユニット、Playwright で E2E。MVPから両方導入</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">CI/CD</td><td>GitHub Actions + SST</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">GitHub内で完結・ジュニアのCI/CD実践学習になる</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">モノレポ</td><td>pnpm workspace（→ Turborepo 検討）</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">シンプルスタート・CIが遅くなったら段階的に強化</td></tr>
         <tr><td style="font-family:'Noto Sans JP',sans-serif">Git 規約</td><td>Conventional Commits + ブランチ命名</td><td><span class="badge badge-confirmed" style="margin:0">暫定</span></td><td style="font-size:12px">採用目的は Sprint 0 でチームと合意（検討中）</td></tr>
@@ -450,18 +450,18 @@
 │   │       ├── <span class="t-dir">pages/</span>                   <span class="t-note">← ルート対応ページコンポーネント</span>
 │   │       ├── <span class="t-dir">features/</span>                <span class="t-note">← 機能単位のコンポーネント群</span>
 │   │       ├── <span class="t-dir">components/</span>              <span class="t-note">← 汎用UIコンポーネント（shadcn-vue + 独自）</span>
-│   │       ├── <span class="t-dir">composables/</span>             <span class="t-note">← Vue Composables（useAuth等）</span>
-│   │       ├── <span class="t-dir">stores/</span>                  <span class="t-note">← Pinia stores（UI状態のみ）</span>
+│   │       ├── <span class="t-dir">api/</span>                     <span class="t-note">← Hono RPCクライアント生成</span>
+│   │       ├── <span class="t-dir">composables/</span>             <span class="t-note">← Vue Composables（useAuth, useCurrentUser 等）</span>
 │   │       ├── <span class="t-dir">queries/</span>                 <span class="t-note">← TanStack Query定義（サーバー状態）</span>
 │   │       ├── <span class="t-dir">router/</span>                  <span class="t-note">← Vue Router設定・ナビゲーションガード</span>
-│   │       ├── <span class="t-dir">api/</span>                     <span class="t-note">← Hono RPCクライアント生成・fetchラッパー</span>
+│   │       ├── <span class="t-dir">plugins/</span>                 <span class="t-note">← queryClient setup</span>
 │   │       └── <span class="t-dir">layouts/</span>                 <span class="t-note">← AppLayout / AuthLayout</span>
 │   │
 │   ├── <span class="t-dir">api/</span>                             <span class="t-note">← Hono バックエンド（Lambda）</span>
 │   │   └── <span class="t-dir">src/</span>
 │   │       ├── <span class="t-dir">routes/</span>                  <span class="t-note">← ルート定義（cards / users / admin）</span>
 │   │       ├── <span class="t-dir">middleware/</span>              <span class="t-note">← auth / logging / error ミドルウェア</span>
-│   │       ├── <span class="t-dir">handlers/</span>               <span class="t-note">← SQS / EventBridge Lambda ハンドラー</span>
+│   │       ├── <span class="t-dir">handlers/</span>               <span class="t-note">← DynamoDB Streams / EventBridge Lambda ハンドラー</span>
 │   │       ├── <span class="t-dir">services/</span>               <span class="t-note">← Bedrock / SES アクセス層</span>
 │   │       └── <span class="t-dir">lib/</span>                     <span class="t-note">← DynamoDBクライアント等のシングルトン</span>
 │   
@@ -570,23 +570,23 @@
       <p><strong>ユーザー管理方針：</strong>管理者向けのユーザー管理Web UIは作らない。Cognito Post-Confirmation トリガーで初回 Google OAuth ログイン時に DynamoDB UserProfile を自動作成する。MVPでは Google OAuth で取得できる情報（名前・メール・アイコン）のみで運用し、部署情報は保持しない。宛先検索は名前・メールのファジーマッチで実装する。将来的に部署フィールドを任意項目として追加する可能性がある。</p>
     </div>
 
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">状態管理方針（Pinia + TanStack Query）</h3>
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">状態管理方針（TanStack Query + composable）</h3>
 
     <div class="callout callout-purple" style="margin-bottom:14px">
       <div class="callout-icon">📐</div>
-      <p><strong>設計原則：「UIの状態はPinia、サーバーの状態はTanStack Query」と役割を明確に分離する。</strong>この境界をチーム全体で理解してもらうことが重要。フォルダ構造でも <code>stores/</code>（Pinia）と <code>queries/</code>（TanStack Query）を分けて視覚的に明示する。</p>
+      <p><strong>設計原則：サーバー状態は TanStack Query、UIローカル状態は composable の <code>ref</code> で管理する。Pinia は使用しない。</strong>状態の所在がシンプルになり、デバッグしやすい。60名規模のアプリに Pinia を入れるメリットよりも、composable だけで完結するシンプルさを優先する。</p>
     </div>
 
     <div class="card-grid card-grid-3">
       <div class="card">
-        <div class="badge badge-info">Pinia で管理</div>
-        <h3>🔑 authStore</h3>
-        <p>Cognitoセッション・JWTトークン・ユーザー情報・isAdminフラグ。アプリ全体で参照するため Pinia で管理。ページリロード時に Cognito SDK で復元する。</p>
+        <div class="badge badge-info">composable で管理</div>
+        <h3>🔑 useAuth</h3>
+        <p>Cognitoセッション・JWTトークン・ユーザー情報・isAdminフラグ。composable の <code>ref</code> でアプリ全体に共有。ページリロード時に Cognito SDK で復元する。</p>
       </div>
       <div class="card">
-        <div class="badge badge-info">Pinia で管理</div>
+        <div class="badge badge-info">composable で管理</div>
         <h3>🖥️ UI状態</h3>
-        <p>モーダルの開閉・フォーム入力中の一時データ・サイドバー展開状態など、サーバーと無関係なUI固有の状態。</p>
+        <p>モーダルの開閉・フォーム入力中の一時データ・サイドバー展開状態など、サーバーと無関係なUI固有の状態。composable の <code>ref</code> で十分。</p>
       </div>
       <div class="card">
         <div class="badge badge-new">TanStack Query で管理</div>
@@ -614,10 +614,10 @@
     <span class="c-key">queryKey</span>: [<span class="c-str">'cards'</span>, cardId],
     <span class="c-key">queryFn</span>: () => api.cards[<span class="c-str">':id'</span>].<span class="c-fn">$get</span>({ param: { id: cardId } }),
 
-    <span class="c-comment">// status が 'processing' の間だけ 8 秒ポーリング。</span>
+    <span class="c-comment">// status が 'processing' の間だけ 5 秒ポーリング。</span>
     <span class="c-comment">// published / blocked になると refetchInterval が false を返し自動停止する。</span>
     <span class="c-key">refetchInterval</span>: (<span class="c-key">query</span>) =>
-      query.state.data?.status === <span class="c-str">'processing'</span> ? <span class="c-num">8000</span> : <span class="c-kw">false</span>,
+      query.state.data?.status === <span class="c-str">'processing'</span> ? <span class="c-num">5000</span> : <span class="c-kw">false</span>,
   })
 }
 
@@ -1128,7 +1128,7 @@
   <div class="section" id="testing">
     <div class="section-label"><span class="dot" style="background:var(--mint)"></span>TEST STRATEGY</div>
     <h2>テスト戦略</h2>
-    <p class="section-desc">Sprint 0 からテストの文化を立ち上げる。Vitest を中心に、段階的にカバレッジを拡大する。</p>
+    <p class="section-desc">Sprint 0 からテストの文化を立ち上げる。Vitest（ユニット）+ Playwright（E2E）をMVPから導入する。</p>
 
     <div class="card-grid card-grid-3">
       <div class="card">
@@ -1142,9 +1142,9 @@
         <p>API エンドポイント単位で検証。Hono の <code>testClient</code> が便利。ElectroDB のエンティティ操作もここでカバー。</p>
       </div>
       <div class="card">
-        <div class="badge badge-new">MVP 後半で検討</div>
+        <div class="badge badge-confirmed">確定</div>
         <h3>🖥️ E2E テスト</h3>
-        <p>MVP 後半で導入を検討。ツールはその時点で選定（Playwright が有力候補）。</p>
+        <p>Playwright をMVPから導入。プロジェクトルートの <code>e2e/</code> ディレクトリに配置し、主要ユーザーフロー（カード送信・タイムライン閲覧）をカバーする。</p>
       </div>
     </div>
   </div>

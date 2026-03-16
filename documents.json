@@ -367,6 +367,20 @@
         "🔗 draw.io"
       ],
       "order": 9
+    },
+    {
+      "title": "アプリケーションアーキテクチャ設計ノート",
+      "path": "./docs/app-architecture-decisions.html",
+      "group": "sprint0",
+      "icon": "🏛️",
+      "badges": ["ARCH", "APP"],
+      "color": "purple",
+      "description": "モノレポ全体構造とapps/web・apps/api・packages/の内部設計判断を記録したアプリケーション層の設計ノート。",
+      "meta": [
+        "📄 全8セクション",
+        "📋 ADR 22件"
+      ],
+      "order": 10
     }
   ]
 }

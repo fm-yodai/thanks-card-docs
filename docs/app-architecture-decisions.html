@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アプリケーションアーキテクチャ設計ノート — ありがとうカード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF9F6; --bg-card: #FFFFFF; --bg-code: #1E1E2E;
+    --text: #1A1A1A; --text-sub: #555; --text-muted: #999;
+    --border: rgba(0,0,0,0.06); --border-light: rgba(0,0,0,0.03);
+    --accent: #3D82AA; --sky: #4D96FF; --purple: #6E5FA0; --coral: #E8593C;
+    --mint: #4E9E7A; --yellow: #D4A017; --amber: #C07B1A; --orange: #E07538;
+    --pink: #C75B8E;
+    --radius: 16px; --radius-sm: 10px;
+    --shadow-sm: 0 2px 16px rgba(0,0,0,0.03);
+    --shadow-md: 0 8px 32px rgba(0,0,0,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 14px; line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+    color: #fff; padding: 80px 40px 64px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -30%; right: -10%;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(77,150,255,0.08), transparent 70%);
+  }
+  .hero-inner { max-width: 980px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-block; font-family: 'Montserrat', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 34px; font-weight: 900; line-height: 1.35; margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { display: block; font-size: 20px; font-weight: 500; color: rgba(255,255,255,0.55); margin-top: 6px; letter-spacing: 0; }
+  .hero-desc { font-size: 14.5px; color: rgba(255,255,255,0.55); max-width: 640px; line-height: 1.9; }
+  .hero-meta { margin-top: 30px; display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-meta-item { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .hero-meta-item strong { color: rgba(255,255,255,0.82); font-weight: 500; }
+
+  /* TOC */
+  .toc {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 26px 30px;
+    margin: 32px auto; max-width: 980px; box-shadow: var(--shadow-sm);
+  }
+  .toc-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+  .toc-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 500; color: var(--text-sub);
+    padding: 9px 12px; border-radius: var(--radius-sm);
+    background: var(--bg); text-decoration: none; transition: background 0.15s;
+  }
+  .toc-item:hover { background: var(--border-light); color: var(--text); }
+  .toc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* MAIN */
+  .main { max-width: 980px; margin: 0 auto; padding: 8px 24px 100px; }
+  .section { margin-bottom: 72px; opacity: 0; transform: translateY(14px); animation: fadeUp 0.5s ease forwards; }
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.10s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.20s; }
+  .section:nth-child(5) { animation-delay: 0.25s; }
+  .section:nth-child(6) { animation-delay: 0.30s; }
+  .section:nth-child(7) { animation-delay: 0.35s; }
+  .section:nth-child(8) { animation-delay: 0.40s; }
+  .section:nth-child(9) { animation-delay: 0.45s; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 10px; color: var(--text-muted);
+  }
+  .section-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .section h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.015em; }
+  .section-desc { color: var(--text-sub); font-size: 14px; margin-bottom: 24px; line-height: 1.85; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .card h3 { font-size: 14.5px; font-weight: 700; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--text-sub); line-height: 1.75; }
+  .card-grid { display: grid; gap: 14px; margin-bottom: 14px; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  /* BADGE */
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; padding: 3px 10px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .badge-confirmed { background: rgba(78,158,122,0.12); color: var(--mint); }
+  .badge-new { background: rgba(77,150,255,0.12); color: var(--sky); }
+  .badge-discuss { background: rgba(232,89,60,0.12); color: var(--coral); }
+
+  /* CALLOUT */
+  .callout {
+    display: flex; gap: 14px; padding: 18px 22px;
+    border-radius: var(--radius-sm); margin-bottom: 14px;
+    font-size: 13px; line-height: 1.75;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-sky { background: rgba(77,150,255,0.06); border: 1px solid rgba(77,150,255,0.12); }
+  .callout-mint { background: rgba(78,158,122,0.06); border: 1px solid rgba(78,158,122,0.12); }
+  .callout-amber { background: rgba(212,160,23,0.06); border: 1px solid rgba(212,160,23,0.15); }
+  .callout-purple { background: rgba(110,95,160,0.06); border: 1px solid rgba(110,95,160,0.12); }
+  .callout p { color: var(--text-sub); }
+
+  /* TABLE */
+  .data-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);
+    margin-bottom: 14px;
+  }
+  .data-table th, .data-table td {
+    padding: 11px 16px; text-align: left; font-size: 12.5px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .data-table th { background: #F7F5F2; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; color: var(--text-sub); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table td { color: var(--text-sub); }
+  .data-table td:first-child { font-weight: 600; color: var(--text); }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--bg-code); border-radius: var(--radius);
+    padding: 24px 28px; margin-bottom: 14px; overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.75;
+  }
+  .code-block .c-comment { color: #6A9955; }
+  .code-block .c-key { color: #9CDCFE; }
+  .code-block .c-type { color: #4EC9B0; }
+  .code-block .c-kw { color: #569CD6; }
+  .code-block .c-fn { color: #DCDCAA; }
+  .code-block .c-str { color: #CE9178; }
+  .code-block .c-num { color: #B5CEA8; }
+  .code-block .c-white { color: rgba(255,255,255,0.85); }
+  .code-block .c-dim { color: rgba(255,255,255,0.3); }
+  .code-block .c-line { display: block; color: rgba(255,255,255,0.75); }
+  .code-block .c-indent { display: block; padding-left: 20px; }
+  .code-block .c-indent2 { display: block; padding-left: 40px; }
+
+  /* TREE */
+  .tree {
+    background: var(--bg-code); border-radius: var(--radius);
+    padding: 28px 32px; margin-bottom: 14px; overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    line-height: 1.8; color: rgba(255,255,255,0.55);
+    white-space: pre;
+  }
+  .tree .t-dir { color: #4EC9B0; font-weight: 600; }
+  .tree .t-file { color: #9CDCFE; }
+  .tree .t-note { color: rgba(255,255,255,0.3); font-family: 'Noto Sans JP', sans-serif; font-size: 11px; }
+  .tree .t-root { color: rgba(255,255,255,0.35); font-family: 'Noto Sans JP', sans-serif; font-size: 11px; }
+
+  /* FLOW */
+  .flow-row { display: flex; align-items: center; gap: 0; margin-bottom: 10px; flex-wrap: wrap; }
+  .flow-step {
+    padding: 10px 18px; border-radius: var(--radius-sm);
+    font-size: 12.5px; font-weight: 600; color: white; white-space: nowrap;
+  }
+  .flow-arrow { color: var(--text-muted); font-size: 18px; margin: 0 8px; }
+
+  /* PRINCIPLE GRID */
+  .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .principle-item {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm);
+  }
+  .principle-num {
+    width: 30px; height: 30px; background: var(--accent); color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; margin-bottom: 12px;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .principle-item h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .principle-item p { font-size: 12.5px; color: var(--text-sub); line-height: 1.7; }
+
+  /* LAYER STACK */
+  .layer-stack { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+  .layer {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px; border-radius: var(--radius-sm); color: white;
+    font-size: 13px; transition: transform 0.15s;
+  }
+  .layer:hover { transform: translateX(4px); }
+  .layer-label { font-weight: 700; min-width: 200px; }
+  .layer-desc { font-size: 12px; opacity: 0.7; }
+  .layer-arrow { text-align: center; color: var(--text-muted); font-size: 14px; padding: 2px 0; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero { padding: 56px 24px 44px; }
+    .hero h1 { font-size: 26px; }
+    .card-grid-2, .card-grid-3, .principle-grid { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">ARCHITECTURE DECISIONS — APP LAYER</div>
+    <h1>アプリケーション<br>アーキテクチャ設計ノート<span>モノレポ全体構造と apps/web・apps/api・packages/ の内部設計を定義する</span></h1>
+    <p class="hero-desc">
+      AWS構成の上に乗るアプリケーションの設計判断を記録したドキュメント。
+      既存の設計ノート（architecture-techselection）のディレクトリ構造を白紙にし、
+      ゼロベースで再設計した結果をまとめている。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><strong>ステータス</strong>　確定（Sprint 0）</div>
+      <div class="hero-meta-item"><strong>前提</strong>　Vue 3 / Hono / DynamoDB / SST v3</div>
+      <div class="hero-meta-item"><strong>対象</strong>　開発メンバー・AIエージェント</div>
+    </div>
+  </div>
+</header>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">目次</div>
+  <div class="toc-grid">
+    <a href="#principles" class="toc-item"><span class="toc-dot" style="background:var(--accent)"></span>設計原則</a>
+    <a href="#monorepo" class="toc-item"><span class="toc-dot" style="background:var(--orange)"></span>モノレポ全体構造</a>
+    <a href="#api" class="toc-item"><span class="toc-dot" style="background:var(--mint)"></span>apps/api</a>
+    <a href="#web" class="toc-item"><span class="toc-dot" style="background:var(--purple)"></span>apps/web</a>
+    <a href="#shared" class="toc-item"><span class="toc-dot" style="background:var(--sky)"></span>packages/shared</a>
+    <a href="#db" class="toc-item"><span class="toc-dot" style="background:var(--pink)"></span>packages/db</a>
+    <a href="#async" class="toc-item"><span class="toc-dot" style="background:var(--amber)"></span>非同期ラベリング</a>
+    <a href="#decisions" class="toc-item"><span class="toc-dot" style="background:var(--coral)"></span>設計判断ログ</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ===== PRINCIPLES ===== -->
+  <div class="section" id="principles">
+    <div class="section-label"><span class="dot" style="background:var(--accent)"></span>DESIGN PRINCIPLES</div>
+    <h2>設計原則</h2>
+    <p class="section-desc">すべての構造的判断は以下の3原則から導出される。迷ったらここに立ち返る。</p>
+
+    <div class="principle-grid">
+      <div class="principle-item">
+        <div class="principle-num">1</div>
+        <h3>1操作 = 1ファイル</h3>
+        <p>UseCaseもfeatureも、変更の単位を小さく閉じる。AIコーディングエージェントがスコープを特定しやすく、PRレビューも明快になる。</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">2</div>
+        <h3>依存は上から下へだけ</h3>
+        <p>route → UseCase → Domain → Repository（実装）の一方向。Repository interface はドメイン層に定義し依存性を逆転（DIP）。feature間も直接importしない。循環依存を構造で防ぐ。</p>
+      </div>
+      <div class="principle-item">
+        <div class="principle-num">3</div>
+        <h3>契約は shared に集約</h3>
+        <p>Zodスキーマ・エラー型・定数は packages/shared に。フロントとバックが同一の型から生成された定義を参照する。ズレが原理的に起きない。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">💡</div>
+      <p><strong>AIエージェント最適化：</strong>この構造は Claude Code / GitHub Copilot 等のAIコーディングエージェントが「このファイルを変更すれば良い」と即座に判断できることを重視している。1ファイル1責務、コンストラクタでの明示的な依存宣言、featureの公開API（index.ts）がエージェントのコンテキスト精度を高める。</p>
+    </div>
+  </div>
+
+  <!-- ===== MONOREPO ===== -->
+  <div class="section" id="monorepo">
+    <div class="section-label"><span class="dot" style="background:var(--orange)"></span>MONOREPO OVERVIEW</div>
+    <h2>モノレポ全体構造</h2>
+    <p class="section-desc">pnpm workspaceによるモノレポ。以降のセクションでは apps/ と packages/ を詳説する。infra/ と etl/ は別途考える。</p>
+
+    <div class="tree"><span class="t-root">thanks-card/</span>
+├── <span class="t-dir">apps/web/</span>              <span class="t-note">← Vue 3 + Vite（SPA） ▸ 詳細は「apps/web 設計」</span>
+├── <span class="t-dir">apps/api/</span>              <span class="t-note">← Hono on Lambda（HTTP API + Worker） ▸ 詳細は「apps/api 設計」</span>
+├── <span class="t-dir">packages/shared/</span>       <span class="t-note">← Zodスキーマ・エラー型・定数 ▸ 詳細は「packages/shared 設計」</span>
+├── <span class="t-dir">packages/db/</span>           <span class="t-note">← ElectroDB エンティティ定義 ▸ 詳細は「packages/db 設計」</span>
+├── <span class="t-dir">packages/config/</span>       <span class="t-note">← 共有 tsconfig・ESLint（Oxlint）・Prettier</span>
+├── <span class="t-dir">infra/</span>                 <span class="t-note">← SST v3 IaC（Lambda, DynamoDB, CloudFront 等）</span>
+├── <span class="t-dir">etl/</span>                   <span class="t-note">← Python（EventBridge → S3 Parquet エクスポート）</span>
+├── <span class="t-dir">e2e/</span>                   <span class="t-note">← Playwright E2Eテスト</span>
+└── <span class="t-file">pnpm-workspace.yaml</span></div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">パッケージ間の依存関係</h3>
+    <div class="flow-row">
+      <div class="flow-step" style="background:var(--purple)">apps/web</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--sky)">packages/shared</div>
+      <div class="flow-arrow">←</div>
+      <div class="flow-step" style="background:var(--mint)">apps/api</div>
+    </div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-step" style="background:var(--mint)">apps/api</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--pink)">packages/db</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--sky)">packages/shared</div>
+    </div>
+    <p style="font-size:12.5px; color:var(--text-muted); margin: 8px 0 16px;">apps/web は packages/db に依存しない。フロントからDBスキーマへの直接参照を構造で防止する。</p>
+
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <h3>packages/config</h3>
+        <p>tsconfig.base.json・ESLint（Oxlint + ESLint）・Prettier の共有設定を集約。各 apps/packages が extends で参照する。</p>
+      </div>
+      <div class="card">
+        <h3>infra/</h3>
+        <p>SST v3 でAWSリソースを定義。Lambda関数・DynamoDBテーブル・CloudFront・Cognito等をTypeScriptで構成管理する。</p>
+      </div>
+      <div class="card">
+        <h3>etl/</h3>
+        <p>Python製の分析用データエクスポート。EventBridgeスケジュールで定期実行し、DynamoDBからS3にParquet形式で出力する。TypeScriptモノレポとは独立。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APPS/API ===== -->
+  <div class="section" id="api">
+    <div class="section-label"><span class="dot" style="background:var(--mint)"></span>BACKEND</div>
+    <h2>apps/api 設計</h2>
+    <p class="section-desc">Hono on Lambda。HTTP APIとWorker Lambdaを同一パッケージに統合し、UseCase・Repositoryを共有する。エントリポイントだけが異なる。</p>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">レイヤー構造</h3>
+    <div class="layer-stack">
+      <div class="layer" style="background: var(--sky);">
+        <span class="layer-label">routes/ ・ handlers/</span>
+        <span class="layer-desc">HTTPエントリ / Workerエントリ。Zodバリデーション → UseCase委譲のみ</span>
+      </div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer" style="background: var(--purple);">
+        <span class="layer-label">use-cases/</span>
+        <span class="layer-desc">1操作 = 1クラス = 1ファイル。オーケストレーション（ドメインモデル操作 + Repository呼び出し）のみ</span>
+      </div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer" style="background: var(--coral);">
+        <span class="layer-label">domain/</span>
+        <span class="layer-desc">ドメインモデル（状態遷移・バリデーション）・Repository interface・ドメインイベント定義</span>
+      </div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer" style="background: var(--mint);">
+        <span class="layer-label">repositories/ ・ services/</span>
+        <span class="layer-desc">データアクセス（domain/interfaces の実装） / 外部API（Bedrock, SES）</span>
+      </div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer" style="background: #888;">
+        <span class="layer-label">lib/ ・ di/</span>
+        <span class="layer-desc">DBクライアント・ロガー / container.ts（composition root）</span>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">ディレクトリ構造</h3>
+    <div class="tree"><span class="t-root">apps/api/src/</span>
+├── <span class="t-dir">routes/</span>                  <span class="t-note">← HTTP APIエントリ（Hono）</span>
+│   ├── <span class="t-file">cards.ts</span>             <span class="t-note">← カードCRUD</span>
+│   ├── <span class="t-file">users.ts</span>             <span class="t-note">← ユーザー情報</span>
+│   ├── <span class="t-file">timeline.ts</span>          <span class="t-note">← タイムライン取得</span>
+│
+├── <span class="t-dir">handlers/</span>                <span class="t-note">← Worker Lambdaエントリ</span>
+│   ├── <span class="t-file">ai-labeler.ts</span>        <span class="t-note">← DynamoDB Streams → AI判定</span>
+│   ├── <span class="t-file">notifier.ts</span>          <span class="t-note">← SES通知送信</span>
+│   └── <span class="t-file">batch.ts</span>             <span class="t-note">← 定期バッチ処理</span>
+│
+├── <span class="t-dir">middleware/</span>              <span class="t-note">← Honoミドルウェア</span>
+│   ├── <span class="t-file">auth.ts</span>              <span class="t-note">← JWT検証</span>
+│   ├── <span class="t-file">error-handler.ts</span>     <span class="t-note">← AppError → HTTPレスポンス変換</span>
+│   ├── <span class="t-file">logger.ts</span>            <span class="t-note">← リクエストロギング</span>
+│   └── <span class="t-file">tenant.ts</span>            <span class="t-note">← テナントID解決（MVP: 固定値、将来: JWTから抽出）</span>
+│
+├── <span class="t-dir">use-cases/</span>               <span class="t-note">← オーケストレーション（1操作 = 1ファイル）</span>
+│   ├── <span class="t-dir">card/</span>                <span class="t-note">← カード送受信コンテキスト</span>
+│   │   ├── <span class="t-file">SendCard.ts</span>
+│   │   └── <span class="t-file">GetTimeline.ts</span>
+│   ├── <span class="t-dir">labeling/</span>            <span class="t-note">← AIラベリングコンテキスト</span>
+│   │   └── <span class="t-file">LabelCard.ts</span>
+│   ├── <span class="t-dir">user/</span>                <span class="t-note">← ユーザー管理コンテキスト</span>
+│   │   └── <span class="t-file">GetProfile.ts</span>
+│   └── <span class="t-dir">notification/</span>        <span class="t-note">← 通知コンテキスト</span>
+│       ├── <span class="t-file">NotifyRecipient.ts</span>
+│       └── <span class="t-file">RunBatch.ts</span>
+│
+├── <span class="t-dir">domain/</span>                  <span class="t-note">← ★ ドメイン層（ビジネスルール・不変条件）</span>
+│   ├── <span class="t-dir">models/</span>              <span class="t-note">← ドメインモデル（状態遷移・バリデーション）</span>
+│   │   ├── <span class="t-file">Card.ts</span>          <span class="t-note">← CardStatus遷移ルール・送信上限チェック</span>
+│   │   └── <span class="t-file">User.ts</span>          <span class="t-note">← プロフィール不変条件・レーダー集計更新</span>
+│   ├── <span class="t-dir">events/</span>              <span class="t-note">← ドメインイベント定義</span>
+│   │   ├── <span class="t-file">CardSent.ts</span>      <span class="t-note">← カード送信時に発行</span>
+│   │   └── <span class="t-file">CardLabeled.ts</span>   <span class="t-note">← AI判定完了時に発行</span>
+│   └── <span class="t-dir">interfaces/</span>          <span class="t-note">← Repository / Service の interface（依存性逆転）</span>
+│       ├── <span class="t-file">CardRepository.ts</span>
+│       ├── <span class="t-file">UserRepository.ts</span>
+│       └── <span class="t-file">AiService.ts</span>
+│
+├── <span class="t-dir">repositories/</span>            <span class="t-note">← domain/interfaces の DynamoDB 実装</span>
+│   ├── <span class="t-file">card.dynamo.repository.ts</span>
+│   └── <span class="t-file">user.dynamo.repository.ts</span>
+│
+├── <span class="t-dir">services/</span>                <span class="t-note">← domain/interfaces の外部API実装</span>
+│   ├── <span class="t-file">ai.bedrock.service.ts</span> <span class="t-note">← Bedrock呼び出し</span>
+│   └── <span class="t-file">notification.ses.service.ts</span> <span class="t-note">← SES送信</span>
+│
+├── <span class="t-dir">lib/</span>                     <span class="t-note">← インフラ基盤</span>
+│   ├── <span class="t-file">dynamo-client.ts</span>     <span class="t-note">← DynamoDBクライアントシングルトン</span>
+│   ├── <span class="t-file">logger.ts</span>
+│   └── <span class="t-file">config.ts</span>            <span class="t-note">← 環境変数読み込み</span>
+│
+├── <span class="t-dir">di/</span>                      <span class="t-note">← 依存性注入</span>
+│   └── <span class="t-file">container.ts</span>         <span class="t-note">← composition root</span>
+│
+└── <span class="t-file">index.ts</span>                 <span class="t-note">← Honoアプリのエクスポート</span></div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">各層の責務ルール</h3>
+    <table class="data-table">
+      <thead><tr><th>層</th><th>責務</th><th>禁止事項</th></tr></thead>
+      <tbody>
+        <tr><td>routes/</td><td>リクエスト受付・Zodバリデーション・UseCaseへの委譲・レスポンス整形</td><td>ビジネスロジック、DB直接アクセス</td></tr>
+        <tr><td>handlers/</td><td>SQS/Streams イベントのパース・UseCaseへの委譲</td><td>ビジネスロジック、DB直接アクセス</td></tr>
+        <tr><td>use-cases/</td><td>オーケストレーション。ドメインモデルの操作とRepository/Service呼び出しの調整</td><td>ビジネスルール（状態遷移・バリデーション）の直接実装、HTTP関連の知識</td></tr>
+        <tr><td style="color:var(--coral); font-weight:700;">domain/</td><td>ビジネスルール・不変条件の保持。状態遷移メソッド・バリデーション・ドメインイベント定義。Repository/Service の interface を定義（依存性逆転）</td><td>インフラ知識（DB固有API、HTTP）、外部ライブラリへの依存</td></tr>
+        <tr><td>repositories/</td><td>domain/interfaces の DynamoDB 実装。データの永続化・取得</td><td>ビジネスロジック、他Repositoryへの依存</td></tr>
+        <tr><td>services/</td><td>domain/interfaces の外部API実装（Bedrock, SES）</td><td>ビジネスロジック</td></tr>
+        <tr><td>di/</td><td>全依存関係の組み立て。「具体実装を知る」唯一の場所</td><td>ビジネスロジック</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-mint">
+      <div class="callout-icon">🔄</div>
+      <p><strong>RDS移行パス：</strong>DynamoDB → RDS に切り替える場合、<code>card.rds.repository.ts</code> を追加し <code>di/container.ts</code> の注入先を差し替えるだけで完了する。Repository interface は <code>domain/interfaces/</code> にあるため、UseCase層・ドメイン層は一切変更不要。</p>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">🧩</div>
+      <p><strong>DI方式 — コンストラクタ注入：</strong>DIライブラリ（tsyringe等）は使用しない。UseCaseクラスのコンストラクタ引数でRepositoryとServiceを受け取り、<code>di/container.ts</code> で組み立てる。デコレータ不要でTypeScript設定がシンプル、AIエージェントが依存関係を即座に把握でき、テスト時はモックを差し込むだけ。</p>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🏛️</div>
+      <p><strong>ドメイン層（軽量ドメインモデル）：</strong><code>domain/models/</code> にはビジネスルールを持つドメインモデルを配置する。Card モデルは状態遷移メソッド（<code>publish()</code>, <code>block(reason)</code>）を持ち、不正な遷移をコンパイル時ではなく実行時に防止する。UseCase はドメインモデルのメソッドを呼ぶだけで、ビジネスルールを直接実装しない。これにより貧血ドメインモデル（Anemic Domain Model）を構造的に防ぐ。</p>
+    </div>
+
+    <div class="callout callout-amber">
+      <div class="callout-icon">🗺️</div>
+      <p><strong>Bounded Context（論理境界）：</strong>MVPでは物理的なサービス分離は行わないが、<code>use-cases/</code> 内をコンテキスト単位でサブディレクトリ分割する。<strong>カード送受信</strong>（Card, Timeline）、<strong>AIラベリング</strong>（LabelingResult, BlockReason）、<strong>ユーザー管理</strong>（User, Tenant）、<strong>通知</strong>（NotifyRecipient）の4境界。特にAIラベリングは独立性が高く、将来の別サービス切り出し候補。</p>
+    </div>
+  </div>
+
+  <!-- ===== APPS/WEB ===== -->
+  <div class="section" id="web">
+    <div class="section-label"><span class="dot" style="background:var(--purple)"></span>FRONTEND</div>
+    <h2>apps/web 設計</h2>
+    <p class="section-desc">Vue 3 SPA。Feature-basedディレクトリ構造で、機能追加時の影響範囲を最小化する。状態管理はTanStack Query + composable（Pinia不使用）。</p>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">データフロー</h3>
+    <div class="flow-row">
+      <div class="flow-step" style="background:var(--coral)">api/ (Hono RPC)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--accent)">TanStack Query</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--purple)">composable</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:#888">component</div>
+    </div>
+    <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:24px;">一方向フロー。逆方向の依存は禁止。mutationもTanStack Queryの useMutation → cache invalidate で処理する。</p>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">ディレクトリ構造</h3>
+    <div class="tree"><span class="t-root">apps/web/src/</span>
+├── <span class="t-dir">pages/</span>                   <span class="t-note">← ルート対応ページ（薄い: layout + feature組み合わせ）</span>
+│   ├── <span class="t-file">HomePage.vue</span>
+│   ├── <span class="t-file">SendPage.vue</span>
+│   ├── <span class="t-file">TimelinePage.vue</span>
+│   ├── <span class="t-file">ProfilePage.vue</span>
+│   └── <span class="t-file">AdminPage.vue</span>
+│
+├── <span class="t-dir">features/</span>                <span class="t-note">← 機能単位の自己完結モジュール</span>
+│   ├── <span class="t-dir">card/</span>                <span class="t-note">← カード送信・表示</span>
+│   │   ├── <span class="t-dir">components/</span>      <span class="t-note">← CardComposer.vue, ThankYouCard.vue</span>
+│   │   ├── <span class="t-dir">composables/</span>     <span class="t-note">← useCardSend.ts, useCardDetail.ts</span>
+│   │   ├── <span class="t-dir">queries/</span>         <span class="t-note">← cardKeys.ts, useCardListQuery.ts</span>
+│   │   ├── <span class="t-dir">types/</span>           <span class="t-note">← feature-local types（必要時のみ）</span>
+│   │   ├── <span class="t-dir">__tests__/</span>       <span class="t-note">← CardComposer.test.ts</span>
+│   │   └── <span class="t-file">index.ts</span>        <span class="t-note">← 公開API（他featureはここからのみimport可）</span>
+│   │
+│   ├── <span class="t-dir">timeline/</span>            <span class="t-note">← タイムライン表示・フィルタ</span>
+│   │   ├── <span class="t-dir">components/</span>  <span class="t-dir">composables/</span>  <span class="t-dir">queries/</span>  <span class="t-dir">__tests__/</span>  <span class="t-file">index.ts</span>
+│   │
+│   ├── <span class="t-dir">analytics/</span>           <span class="t-note">← 分析・レポート</span>
+│   │   ├── <span class="t-dir">components/</span>  <span class="t-dir">composables/</span>  <span class="t-dir">queries/</span>  <span class="t-dir">__tests__/</span>  <span class="t-file">index.ts</span>
+│   │
+│   └── <span class="t-dir">auth/</span>                <span class="t-note">← ログイン・認証</span>
+│       ├── <span class="t-dir">components/</span>  <span class="t-dir">composables/</span>  <span class="t-dir">__tests__/</span>  <span class="t-file">index.ts</span>
+│
+├── <span class="t-dir">components/</span>
+│   └── <span class="t-dir">ui/</span>                  <span class="t-note">← デザインシステムL2 / shadcn-vue ベース（Button, Input, Avatar, Toast...）</span>
+│
+├── <span class="t-dir">composables/</span>             <span class="t-note">← feature横断の共有composable</span>
+│   ├── <span class="t-file">useAuth.ts</span>           <span class="t-note">← 認証状態</span>
+│   ├── <span class="t-file">useCurrentUser.ts</span>    <span class="t-note">← ログインユーザー情報</span>
+│   └── <span class="t-file">useTenant.ts</span>         <span class="t-note">← テナント情報</span>
+│
+├── <span class="t-dir">api/</span>                     <span class="t-note">← Hono RPCクライアント生成（型安全なAPIコール）</span>
+├── <span class="t-dir">router/</span>                  <span class="t-note">← Vue Router + ナビゲーションガード</span>
+├── <span class="t-dir">layouts/</span>                 <span class="t-note">← AppLayout.vue, AuthLayout.vue</span>
+├── <span class="t-dir">plugins/</span>                 <span class="t-note">← queryClient setup</span>
+└── <span class="t-file">main.ts</span></div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">feature間ルール</h3>
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <div class="badge badge-confirmed">必須</div>
+        <h3>直接importは禁止</h3>
+        <p><code>card/</code> が <code>timeline/</code> のファイルを直接参照しない。連携が必要な場合は <code>index.ts</code> の公開APIを通じて行う。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">必須</div>
+        <h3>index.ts で公開APIを明示</h3>
+        <p>各featureは <code>index.ts</code> で外部に公開するコンポーネント・composable・型を明示する。内部のファイルは外から見えない。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">必須</div>
+        <h3>queries/ はfeature内に閉じる</h3>
+        <p>TanStack Queryのquery key定義とhookをfeature内に持つ。キャッシュの管理単位が機能に紐づき、invalidateの制御が明確になる。</p>
+      </div>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">📦</div>
+      <p><strong>状態管理：Pinia不使用。</strong>サーバー状態はTanStack Queryが管理。UIローカルの状態（モーダル開閉、フィルタ条件等）はcomposableの <code>ref</code> で十分。状態の所在がシンプルになり、デバッグしやすい。</p>
+    </div>
+
+    <div class="callout callout-mint">
+      <div class="callout-icon">🔗</div>
+      <p><strong>Hono RPC による型安全API呼び出し：</strong><code>api/</code> ディレクトリで Hono の <code>hc&lt;AppType&gt;()</code> を使い、バックエンドのルート定義から型安全なクライアントを自動生成する。Zodスキーマ（packages/shared）→ Honoルート型 → RPCクライアント → TanStack Query の一気通貫で、APIの入出力型がコンパイル時に検証される。</p>
+    </div>
+
+    <div class="callout callout-amber">
+      <div class="callout-icon">🧪</div>
+      <p><strong>テスト戦略：</strong>ユニットテスト（Vitest）+ E2Eテスト（Playwright）をMVPから導入。feature内の <code>__tests__/</code> はVitest単体・composableテスト用。E2Eテストはプロジェクトルートの <code>e2e/</code> ディレクトリに配置し、主要ユーザーフロー（カード送信・タイムライン閲覧）をカバーする。</p>
+    </div>
+  </div>
+
+  <!-- ===== PACKAGES/SHARED ===== -->
+  <div class="section" id="shared">
+    <div class="section-label"><span class="dot" style="background:var(--sky)"></span>SHARED PACKAGE</div>
+    <h2>packages/shared 設計</h2>
+    <p class="section-desc">フロントとバックの「契約」とドメイン共有型を定義する場所。Zodスキーマが全ての型の起点（Single Source of Truth）。contracts/ はAPI入出力の形、domain-types/ はドメイン概念の定義を担い、関心を明確に分離する。</p>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">ディレクトリ構造</h3>
+    <div class="tree"><span class="t-root">packages/shared/src/</span>
+├── <span class="t-dir">contracts/</span>               <span class="t-note">← API契約（リクエスト/レスポンスのZodスキーマ）</span>
+│   ├── <span class="t-file">card.contract.ts</span>     <span class="t-note">← CreateCardInput, CardResponse, CardListResponse</span>
+│   ├── <span class="t-file">user.contract.ts</span>     <span class="t-note">← UserProfileResponse, MemberListResponse</span>
+│   └── <span class="t-file">timeline.contract.ts</span> <span class="t-note">← TimelineQuery, PaginatedResponse</span>
+│
+├── <span class="t-dir">domain-types/</span>            <span class="t-note">← ドメイン共有型（フロント・バック共通で参照する値の定義）</span>
+│   ├── <span class="t-file">card-status.ts</span>       <span class="t-note">← CardStatus enum: processing / published / blocked</span>
+│   └── <span class="t-file">competency.ts</span>        <span class="t-note">← CompetencyId (enum: 5値), CompetencyMeta</span>
+│
+├── <span class="t-dir">errors/</span>                  <span class="t-note">← 共通エラー型（discriminated union）</span>
+│   ├── <span class="t-file">app-error.ts</span>         <span class="t-note">← AppErrorクラス + エラーコード定義</span>
+│   └── <span class="t-file">error-response.schema.ts</span> <span class="t-note">← ErrorResponseSchema + isAppError() type guard</span>
+│
+├── <span class="t-dir">constants/</span>               <span class="t-note">← コンピテンシー定義・上限値・テナント設定</span>
+├── <span class="t-dir">utils/</span>                   <span class="t-note">← 日付フォーマッター・ID生成</span>
+└── <span class="t-file">index.ts</span>                 <span class="t-note">← 全re-export: import { CardSchema } from '@repo/shared'</span></div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">エラー型設計</h3>
+    <table class="data-table">
+      <thead><tr><th>コード</th><th>HTTP</th><th>意味</th><th>フロントUI</th></tr></thead>
+      <tbody>
+        <tr><td>VALIDATION</td><td>400</td><td>入力不正（Zodバリデーション失敗）</td><td>フィールド単位のインラインエラー</td></tr>
+        <tr><td>UNAUTHORIZED</td><td>401</td><td>未ログイン・トークン期限切れ</td><td>ログイン画面へリダイレクト</td></tr>
+        <tr><td>FORBIDDEN</td><td>403</td><td>権限不足（管理者のみの操作）</td><td>権限エラーToast</td></tr>
+        <tr><td>BUSINESS</td><td>409</td><td>ビジネスルール違反（送信上限等）</td><td>説明付きToast</td></tr>
+        <tr><td>EXTERNAL</td><td>502</td><td>外部サービス障害（AI API等）</td><td>リトライ促すToast</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">🔍</div>
+      <p><strong>AIブロックはエラー型に含めない。</strong>AIラベリングは非同期で実行され、ブロック判定はカードの状態遷移（<code>status: 'blocked'</code>）として扱う。ブロック理由付きのメール通知で送信者に伝える。フロントのエラーハンドリングとは完全に別フロー。</p>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">🔗</div>
+      <p><strong>バックエンド → フロント連携：</strong>UseCaseが <code>AppError</code> をthrow → middlewareの <code>error-handler.ts</code> が <code>code</code> を見てHTTPステータスに変換 → フロント側は <code>isAppError()</code> type guardで判別 → <code>code</code> に応じたUI表示（Toastの色・メッセージを切り替え）。</p>
+    </div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">CardStatus 状態遷移</h3>
+    <div class="flow-row">
+      <div class="flow-step" style="background:var(--sky)">processing</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--mint)">published</div>
+    </div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-step" style="background:var(--sky)">processing</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--coral)">blocked</div>
+    </div>
+    <p style="font-size:12.5px; color:var(--text-muted); margin: 4px 0 6px;">※ 送信直後は processing。AI判定完了で published に遷移し、不適切と判定された場合は blocked へ。MVPでは blocked → published の復旧機能は実装しない。</p>
+
+    <div class="callout callout-purple" style="margin-top:14px;">
+      <div class="callout-icon">🛡️</div>
+      <p><strong>ドメインモデルによる遷移保護：</strong>CardStatus の遷移ルールは <code>domain/models/Card.ts</code> の <code>publish()</code> / <code>block(reason)</code> メソッドで強制する。processing 以外の状態から遷移しようとするとドメインエラーをthrowする。UseCaseやRepositoryに遷移ロジックを書かず、不正な遷移を構造的に防止する。</p>
+    </div>
+  </div>
+
+  <!-- ===== PACKAGES/DB ===== -->
+  <div class="section" id="db">
+    <div class="section-label"><span class="dot" style="background:var(--pink)"></span>DATABASE PACKAGE</div>
+    <h2>packages/db 設計</h2>
+    <p class="section-desc">ElectroDB を用いた DynamoDB エンティティ定義。Single Table Design のスキーマを型安全に管理し、apps/api の Repository 層から利用される。</p>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">ディレクトリ構造</h3>
+    <div class="tree"><span class="t-root">packages/db/src/</span>
+├── <span class="t-dir">entities/</span>                <span class="t-note">← ElectroDB エンティティ定義</span>
+│   ├── <span class="t-file">card.entity.ts</span>       <span class="t-note">← PK: USER#id  SK: CARD#ulid</span>
+│   ├── <span class="t-file">user.entity.ts</span>       <span class="t-note">← PK: USER#id  SK: PROFILE</span>
+│   ├── <span class="t-file">timeline.entity.ts</span>   <span class="t-note">← GSI1: TIMELINE#tenantId  SK: ulid（降順）</span>
+│   └── <span class="t-file">radar-agg.entity.ts</span>  <span class="t-note">← PK: USER#id  SK: RADAR（書き込み時集計）</span>
+│
+├── <span class="t-file">service.ts</span>               <span class="t-note">← ElectroDB Service（全エンティティを束ねる）</span>
+├── <span class="t-file">client.ts</span>                <span class="t-note">← DynamoDB クライアント生成</span>
+└── <span class="t-file">index.ts</span>                 <span class="t-note">← 全re-export: import { CardEntity } from '@repo/db'</span></div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">Repository との関係</h3>
+    <div class="flow-row">
+      <div class="flow-step" style="background:var(--purple)">UseCase</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--mint)">Repository (interface)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--pink)">ElectroDB Entity</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:#888">DynamoDB</div>
+    </div>
+    <p style="font-size:12.5px; color:var(--text-muted); margin: 8px 0 16px;">Repository の DynamoDB 実装（<code>card.dynamo.repository.ts</code>）は packages/db の ElectroDB エンティティを利用する。UseCase は Repository interface のみに依存し、ElectroDB を直接知らない。</p>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">🔑</div>
+      <p><strong>Single Table Design：</strong>全エンティティが1つの DynamoDB テーブルを共有する。ElectroDB が PK/SK のプレフィクス管理・型変換・クエリビルドを担い、生の DynamoDB SDK を直接操作する必要がない。RDS 移行時は Repository 実装の差し替えのみで、packages/db は廃止される。</p>
+    </div>
+
+    <div class="callout callout-sky">
+      <div class="callout-icon">📦</div>
+      <p><strong>3層のスキーマ棲み分け：</strong>shared/contracts はAPI入出力の形、shared/domain-types はフロント・バック共通のドメイン概念（CardStatus, CompetencyId等）、db はバックエンド専用の永続化スキーマ。apps/api の <code>domain/models/</code> はドメインの不変条件（状態遷移ルール等）を持つ。フロントは packages/db に依存せず、domain-types を通じてドメイン概念を共有する。</p>
+    </div>
+  </div>
+
+  <!-- ===== ASYNC LABELING ===== -->
+  <div class="section" id="async">
+    <div class="section-label"><span class="dot" style="background:var(--amber)"></span>ASYNC LABELING</div>
+    <h2>非同期ラベリング設計</h2>
+    <p class="section-desc">送信即完了 → AIラベルは後から自然に表示。TanStack Queryのスマートポーリングで実現する（SSEは見送り）。</p>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">SSEを見送った理由</h3>
+    <div class="card-grid card-grid-3" style="margin-bottom: 24px;">
+      <div class="card">
+        <div class="badge badge-discuss">制約</div>
+        <h3>Lambda 29秒制限</h3>
+        <p>API Gateway + Lambdaの組み合わせではSSEの持続接続がLambdaタイムアウトに抵触する。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-discuss">制約</div>
+        <h3>コスト</h3>
+        <p>WebSocket APIの追加は月$50の予算制約下でオーバーエンジニアリング。60名規模には不要。</p>
+      </div>
+      <div class="card">
+        <div class="badge badge-confirmed">代替</div>
+        <h3>TanStack Queryで十分</h3>
+        <p>スマートポーリング + window focus refetch で、SSEと遜色ないUXを実現できる。</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">3フェーズフロー</h3>
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <h3>Phase 1: 送信（即時）</h3>
+        <p>APIがDynamoDBに保存 → 即レスポンス。TanStack Queryの<strong>optimistic update</strong>でタイムラインにカードが即座に表示される。ラベル部分は「ラベリング中...」のシマー表示。</p>
+      </div>
+      <div class="card">
+        <h3>Phase 2: AI処理（非同期）</h3>
+        <p>DynamoDB Streams → Worker Lambda → Bedrock → 結果をDynamoDBに書き戻し。ユーザーは待つ必要なし。画面を閉じてもOK。</p>
+      </div>
+      <div class="card">
+        <h3>Phase 3: フロント反映</h3>
+        <p>TanStack Queryの2つのポーリング戦略がキャッチ。ラベルがCSSトランジションでふわっとフェードイン。</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px; font-weight:700; margin:24px 0 14px;">2つのポーリング戦略</h3>
+    <table class="data-table">
+      <thead><tr><th>戦略</th><th>用途</th><th>設定</th><th>停止条件</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>A: post-send polling</td>
+          <td>送信直後に画面を見ている人向け</td>
+          <td><code>refetchInterval: 5s</code>（最大60秒）</td>
+          <td>competenciesフィールドが埋まったら停止</td>
+        </tr>
+        <tr>
+          <td>B: background freshness</td>
+          <td>別画面から戻ってきた人向け</td>
+          <td><code>refetchOnWindowFocus: true</code><br><code>staleTime: 30s</code></td>
+          <td>常時有効（タイムライン全体に適用）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-amber">
+      <div class="callout-icon">✨</div>
+      <p><strong>UXディテール：</strong>ラベル未確定のカードはスケルトン/シマーで「何かが入る場所」を予約表示。ラベルが付いた瞬間、CSSトランジション（opacity 0→1, 300ms ease）でフェードイン。「忙しくてもストレスなく、何なら気持ちよく使える」体験を実現する。</p>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">📡</div>
+      <p><strong>ドメインイベントによるモデリング：</strong>非同期フローはドメインイベント（<code>CardSent</code>, <code>CardLabeled</code>）として <code>domain/events/</code> に明示的に定義する。UseCase が <code>CardSent</code> イベントを発行 → インフラ層（DynamoDB Streams）が配送 → Worker Lambda が <code>CardLabeled</code> を処理する構造。イベントの定義がドメイン層にあるため、インフラ（Streams → SQS → EventBridge）を差し替えてもドメインロジックは不変。テスト時は「イベントが発行されたか」を検証するだけで済む。</p>
+    </div>
+  </div>
+
+  <!-- ===== DECISION LOG ===== -->
+  <div class="section" id="decisions">
+    <div class="section-label"><span class="dot" style="background:var(--coral)"></span>DECISION LOG</div>
+    <h2>設計判断ログ</h2>
+    <p class="section-desc">本ドキュメントで確定した全設計判断の一覧。「なぜそう決めたか」を記録し、将来の見直し時に参照する。</p>
+
+    <table class="data-table">
+      <thead><tr><th style="width:60px">ID</th><th style="width:200px">判断</th><th>選択</th><th>根拠</th></tr></thead>
+      <tbody>
+        <tr><td>ADR-01</td><td>バックエンド構造</td><td>Route → UseCase → Repository 3層</td><td>RDS移行可能性に備えた抽象化。UseCaseがビジネスロジックの単一責任を持つ</td></tr>
+        <tr><td>ADR-02</td><td>UseCase粒度</td><td>1操作 = 1クラス = 1ファイル</td><td>AIエージェントがスコープを即座に特定できる。PRレビューの粒度も適切</td></tr>
+        <tr><td>ADR-03</td><td>DI方式</td><td>コンストラクタ注入 + composition root</td><td>ライブラリ不要でシンプル。依存が明示的。テスト時のモック差し込みが容易</td></tr>
+        <tr><td>ADR-04</td><td>Worker配置</td><td>apps/api内に統合（エントリポイント分離）</td><td>UseCase/Repository共有のimportが簡潔。SSTでデプロイは個別バンドル可能</td></tr>
+        <tr><td>ADR-05</td><td>フロント構造</td><td>Feature-based ディレクトリ</td><td>機能追加時の影響範囲を最小化。feature間の直接importを構造で禁止</td></tr>
+        <tr><td>ADR-06</td><td>ルーティング</td><td>Vue Router（ファイルベースなし）</td><td>明示的でコントロールしやすい。ナビゲーションガードの挙動が透明</td></tr>
+        <tr><td>ADR-07</td><td>状態管理</td><td>TanStack Query + composable（Pinia不使用）</td><td>サーバー状態はTanStack Query、UIローカル状態はcomposableのrefで管理。Piniaを入れない分、状態の所在がシンプルで60名規模に十分</td></tr>
+        <tr><td>ADR-08</td><td>スキーマ方針</td><td>Zodスキーマ → z.infer で型生成</td><td>Single Source of Truth。スキーマと型のズレが原理的に起きない</td></tr>
+        <tr><td>ADR-09</td><td>エラー型</td><td>discriminated union（5カテゴリ）</td><td>フロント・バック共通の型でcode→UIのマッピングが明確</td></tr>
+        <tr><td>ADR-10</td><td>AIブロック扱い</td><td>エラーではなくCardStatusの状態遷移</td><td>非同期判定なのでフロントエラーフローに載せない。メール通知で伝える</td></tr>
+        <tr><td>ADR-11</td><td>非同期ラベリング</td><td>TanStack Queryスマートポーリング（5秒）</td><td>Lambda 29秒制限でSSE不可。ポーリング2戦略（post-send 5s + window focus）でSSE同等のUXを実現</td></tr>
+        <tr><td>ADR-12</td><td>マルチテナント</td><td>データ層にテナントIDプレフィクス</td><td>MVPはシングルテナント運用（tenant.tsは固定値）。外販フェーズでJWTからテナントID抽出に切替</td></tr>
+        <tr><td>ADR-13</td><td>テスト戦略</td><td>Vitest + Playwright（MVPから導入）</td><td>feature内__tests__でVitestユニット、プロジェクトルートe2e/でPlaywright E2E</td></tr>
+        <tr><td>ADR-14</td><td>DBアクセス層</td><td>ElectroDB（packages/db）</td><td>Single Table DesignのPK/SK管理・型変換をElectroDBに委譲。Repository実装がエンティティを利用</td></tr>
+        <tr><td>ADR-15</td><td>CardStatus初期値</td><td>processing → published / blocked</td><td>送信=即公開（下書き機能なし）。AI処理中はprocessing、判定完了でpublished、不適切ならblocked</td></tr>
+        <tr><td>ADR-16</td><td>ドメイン層の導入</td><td>軽量ドメインモデル（domain/models/ + domain/interfaces/）</td><td>UseCaseへのビジネスロジック集中（貧血ドメインモデル）を防止。フルDDDは過剰、状態遷移・バリデーション・interface定義に絞った軽量構成</td></tr>
+        <tr><td>ADR-17</td><td>Repository interface 配置</td><td>domain/interfaces/ に定義、repositories/ は実装のみ</td><td>依存性逆転の原則（DIP）をディレクトリ構造で強制。ドメインがインフラに依存しないことを保証</td></tr>
+        <tr><td>ADR-18</td><td>CardStatus 遷移保護</td><td>domain/models/Card.ts のメソッドで遷移を強制</td><td>publish() / block(reason) メソッドがprocessing以外からの遷移を拒否。不正遷移を構造的に防止</td></tr>
+        <tr><td>ADR-19</td><td>shared 内部構造</td><td>contracts/（API契約） + domain-types/（ドメイン共有型）に分離</td><td>API入出力の形とドメイン概念の定義は異なる関心事。分離により意図しない結合を防止</td></tr>
+        <tr><td>ADR-20</td><td>集約境界</td><td>Card集約（CardStatus, Competencies）, User集約（Profile, RadarAgg）</td><td>トランザクション境界の明確化。RDS移行時のトランザクション設計基盤。集約ルートのみが内部の不変条件を保証</td></tr>
+        <tr><td>ADR-21</td><td>ドメインイベント</td><td>domain/events/ に CardSent / CardLabeled を定義</td><td>非同期フローをインフラ（DynamoDB Streams）でなくドメインとしてモデリング。テスタビリティ向上、インフラ差し替え時にドメインは不変</td></tr>
+        <tr><td>ADR-22</td><td>Bounded Context（論理境界）</td><td>use-cases/ をコンテキスト単位でサブディレクトリ分割</td><td>カード送受信・AIラベリング・ユーザー管理・通知の4境界。物理的サービス分離はMVP後に検討。AIラベリングは独立性が高く別サービス切り出し候補</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">
+  ありがとうカード プロジェクト — アプリケーションアーキテクチャ設計ノート v1
+</div>
+
+</body>
+</html>
