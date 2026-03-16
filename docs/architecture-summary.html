@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ありがとうカード — アーキテクチャ設計サマリー</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --dark-sub: #2d2d4a;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.8;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--dark);
+    color: #fff;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(255,107,107,0.15), transparent),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(255,165,82,0.12), transparent);
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .summary-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--sky), var(--purple));
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 30px;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.3;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #ffd6d6 50%, #ffe8c2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .meta-label {
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ===== MAIN ===== */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 80px 80px;
+  }
+
+  /* ===== SECTIONS ===== */
+  .doc-section {
+    margin-bottom: 56px;
+  }
+
+  .doc-section h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-icon { font-size: 28px; }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    line-height: 1.8;
+  }
+
+  /* ===== ARCHITECTURE DIAGRAM ===== */
+  .arch-diagram {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+  }
+
+  .arch-link {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--sky);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .arch-link:hover { text-decoration: underline; }
+
+  /* ===== TECH TABLE ===== */
+  .tech-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+
+  .tech-table th {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 14px 18px;
+    text-align: left;
+  }
+
+  .tech-table td {
+    background: #fff;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--text-light);
+  }
+
+  .tech-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .tech-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .tech-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ===== NFR RANKING ===== */
+  .nfr-ranking {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nfr-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  }
+
+  .rank-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 32px;
+  }
+
+  .nfr-rank-item:nth-child(1) .rank-num { color: var(--coral); }
+  .nfr-rank-item:nth-child(2) .rank-num { color: var(--orange); }
+  .nfr-rank-item:nth-child(3) .rank-num { color: var(--yellow); }
+  .nfr-rank-item:nth-child(4) .rank-num { color: var(--sky); }
+  .nfr-rank-item:nth-child(5) .rank-num { color: var(--purple); }
+  .nfr-rank-item:nth-child(6) .rank-num { color: var(--mint); }
+
+  .nfr-rank-label {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 140px;
+  }
+
+  .nfr-rank-note {
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  /* ===== ADR TABLE ===== */
+  .adr-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+
+  .adr-table th {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 12px 16px;
+    text-align: left;
+  }
+
+  .adr-table td {
+    background: #fff;
+    padding: 11px 16px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--text-light);
+  }
+
+  .adr-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .adr-table td:first-child {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--sky);
+    white-space: nowrap;
+  }
+
+  .adr-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ===== OPEN ITEMS ===== */
+  .open-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .open-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(255,107,107,0.04);
+    border: 1px solid rgba(255,107,107,0.1);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .open-item-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .open-item p {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  .open-item strong {
+    color: var(--text);
+  }
+
+  /* ===== DOC LINKS ===== */
+  .doc-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .doc-link-card {
+    display: block;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 14px;
+    padding: 22px;
+    text-decoration: none;
+    color: var(--text);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .doc-link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  }
+
+  .doc-link-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .doc-link-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .doc-link-card p {
+    font-size: 12.5px;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  /* ===== NOTES ===== */
+  .notes-area {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+  }
+
+  .note-block {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .note-block:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .note-block h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .note-block p, .note-block ul {
+    font-size: 13.5px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  .note-block ul {
+    padding-left: 20px;
+    margin-top: 4px;
+  }
+
+  .note-block li {
+    margin-bottom: 2px;
+  }
+
+  /* ===== FOOTER ===== */
+  .doc-footer {
+    text-align: center;
+    padding-top: 40px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .doc-footer p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+
+  .doc-footer strong {
+    color: var(--text);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .header { padding: 40px 24px; }
+    .main { padding: 32px 24px 60px; }
+    .header-meta { flex-direction: column; gap: 8px; }
+    .nfr-rank-label { min-width: auto; }
+    .doc-links { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <span class="summary-badge">SUMMARY — Sprint 0 確定</span>
+    <h1>アーキテクチャ設計・<br>技術スタック</h1>
+    <p class="header-subtitle">Sprint 0 で確定した技術選定とアーキテクチャ判断のサマリー。<br>詳細は各設計ノートを参照。</p>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-label">作成日：</span>2026/03/16</div>
+      <div class="meta-item"><span class="meta-label">参加者：</span>開発チーム12名</div>
+      <div class="meta-item"><span class="meta-label">ステータス：</span>Sprint 0 確定</div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 1. システム構成図 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">🖼️</span> システム構成図</h2>
+    <p class="section-desc">AWSサーバーレス構成の全体像。月額 $5-7 / SST v3 (IaC) で管理。</p>
+    <div class="arch-diagram">
+      <img src="aws-architecture.drawio.png" alt="ありがとうカード AWS サーバーレス構成図" style="width:100%;height:auto;border-radius:8px;">
+      <a class="arch-link" href="aws-architecture.drawio" download>📐 draw.io で開いて編集する（aws-architecture.drawio）</a>
+    </div>
+  </section>
+
+  <!-- 2. 技術スタック -->
+  <section class="doc-section">
+    <h2><span class="section-icon">🔧</span> 技術スタック</h2>
+    <p class="section-desc">各レイヤーの選定技術と理由。詳細な比較・設計判断は <a href="architecture-techselection.html" style="color:var(--sky)">統合設計ノート</a> を参照。</p>
+    <table class="tech-table">
+      <thead>
+        <tr>
+          <th>カテゴリ</th>
+          <th>選定技術</th>
+          <th>比較した候補</th>
+          <th>選定理由（WHY）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🖥️ フロントエンド</td>
+          <td>Vue 3 + Vite（SPA）</td>
+          <td>React / Svelte</td>
+          <td>社内標準・学習コスト低。S3 + CloudFront で静的配信しサーバー不要</td>
+        </tr>
+        <tr>
+          <td>🎨 UIライブラリ / CSS</td>
+          <td>shadcn-vue + Tailwind CSS</td>
+          <td>Vuetify / PrimeVue</td>
+          <td>ヘッドレスで自由度高。AIエージェント親和性が高く、デザインの一貫性を保ちやすい</td>
+        </tr>
+        <tr>
+          <td>⚙️ バックエンド</td>
+          <td>Hono on Lambda</td>
+          <td>Express / Fastify</td>
+          <td>TSファースト・Web標準API。サーバーレスでの運用負荷最小。Hono RPC で型安全API</td>
+        </tr>
+        <tr>
+          <td>🗄️ データベース</td>
+          <td>DynamoDB + ElectroDB</td>
+          <td>RDS (PostgreSQL) / Supabase</td>
+          <td>フルマネージド・月$1以下。サーバーレス親和。ElectroDB でシングルテーブル設計を型安全に管理</td>
+        </tr>
+        <tr>
+          <td>🤖 AI（LLM）</td>
+          <td>Amazon Bedrock</td>
+          <td>OpenAI API / Anthropic API</td>
+          <td>AWS統一管理・IAM認証。MVPではコンテンツフィルタ + コンピテンシー判定のみ実装</td>
+        </tr>
+        <tr>
+          <td>🔐 認証</td>
+          <td>Cognito + Google OAuth</td>
+          <td>Auth0 / Firebase Auth</td>
+          <td>AWS統一・5万ユーザー無料。フロントSDKは oidc-client-ts（外販時のIdP切り替えに備える）</td>
+        </tr>
+        <tr>
+          <td>☁️ ホスティング / IaC</td>
+          <td>AWS (S3 + CloudFront + Lambda) + SST v3</td>
+          <td>Vercel / Netlify</td>
+          <td>AWS統一管理・TypeScriptでIaC。SSTステージで環境分離</td>
+        </tr>
+        <tr>
+          <td>🚀 CI/CD</td>
+          <td>GitHub Actions + SST</td>
+          <td>AWS CodePipeline</td>
+          <td>GitHub内完結。ジュニアのCI/CD実践学習になる</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3. 非機能要件の優先順位 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">⚖️</span> 非機能要件の優先順位</h2>
+    <p class="section-desc">トレードオフが発生した際の判断基準。上位ほど優先する。プロジェクトの3大方針（学びの方向性・月50USD予算・外販への備え）から導出。</p>
+    <div class="nfr-ranking">
+      <div class="nfr-rank-item">
+        <span class="rank-num">1</span>
+        <span class="nfr-rank-label">保守性</span>
+        <span class="nfr-rank-note">ジュニアが理解・修正しやすいコード構造。AIエージェントの活用効率にも直結。1操作=1ファイルの原則</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">2</span>
+        <span class="nfr-rank-label">コスト</span>
+        <span class="nfr-rank-note">月50USDは硬い制約。サーバーレス・無料枠の活用で月$5-7を実現。超えたら止まる</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">3</span>
+        <span class="nfr-rank-label">デプロイ容易性</span>
+        <span class="nfr-rank-note">SST v3でワンコマンドデプロイ。GitHub Actions でCI/CD自動化。開発サイクルの高速化</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">4</span>
+        <span class="nfr-rank-label">セキュリティ</span>
+        <span class="nfr-rank-note">Cognito + IAM + JWT検証で基盤は整備済み。WAFは外販フェーズで検討。セキュリティは重要だが、MVP段階では過剰な対策は避ける</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">5</span>
+        <span class="nfr-rank-label">パフォーマンス</span>
+        <span class="nfr-rank-note">60名規模でDynamoDB + Lambdaなら素の状態で十分速い。過剰な最適化は行わない</span>
+      </div>
+      <div class="nfr-rank-item">
+        <span class="rank-num">6</span>
+        <span class="nfr-rank-label">スケーラビリティ</span>
+        <span class="nfr-rank-note">外販は「備える」が「今は作らない」（YAGNI）。サーバーレス構成が自然にスケール</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 主要な設計判断 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">🏛️</span> 主要な設計判断</h2>
+    <p class="section-desc">Sprint 0 で確定したアーキテクチャ判断の要約。全22件の ADR 詳細は <a href="app-architecture-decisions.html" style="color:var(--sky)">アプリケーションアーキテクチャ設計ノート</a> を参照。</p>
+    <table class="adr-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>判断</th>
+          <th>選択</th>
+          <th>根拠</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ADR-01</td>
+          <td>バックエンド構造</td>
+          <td>Route → UseCase → Domain → Repository 4層</td>
+          <td>RDS移行パスの確保。ドメインロジックの独立性</td>
+        </tr>
+        <tr>
+          <td>ADR-02</td>
+          <td>UseCase粒度</td>
+          <td>1操作 = 1クラス = 1ファイル</td>
+          <td>AIエージェントのスコープ特定・PRレビュー粒度</td>
+        </tr>
+        <tr>
+          <td>ADR-05</td>
+          <td>フロント構造</td>
+          <td>Feature-based ディレクトリ</td>
+          <td>機能追加時の影響範囲最小化。feature間の直接import禁止</td>
+        </tr>
+        <tr>
+          <td>ADR-07</td>
+          <td>状態管理</td>
+          <td>TanStack Query + composable（Pinia不使用）</td>
+          <td>60名規模にPiniaは過剰。状態の所在がシンプル</td>
+        </tr>
+        <tr>
+          <td>ADR-08</td>
+          <td>スキーマ方針</td>
+          <td>Zod → z.infer で型生成（Single Source of Truth）</td>
+          <td>スキーマと型のズレが原理的に起きない</td>
+        </tr>
+        <tr>
+          <td>ADR-11</td>
+          <td>非同期ラベリング</td>
+          <td>TanStack Query ポーリング（5秒）</td>
+          <td>Lambda 29秒制限でSSE不可。ポーリングでSSE同等UX</td>
+        </tr>
+        <tr>
+          <td>ADR-16</td>
+          <td>ドメイン層</td>
+          <td>軽量ドメインモデル（状態遷移・バリデーション）</td>
+          <td>貧血ドメインモデルを構造的に防止</td>
+        </tr>
+        <tr>
+          <td>ADR-17</td>
+          <td>依存性逆転</td>
+          <td>domain/interfaces/ にRepository interface定義</td>
+          <td>ドメインがインフラに依存しないことをディレクトリ構造で強制</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 5. 未決定事項 -->
+  <section class="doc-section">
+    <h2><span class="section-icon">⚠️</span> 未決定事項</h2>
+    <p class="section-desc">Sprint 0 時点で結論が出ていない項目。プロト検証や追加議論が必要。</p>
+    <div class="open-items">
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p><strong>DynamoDB テーブル設計方式</strong> — シングルテーブル設計 vs テーブル・パー・エンティティ方式。Sprint 0 でプロト検証を行い、チームの理解しやすさ・AI支援との相性を比較した上で決定する。</p>
+      </div>
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p><strong>WAF 導入時期</strong> — MVPでは不要と判断。外販フェーズでIP制限・レート制限を検討する。ただしCloudFrontにWAFをアタッチする構成は設計に含めてある。</p>
+      </div>
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p><strong>ETL 方式の詳細</strong> — DynamoDB Export to S3 方向で検討中。marimo + polars + plotly でアドホック分析スクリプトを作成予定だが、具体的な分析項目は未定。</p>
+      </div>
+      <div class="open-item">
+        <span class="open-item-icon">❓</span>
+        <p><strong>「暫定」ステータスの技術</strong> — 技術スタックの多くは「暫定」。Sprint 1 で実装を進めながら最終確定する。DB（DynamoDB）と認証（Cognito + oidc-client-ts）のみチーム合意で「確定」済み。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 詳細ドキュメント -->
+  <section class="doc-section">
+    <h2><span class="section-icon">📚</span> 詳細ドキュメント</h2>
+    <p class="section-desc">このサマリーの元となる詳細設計ノート。各領域の深い議論と判断根拠はこちら。</p>
+    <div class="doc-links">
+      <a class="doc-link-card" href="architecture-techselection.html">
+        <div class="doc-link-icon">🔧</div>
+        <h3>Sprint 0 統合設計ノート</h3>
+        <p>技術選定の全比較表、DynamoDBテーブル設計、APIルート構成、ミドルウェアスタック、コスト試算、セキュリティ設計、外販拡張計画</p>
+      </a>
+      <a class="doc-link-card" href="app-architecture-decisions.html">
+        <div class="doc-link-icon">🏛️</div>
+        <h3>アプリケーションアーキテクチャ設計ノート</h3>
+        <p>モノレポ構造、apps/api レイヤー設計、apps/web Feature-based構造、packages/shared・db設計、非同期ラベリング設計、全22件のADR</p>
+      </a>
+      <a class="doc-link-card" href="aws-architecture.drawio" download>
+        <div class="doc-link-icon">📐</div>
+        <h3>AWS構成図（draw.io）</h3>
+        <p>CloudFront → API Gateway → Lambda → DynamoDB → Streams → Bedrock の全体構成。draw.io で開いて閲覧・編集可能</p>
+      </a>
+      <a class="doc-link-card" href="../index.html">
+        <div class="doc-link-icon">📋</div>
+        <h3>ドキュメントポータル</h3>
+        <p>プロジェクト全体のドキュメント一覧。プロジェクト概要、開発ガイド、Sprint資料など</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- 7. 議事メモ -->
+  <section class="doc-section">
+    <h2><span class="section-icon">📝</span> 議事メモ</h2>
+    <p class="section-desc">Sprint 0 での議論の過程と判断の背景。</p>
+    <div class="notes-area">
+      <div class="note-block">
+        <h3>前提確認で合意したこと</h3>
+        <ul>
+          <li>ユーザー規模：全社60名（4部門：営業部・開発部・DX企画部・管理部）</li>
+          <li>予算：月50USD以内（インフラ + AI API）</li>
+          <li>認証：Google OAuth（社内Google Workspace連携）</li>
+          <li>AI：コンテンツフィルタ + コンピテンシー5種の自動判定。文面提案はMVP後</li>
+          <li>開発体制：12名、アジャイル/スクラム 1ヶ月スプリント、約6ヶ月でMVP</li>
+        </ul>
+      </div>
+      <div class="note-block">
+        <h3>フロントエンドの議論</h3>
+        <p>Vue 3 は社内標準で異論なし。状態管理で Pinia vs TanStack Query + composable を議論し、60名規模の社内ツールにPiniaは過剰としてTanStack Queryに決定。UIはshadcn-vue + Tailwind CSSで、ヘッドレスUIの自由度とAIエージェントとの相性を評価。</p>
+      </div>
+      <div class="note-block">
+        <h3>バックエンド・AI連携の議論</h3>
+        <p>AIラベリングのタイミングが最大の議論点。同期処理（送信時にAI判定を待つ）vs 非同期処理（送信即完了、AI判定は後から）を検討し、Lambda 29秒制限とUXの両面から非同期を採用。DynamoDB Streams → Worker Lambda → Bedrock のパイプラインで、SQS投入失敗リスクを構造的に排除。</p>
+      </div>
+      <div class="note-block">
+        <h3>データベースの議論</h3>
+        <p>DynamoDB はチーム全員が未経験で最も議論が白熱。AI支援（Claude Code等）を活用して学習しつつ進める方針で合意。RDS（PostgreSQL）も候補だったが、月$1以下のコスト・フルマネージド・サーバーレス親和を優先。テーブル設計方式（シングルテーブル vs テーブル・パー・エンティティ）はプロト検証後に決定。</p>
+      </div>
+      <div class="note-block">
+        <h3>アーキテクチャ原則の合意</h3>
+        <ul>
+          <li><strong>1操作 = 1ファイル：</strong>AIコーディングエージェントがスコープを即座に特定できる粒度</li>
+          <li><strong>依存は上から下へだけ：</strong>Route → UseCase → Domain → Repository の一方向。循環依存を構造で防ぐ</li>
+          <li><strong>契約は shared に集約：</strong>ZodスキーマをSingle Source of Truthとして、フロント・バックの型ズレを原理的に排除</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="doc-footer">
+    <p>
+      ありがとうカード プロジェクト — Sprint 0 アーキテクチャ設計サマリー v1<br>
+      <strong>フィードバック期限：</strong>2026/03/23
+    </p>
+  </section>
+
+</main>
+
+</body>
+</html>

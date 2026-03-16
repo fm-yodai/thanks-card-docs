@@ -220,17 +220,18 @@
       "order": 4
     },
     {
-      "title": "アーキテクチャ設計・技術スタック（叩き台）",
-      "path": "./docs/architecture_decision_draft.html",
-      "group": "sprint0",
-      "icon": "📋",
-      "badges": ["TEMPLATE", "ARCH"],
-      "color": "mint",
-      "description": "ワークショップの成果を記録するためのテンプレート。技術選定の理由と未決定事項を整理します。",
+      "title": "アーキテクチャ設計サマリー",
+      "path": "./docs/architecture-summary.html",
+      "group": "project",
+      "icon": "🏗️",
+      "badges": ["ARCH", "SUMMARY"],
+      "color": "sky",
+      "description": "技術スタック・非機能要件・主要設計判断・未決定事項をまとめたアーキテクチャのサマリー。詳細設計ノートへのハブ。",
       "meta": [
-        "📄 テンプレート"
+        "📄 サマリー",
+        "📋 ADR 8件抜粋"
       ],
-      "order": 5
+      "order": 4
     },
     {
       "title": "Definition of Done（DoD）入門",
