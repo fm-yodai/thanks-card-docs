@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ありがとうカード — 要件定義（骨格）ワーク</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #FF6B6B;
+    --orange: #FFA552;
+    --yellow: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --purple: #9B72CF;
+    --dark: #1a1a2e;
+    --dark-sub: #2d2d4a;
+    --cream: #FFF8F0;
+    --text: #2d2d4a;
+    --text-light: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    line-height: 1.8;
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  nav a {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text);
+    opacity: 0.2;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: block;
+    position: relative;
+  }
+
+  nav a.active {
+    opacity: 1;
+    transform: scale(1.4);
+    background: var(--mint);
+  }
+
+  nav a::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  nav a:hover::after { opacity: 1; }
+
+  /* ===== SECTIONS ===== */
+  section {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .section-inner.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--dark);
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(107,203,119,0.12), transparent),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(77,150,255,0.10), transparent),
+      radial-gradient(ellipse 400px 300px at 50% 50%, rgba(255,217,61,0.07), transparent);
+  }
+
+  .hero .section-inner { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--mint), var(--sky));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 30px;
+    letter-spacing: 0.08em;
+    margin-bottom: 32px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .hero h1 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 60px);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, #d4f5dc 50%, #cfe8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    margin-bottom: 40px;
+    line-height: 1.9;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .hero-meta-item span { font-size: 18px; }
+
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    animation: fadeInUp 1s 1.2s both;
+  }
+
+  .scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid rgba(255,255,255,0.35);
+    border-bottom: 2px solid rgba(255,255,255,0.35);
+    transform: rotate(45deg);
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: rotate(45deg) translateY(0); }
+    30% { transform: rotate(45deg) translateY(6px); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 120px;
+    line-height: 1;
+    opacity: 0.06;
+    position: absolute;
+    top: 40px;
+    left: 60px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(24px, 3.5vw, 38px);
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
+  .lead {
+    font-size: 15px;
+    color: var(--text-light);
+    max-width: 800px;
+    margin-bottom: 32px;
+    line-height: 1.9;
+  }
+
+  /* ===== SECTION THEMES ===== */
+  .light-section { background: var(--cream); }
+  .light-section .section-tag { background: rgba(77,150,255,0.1); color: var(--sky); }
+  .light-section .section-num { color: var(--text); }
+
+  .alt-section { background: linear-gradient(180deg, #eef6ff, #f0f0ff); }
+  .alt-section .section-tag { background: rgba(155,114,207,0.12); color: var(--purple); }
+
+  .warm-section { background: linear-gradient(180deg, #fff8f0, #fff0e6); }
+  .warm-section .section-tag { background: rgba(255,165,82,0.12); color: var(--orange); }
+
+  .green-section { background: var(--cream); }
+  .green-section .section-tag { background: rgba(107,203,119,0.12); color: var(--mint); }
+
+  .dark-section {
+    background: var(--dark);
+    color: #fff;
+  }
+  .dark-section .section-num { color: #fff; opacity: 0.04; }
+  .dark-section .section-tag { background: rgba(255,217,61,0.15); color: var(--yellow); }
+  .dark-section .lead { color: rgba(255,255,255,0.55); }
+  .dark-section h2 { color: #fff; }
+
+  .cta-section {
+    background: var(--dark);
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 500px 400px at 30% 60%, rgba(107,203,119,0.12), transparent),
+      radial-gradient(ellipse 600px 400px at 70% 40%, rgba(77,150,255,0.10), transparent);
+  }
+
+  .cta-section .section-inner { position: relative; z-index: 1; }
+
+  /* ===== DRAFT BADGE ===== */
+  .draft-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(107,203,119,0.12);
+    border: 1px solid rgba(107,203,119,0.25);
+    color: var(--mint);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 4px 14px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+  }
+
+  /* ===== AGENDA ===== */
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .agenda-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    text-align: center;
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .agenda-item:hover { transform: translateY(-4px); }
+
+  .agenda-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .agenda-item:nth-child(1)::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .agenda-item:nth-child(2)::before { background: linear-gradient(90deg, var(--purple), var(--mint)); }
+  .agenda-item:nth-child(3)::before { background: linear-gradient(90deg, var(--orange), var(--coral)); }
+  .agenda-item:nth-child(4)::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+
+  .agenda-time {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    opacity: 0.6;
+  }
+
+  .agenda-item:nth-child(1) .agenda-time { color: var(--sky); }
+  .agenda-item:nth-child(2) .agenda-time { color: var(--purple); }
+  .agenda-item:nth-child(3) .agenda-time { color: var(--orange); }
+  .agenda-item:nth-child(4) .agenda-time { color: var(--mint); }
+
+  .agenda-icon { font-size: 32px; margin-bottom: 10px; }
+
+  .agenda-item h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .agenda-item p {
+    font-size: 12px;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  /* ===== INSIGHT BOX ===== */
+  .insight-box {
+    margin-top: 24px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 26px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--mint);
+  }
+
+  .dark-section .insight-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 4px solid var(--yellow);
+  }
+
+  .insight-box p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .dark-section .insight-box p { color: rgba(255,255,255,0.65); }
+  .insight-box strong { color: var(--text); }
+  .dark-section .insight-box strong { color: #fff; }
+
+  /* ===== DEFINITION CARDS ===== */
+  .def-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .def-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .def-card:hover { transform: translateY(-3px); }
+
+  .def-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .def-card.sky::before   { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .def-card.mint::before  { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .def-card.coral::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .def-card.orange::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+
+  .def-card-icon { font-size: 26px; margin-bottom: 10px; display: block; }
+
+  .def-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .def-card p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== COMPARE TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    margin-top: 8px;
+    margin-bottom: 24px;
+  }
+
+  .compare-table th {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 13px 18px;
+    text-align: left;
+  }
+
+  .compare-table th:not(:first-child) { text-align: center; }
+
+  .compare-table td {
+    background: #fff;
+    padding: 12px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--text-light);
+  }
+
+  .compare-table td:first-child { font-weight: 700; color: var(--text); }
+  .compare-table td:not(:first-child) { text-align: center; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .cell-ok { color: var(--mint) !important; font-weight: 700 !important; }
+
+  /* ===== DRAFT INTRO CARDS ===== */
+  .draft-intro-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 8px;
+  }
+
+  .draft-intro-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+
+  .draft-intro-card:hover { transform: translateY(-4px); }
+
+  .draft-intro-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .draft-intro-card:nth-child(1)::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .draft-intro-card:nth-child(2)::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .draft-intro-card:nth-child(3)::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+
+  .draft-intro-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .draft-intro-card:nth-child(1) .draft-intro-num { color: var(--sky); }
+  .draft-intro-card:nth-child(2) .draft-intro-num { color: var(--coral); }
+  .draft-intro-card:nth-child(3) .draft-intro-num { color: var(--mint); }
+
+  .draft-intro-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 17px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .draft-intro-card p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  .draft-status {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .draft-intro-card:nth-child(1) .draft-status { background: rgba(77,150,255,0.1); color: var(--sky); }
+  .draft-intro-card:nth-child(2) .draft-status { background: rgba(255,107,107,0.1); color: var(--coral); }
+  .draft-intro-card:nth-child(3) .draft-status { background: rgba(107,203,119,0.1); color: var(--mint); }
+
+  /* ===== DRAFT CONTENT ===== */
+  .quote-box {
+    background: linear-gradient(135deg, rgba(77,150,255,0.06), rgba(155,114,207,0.06));
+    border-left: 4px solid var(--sky);
+    border-radius: 0 14px 14px 0;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .quote-box p {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .quote-box .quote-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--sky);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .info-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 30px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    color: var(--text);
+  }
+
+  /* ===== MVP TABLE ===== */
+  .mvp-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 8px;
+  }
+
+  .mvp-col h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .feature-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    line-height: 1.5;
+  }
+
+  .feature-item .fi-cat {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 30px;
+    white-space: nowrap;
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  .fi-cat.auth   { background: rgba(77,150,255,0.12); color: var(--sky); }
+  .fi-cat.card   { background: rgba(255,107,107,0.12); color: var(--coral); }
+  .fi-cat.view   { background: rgba(155,114,207,0.12); color: var(--purple); }
+  .fi-cat.notify { background: rgba(255,165,82,0.12); color: var(--orange); }
+  .fi-cat.engage { background: rgba(107,203,119,0.12); color: var(--mint); }
+  .fi-cat.base   { background: rgba(255,217,61,0.12); color: #b8960a; }
+
+  .feature-item .fi-name { font-weight: 600; color: var(--text); }
+  .feature-item .fi-desc { font-size: 12px; color: var(--text-light); }
+
+  .ng-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ng-item {
+    background: rgba(0,0,0,0.03);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .ng-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .ng-item .ng-name { font-weight: 600; color: var(--text-light); }
+  .ng-item .ng-reason { font-size: 12px; color: var(--text-light); opacity: 0.8; }
+
+  /* ===== SCREEN CARDS ===== */
+  .screen-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .screen-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screen-card:hover { transform: translateY(-3px); }
+
+  .screen-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .screen-card:nth-child(1)::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .screen-card:nth-child(2)::before { background: linear-gradient(90deg, var(--purple), var(--coral)); }
+  .screen-card:nth-child(3)::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .screen-card:nth-child(4)::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+
+  .screen-path {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .screen-card:nth-child(1) .screen-path { color: var(--sky); }
+  .screen-card:nth-child(2) .screen-path { color: var(--purple); }
+  .screen-card:nth-child(3) .screen-path { color: var(--coral); }
+  .screen-card:nth-child(4) .screen-path { color: var(--mint); }
+
+  .screen-guard {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 30px;
+    background: rgba(0,0,0,0.06);
+    color: var(--text-light);
+    font-weight: 600;
+  }
+
+  .screen-card h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .screen-card p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.65;
+  }
+
+  .screen-features {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sf-tag {
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.04);
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  /* ===== CATEGORY CARDS ===== */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .cat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-card:hover { transform: translateY(-3px); }
+
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .cat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .cat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
+  .cat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--purple), var(--coral)); }
+  .cat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+  .cat-card:nth-child(5)::before { background: linear-gradient(90deg, var(--mint), var(--sky)); }
+  .cat-card:nth-child(6)::before { background: linear-gradient(90deg, var(--sky), var(--mint)); }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .cat-icon { font-size: 20px; }
+
+  .cat-header h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .cat-count {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 30px;
+    background: rgba(0,0,0,0.05);
+    color: var(--text-light);
+  }
+
+  .cat-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-light);
+    line-height: 1.5;
+    padding: 3px 0;
+  }
+
+  .cat-item::before {
+    content: '›';
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .cat-card:nth-child(1) .cat-item::before { color: var(--sky); }
+  .cat-card:nth-child(2) .cat-item::before { color: var(--coral); }
+  .cat-card:nth-child(3) .cat-item::before { color: var(--purple); }
+  .cat-card:nth-child(4) .cat-item::before { color: var(--orange); }
+  .cat-card:nth-child(5) .cat-item::before { color: var(--mint); }
+  .cat-card:nth-child(6) .cat-item::before { color: var(--sky); }
+
+  .cat-item strong { color: var(--text); font-weight: 600; }
+
+  /* ===== REF LINK ===== */
+  .ref-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    border: 1px solid currentColor;
+    opacity: 0.7;
+    color: var(--sky);
+  }
+
+  .ref-link:hover { opacity: 1; }
+  .ref-link.coral { color: var(--coral); }
+  .ref-link.mint  { color: var(--mint); }
+
+  /* ===== DISCUSS PROMPT ===== */
+  .discuss-prompt {
+    background: linear-gradient(135deg, #1e2040, #2a2a50);
+    border-radius: 20px;
+    padding: 32px 36px;
+    color: #fff;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .discuss-prompt::before {
+    content: '💬';
+    position: absolute;
+    top: -8px; right: 20px;
+    font-size: 80px;
+    opacity: 0.06;
+  }
+
+  .discuss-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    background: rgba(107,203,119,0.2);
+    color: var(--mint);
+  }
+
+  .discuss-prompt h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .discuss-prompt > p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.8;
+  }
+
+  .discuss-questions {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .discuss-q {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    transition: background 0.3s;
+  }
+
+  .discuss-q:hover { background: rgba(255,255,255,0.1); }
+
+  .discuss-q-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== TIMER BANNER ===== */
+  .timer-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,217,61,0.12);
+    border: 1px solid rgba(255,217,61,0.2);
+    border-radius: 30px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--yellow);
+    margin-bottom: 20px;
+  }
+
+  .light-section .timer-banner,
+  .warm-section .timer-banner,
+  .alt-section .timer-banner,
+  .green-section .timer-banner {
+    background: rgba(107,203,119,0.1);
+    border-color: rgba(107,203,119,0.2);
+    color: var(--mint);
+  }
+
+  /* ===== CHECKLIST ===== */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .check-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    transition: transform 0.3s;
+  }
+
+  .check-item:hover { transform: translateX(4px); }
+
+  .check-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .check-item:nth-child(1) .check-icon { background: rgba(107,203,119,0.12); }
+  .check-item:nth-child(2) .check-icon { background: rgba(255,107,107,0.12); }
+  .check-item:nth-child(3) .check-icon { background: rgba(77,150,255,0.12); }
+  .check-item:nth-child(4) .check-icon { background: rgba(255,165,82,0.12); }
+
+  .check-item h3 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .check-item p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* ===== NEXT STEPS ===== */
+  .next-steps {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+
+  .next-step {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px 28px;
+    text-align: center;
+    min-width: 150px;
+  }
+
+  .next-step-icon { font-size: 28px; margin-bottom: 8px; }
+  .next-step-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+  }
+
+  .cta-section h2 {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4vw, 48px);
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff, #d4f5dc, #cfe8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cta-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    max-width: 620px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+  }
+
+  /* ===== PAGE COUNTER ===== */
+  .page-counter {
+    position: fixed;
+    bottom: 24px;
+    left: 32px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0.3;
+    z-index: 100;
+    transition: color 0.4s;
+  }
+
+  .page-counter.light { color: #fff; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    section { padding: 40px 20px; }
+    .section-num { font-size: 72px; top: 20px; left: 20px; }
+    .agenda-grid, .def-grid, .draft-intro-grid, .screen-grid, .mvp-split, .cat-grid { grid-template-columns: 1fr; }
+    nav { right: 10px; }
+    .hero-meta { flex-direction: column; align-items: center; gap: 10px; }
+    .next-steps { flex-direction: column; align-items: center; }
+    .compare-table { font-size: 12px; }
+    .compare-table th, .compare-table td { padding: 10px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#hero"          data-label="Top" class="active"></a>
+  <a href="#agenda"        data-label="アジェンダ"></a>
+  <a href="#what-is-req"   data-label="要件定義とは"></a>
+  <a href="#agile"         data-label="アジャイルの文脈"></a>
+  <a href="#draft-intro"   data-label="叩き台の提示"></a>
+  <a href="#draft-purpose" data-label="①目的"></a>
+  <a href="#draft-mvp"     data-label="②MVP"></a>
+  <a href="#draft-scope"   data-label="③大項目"></a>
+  <a href="#discussion"    data-label="ディスカッション"></a>
+  <a href="#next-action"   data-label="ネクストアクション"></a>
+  <a href="#close"         data-label="クロージング"></a>
+</nav>
+
+<div class="page-counter"><span id="currentPage">1</span> / 11</div>
+
+
+<!-- ===== 1. HERO ===== -->
+<section class="hero" id="hero">
+  <div class="section-inner visible">
+    <div class="hero-badge">📋 Sprint 0 ワーク</div>
+    <h1>要件定義（骨格）ワーク</h1>
+    <p class="hero-sub">
+      叩き台を一緒に確認して、内容への合意を目指す。<br>
+      「何が決まったか」がわかる状態でこの場を終えよう。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span>⏱</span> 30〜60分</div>
+      <div class="hero-meta-item"><span>👥</span> 要件定義チーム 4名</div>
+      <div class="hero-meta-item"><span>🎯</span> 叩き台への合意</div>
+      <div class="hero-meta-item"><span>🎙️</span> ファシリテーター: 中島さん</div>
+    </div>
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 2. AGENDA ===== -->
+<section class="light-section" id="agenda">
+  <div class="section-num">01</div>
+  <div class="section-inner">
+    <span class="section-tag">AGENDA</span>
+    <h2>今日の流れ</h2>
+    <p class="lead">
+      全体で30〜60分。既存の資料から作った叩き台を見てもらいながら、内容を確認・議論します。
+    </p>
+    <div class="agenda-grid">
+      <div class="agenda-item">
+        <div class="agenda-time">0:00–0:05</div>
+        <div class="agenda-icon">🙌</div>
+        <h3>オープニング</h3>
+        <p>今日の目的と<br>ゴールを共有</p>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">0:05–0:15</div>
+        <div class="agenda-icon">📖</div>
+        <h3>要件定義の基礎</h3>
+        <p>要件定義とは何か<br>アジャイルでの位置づけ</p>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">0:15–0:50</div>
+        <div class="agenda-icon">💬</div>
+        <h3>叩き台の確認・議論</h3>
+        <p>①目的 ②MVP ③大項目<br>の内容を一緒に確認</p>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time">0:50–1:00</div>
+        <div class="agenda-icon">✅</div>
+        <h3>合意・まとめ</h3>
+        <p>決まったことの確認<br>ネクストアクション</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>🎯 <strong>今日のゴール：</strong>要件定義の叩き台（①目的・②MVP・③大項目）の内容についてチームで合意すること。完璧な要件書ではありません。「この方向で進めていい」という初稿への合意が目的です。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 3. WHAT IS REQUIREMENTS ===== -->
+<section class="light-section" id="what-is-req">
+  <div class="section-num">02</div>
+  <div class="section-inner">
+    <span class="section-tag">KNOWLEDGE</span>
+    <h2>要件定義とは？</h2>
+    <p class="lead">
+      要件定義とは「何を作るか」を明確にする作業です。<br>
+      開発に入る前に、作る側と依頼する側の認識を揃えることが目的です。
+    </p>
+    <div class="def-grid">
+      <div class="def-card sky">
+        <span class="def-card-icon">🎯</span>
+        <h3>機能要件</h3>
+        <p>システムが「何をするか」。ユーザーが使う機能・画面・データの流れ。<br>例）カードを送信できる / タイムラインを閲覧できる</p>
+      </div>
+      <div class="def-card mint">
+        <span class="def-card-icon">⚙️</span>
+        <h3>非機能要件</h3>
+        <p>システムが「どれくらい」動くか。速度・セキュリティ・可用性など。<br>例）60名が同時利用できる / 月5,000円以内で運用できる</p>
+      </div>
+      <div class="def-card coral">
+        <span class="def-card-icon">🚫</span>
+        <h3>スコープ外</h3>
+        <p>「やらないこと」の明示。何をしないかを決めることでスコープが締まる。<br>例）ランキング機能・人事評価との連動はMVPに含めない</p>
+      </div>
+      <div class="def-card orange">
+        <span class="def-card-icon">🏁</span>
+        <h3>完成の定義（DoD）</h3>
+        <p>「作った」と言えるための基準。テスト・レビュー・デプロイの条件。<br>例）動作確認済み / PRレビュー通過 / ステージング反映</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>目的は「認識合わせ」です。</strong>作ってから「これじゃなかった」という事態を防ぐために、先に方針を揃えます。ドキュメントを作ることが目的ではありません。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 4. AGILE CONTEXT ===== -->
+<section class="alt-section" id="agile">
+  <div class="section-num">03</div>
+  <div class="section-inner">
+    <span class="section-tag">AGILE CONTEXT</span>
+    <h2>アジャイルでの要件定義</h2>
+    <p class="lead">
+      今回はウォーターフォールではなく、アジャイル・カンバン方式での開発です。<br>
+      要件定義の「粒度」と「タイミング」が少し変わります。
+    </p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>観点</th>
+          <th>ウォーターフォール</th>
+          <th>アジャイル（今回）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>📋 要件の粒度</td>
+          <td>開発前に全て詳細に定義</td>
+          <td class="cell-ok">骨格を決め、詳細はスプリントごとに追加</td>
+        </tr>
+        <tr>
+          <td>📅 定義のタイミング</td>
+          <td>プロジェクト開始時に一括</td>
+          <td class="cell-ok">継続的に見直し・更新できる</td>
+        </tr>
+        <tr>
+          <td>🔄 変更の扱い</td>
+          <td>変更はコストが高い</td>
+          <td class="cell-ok">変更を受け入れ、柔軟に対応する</td>
+        </tr>
+        <tr>
+          <td>📄 ドキュメント量</td>
+          <td>仕様書を詳細に整備</td>
+          <td class="cell-ok">必要最小限。動くものを優先</td>
+        </tr>
+        <tr>
+          <td>👥 全員の関与</td>
+          <td>要件定義フェーズに集中</td>
+          <td class="cell-ok">スプリントごとに全員で確認・調整</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="insight-box" style="border-left-color: var(--purple);">
+      <p>📌 <strong>今回の方針：</strong>今日は「骨格となる叩き台」を確認する会です。詳細な機能仕様は各スプリントで担当者と詰めていきます。今日決めるのは「方向性」だけで大丈夫です。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 5. DRAFT INTRO ===== -->
+<section class="warm-section" id="draft-intro">
+  <div class="section-num">04</div>
+  <div class="section-inner">
+    <span class="section-tag">DRAFT</span>
+    <h2>叩き台を用意しました</h2>
+    <p class="lead">
+      インセプションデッキと技術設計ノートから情報を引用して、要件定義の初稿（叩き台）を作りました。<br>
+      次のスライドから順番に確認して、気になるところを話し合いましょう。
+    </p>
+    <div class="draft-intro-grid">
+      <div class="draft-intro-card">
+        <div class="draft-intro-num">01</div>
+        <h3>目的</h3>
+        <p>なぜ作るか・誰のためかを整理。インセプションデッキのエレベーターピッチを軸に、プロダクトの存在意義と学習目的をまとめました。</p>
+        <span class="draft-status">✅ インセプションデッキより引用</span>
+      </div>
+      <div class="draft-intro-card">
+        <div class="draft-intro-num">02</div>
+        <h3>MVP</h3>
+        <p>含む機能14件・やらないこと7件を整理。機能リストは既にありますが「最低ライン（カットできるもの）」はまだ合意できていません。</p>
+        <span class="draft-status">⚠️ 最低ラインは今日の議論ポイント</span>
+      </div>
+      <div class="draft-intro-card">
+        <div class="draft-intro-num">03</div>
+        <h3>大項目</h3>
+        <p>MVPの14機能を6カテゴリに分け、「〜できる」形式のユーザーストーリーで整理しました。記述の正確さとカテゴリの漏れを確認します。</p>
+        <span class="draft-status">✅ 技術設計ノートより引用・整理</span>
+      </div>
+    </div>
+    <div class="insight-box" style="border-left-color: var(--orange);">
+      <p>💡 <strong>見てほしいこと：</strong>「抜けや違いはないか」「この方向でいいか」の視点で確認してください。叩き台なので、修正・追加・削除は全て歓迎です。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 6. DRAFT — ①目的 ===== -->
+<section class="light-section" id="draft-purpose">
+  <div class="section-num">05</div>
+  <div class="section-inner">
+    <div class="draft-badge">📋 DRAFT — ① 目的</div>
+    <h2>このアプリを作る目的</h2>
+    <p class="lead">インセプションデッキで合意した内容をもとにした叩き台です。</p>
+
+    <div class="quote-box">
+      <span class="quote-label">ELEVATOR PITCH</span>
+      <p>
+        <strong>従業員エンゲージメントを高めたい</strong>組織のための「ありがとうカード」は、<br>
+        <strong>感謝 × AIラベリングで承認を可視化する</strong>アプリです。<br>
+        AIが自動でコンピテンシーをラベル付けし、<strong>承認が記録として蓄積され、行動指針が自然と共通言語になる</strong>ことが特徴です。
+      </p>
+    </div>
+
+    <div class="def-grid" style="margin-top:0;">
+      <div class="def-card sky">
+        <span class="def-card-icon">🌱</span>
+        <h3>プロダクトとしての目的</h3>
+        <p>感謝を「記録される承認」に変え、FREEMINDの5つのコアコンピテンシー（誠実・当事者意識・協働・挑戦への意欲・創造的思考）の浸透とエンゲージメント向上の好循環を生み出す。</p>
+      </div>
+      <div class="def-card mint">
+        <span class="def-card-icon">🎓</span>
+        <h3>プロジェクトとしての目的</h3>
+        <p>若手メンバーが企画→設計→開発→リリース→運用の全工程を経験し、0からプロダクトを作り切る成長の場にする。「プロダクト」と「人」の両方を育てる。</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+      <p style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:8px;">ターゲット</p>
+      <div class="info-chips">
+        <span class="chip">👥 全社員 約60名</span>
+        <span class="chip">🏢 4部署（営業部・開発部・DX企画部・管理部）</span>
+      </div>
+    </div>
+
+    <a class="ref-link" href="../docs/inception-deck.html" target="_blank">📄 インセプションデッキを見る →</a>
+  </div>
+</section>
+
+
+<!-- ===== 7. DRAFT — ②MVP ===== -->
+<section class="light-section" id="draft-mvp">
+  <div class="section-num">06</div>
+  <div class="section-inner">
+    <div class="draft-badge">📋 DRAFT — ② MVP</div>
+    <h2>MVPに含む機能とスコープ外</h2>
+    <p class="lead">インセプションデッキの「やること / やらないこと」をもとにした叩き台です。</p>
+    <div class="timer-banner">⏱ ここが最も重要な確認ポイントです</div>
+
+    <div class="mvp-split">
+      <!-- やること -->
+      <div class="mvp-col">
+        <h3>✅ やること（MVP機能 14件）</h3>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="fi-cat auth">認証</span>
+            <div><div class="fi-name">ログイン</div><div class="fi-desc">@freemind.co.jp のGoogleアカウント認証</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat card">カード</span>
+            <div><div class="fi-name">宛先選択</div><div class="fi-desc">1名 / 複数名 / 未選択（全体向け）の3パターン</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat card">カード</span>
+            <div><div class="fi-name">カード送信</div><div class="fi-desc">テキスト入力・送信</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat card">カード</span>
+            <div><div class="fi-name">AIバッジ自動付与</div><div class="fi-desc">5コンピテンシーをAIが自動判定・ラベリング</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat card">カード</span>
+            <div><div class="fi-name">匿名送信</div><div class="fi-desc">受信者には匿名・管理者は確認可能</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat card">カード</span>
+            <div><div class="fi-name">公開 / 非公開</div><div class="fi-desc">非公開は送受信者のみ閲覧可</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat view">閲覧</span>
+            <div><div class="fi-name">送受信一覧</div><div class="fi-desc">自分が送った / 受け取ったカードの一覧</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat view">閲覧</span>
+            <div><div class="fi-name">全体タイムライン</div><div class="fi-desc">公開カードを全社員が閲覧</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat notify">通知</span>
+            <div><div class="fi-name">メール通知</div><div class="fi-desc">未開封カード通知 + 月1集計通知</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat view">閲覧</span>
+            <div><div class="fi-name">開封演出</div><div class="fi-desc">カード開封時のアニメーション</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat card">カード</span>
+            <div><div class="fi-name">送信時アニメーション</div><div class="fi-desc">カード送信時の演出</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat engage">成長</span>
+            <div><div class="fi-name">ゲーミフィケーション</div><div class="fi-desc">組織の木（全員で育てる）+ ありがとうゲージ</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat engage">成長</span>
+            <div><div class="fi-name">自己分析</div><div class="fi-desc">コンピテンシー集計・強み表示・レーダーチャート</div></div>
+          </div>
+          <div class="feature-item">
+            <span class="fi-cat base">基盤</span>
+            <div><div class="fi-name">分析基盤</div><div class="fi-desc">KPI収集・蓄積（管理画面なし）</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- やらないこと -->
+      <div class="mvp-col">
+        <h3>🚫 やらないこと（スコープ外）</h3>
+        <div class="ng-list">
+          <div class="ng-item">
+            <span class="ng-icon">🏆</span>
+            <div><div class="ng-name">ランキング機能</div><div class="ng-reason">競争を煽る仕組みは感謝文化と合わない</div></div>
+          </div>
+          <div class="ng-item">
+            <span class="ng-icon">📊</span>
+            <div><div class="ng-name">人事評価との連動</div><div class="ng-reason">評価と紐づくと気軽に使えなくなる</div></div>
+          </div>
+          <div class="ng-item">
+            <span class="ng-icon">🎨</span>
+            <div><div class="ng-name">スタンプ・テンプレート固定</div><div class="ng-reason">自分の言葉で感謝を伝えることを重視</div></div>
+          </div>
+          <div class="ng-item">
+            <span class="ng-icon">👍</span>
+            <div><div class="ng-name">いいね / いいねランキング</div><div class="ng-reason">人気投票化のリスクがある</div></div>
+          </div>
+          <div class="ng-item">
+            <span class="ng-icon">🔔</span>
+            <div><div class="ng-name">通知カスタマイズ</div><div class="ng-reason">複雑度が高い。メール通知のみで十分</div></div>
+          </div>
+          <div class="ng-item">
+            <span class="ng-icon">🔄</span>
+            <div><div class="ng-name">アカウント自動同期</div><div class="ng-reason">60名規模なので手動管理で対応</div></div>
+          </div>
+          <div class="ng-item">
+            <span class="ng-icon">🤖</span>
+            <div><div class="ng-name">AI文章生成・ラベリングカスタマイズ</div><div class="ng-reason">MVPリリース後に追加</div></div>
+          </div>
+        </div>
+
+        <div class="insight-box" style="margin-top: 16px; border-left-color: var(--coral);">
+          <p>⚠️ <strong>今日の議論ポイント：</strong>14機能のうち「カットできるもの」はどれか。「これだけあればリリースできる」最低ラインを確認しましょう。</p>
+        </div>
+      </div>
+    </div>
+
+    <a class="ref-link coral" href="../docs/inception-deck.html" target="_blank">📄 インセプションデッキ（機能一覧）を見る →</a>
+  </div>
+</section>
+
+
+<!-- ===== 8. DRAFT — ③大項目 ===== -->
+<section class="alt-section" id="draft-scope">
+  <div class="section-num">07</div>
+  <div class="section-inner">
+    <div class="draft-badge">📋 DRAFT — ③ 大項目</div>
+    <h2>機能の大項目（ユーザーストーリー）</h2>
+    <p class="lead">MVPの機能を「〜できる」形式で6カテゴリに整理した叩き台です。記述が実態と合っているか、漏れがないか確認してください。</p>
+
+    <div class="cat-grid">
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-icon">🔐</span>
+          <h3>認証・ユーザー管理</h3>
+          <span class="cat-count">2件</span>
+        </div>
+        <div class="cat-items">
+          <div class="cat-item">社員は <strong>Googleアカウントでログインできる</strong></div>
+          <div class="cat-item">未ログインの場合、ログイン画面に <strong>自動でリダイレクトされる</strong></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-icon">💌</span>
+          <h3>カード機能</h3>
+          <span class="cat-count">7件</span>
+        </div>
+        <div class="cat-items">
+          <div class="cat-item">社員は <strong>宛先（1名・複数名・全体）を選んでカードを送ることができる</strong></div>
+          <div class="cat-item">社員は <strong>テキストで感謝メッセージを書いて送信できる</strong></div>
+          <div class="cat-item">送信されたカードに <strong>AIが5つのコンピテンシーバッジを自動付与できる</strong></div>
+          <div class="cat-item">社員は <strong>匿名でカードを送ることができる</strong>（受信者には匿名・管理者は確認可）</div>
+          <div class="cat-item">社員は <strong>カードを公開 / 非公開で送ることができる</strong></div>
+          <div class="cat-item">社員は <strong>カード送信時にアニメーション演出を見ることができる</strong></div>
+          <div class="cat-item">社員は <strong>受け取ったカードを開封する演出を体験できる</strong></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-icon">📋</span>
+          <h3>閲覧・タイムライン</h3>
+          <span class="cat-count">2件</span>
+        </div>
+        <div class="cat-items">
+          <div class="cat-item">社員は <strong>全社の公開カードをタイムラインで一覧できる</strong></div>
+          <div class="cat-item">社員は <strong>自分が送った・受け取ったカードを一覧できる</strong></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-icon">🔔</span>
+          <h3>通知</h3>
+          <span class="cat-count">2件</span>
+        </div>
+        <div class="cat-items">
+          <div class="cat-item">社員は <strong>未開封のカードがある時、メールで通知を受け取ることができる</strong></div>
+          <div class="cat-item">社員は <strong>月1回、感謝の集計レポートをメールで受け取ることができる</strong></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-icon">🌱</span>
+          <h3>エンゲージメント</h3>
+          <span class="cat-count">2件</span>
+        </div>
+        <div class="cat-items">
+          <div class="cat-item">社員は <strong>カードが送られるたびに組織の木が育つのを全員で確認できる</strong></div>
+          <div class="cat-item">社員は <strong>自分のコンピテンシーレーダーチャートで強みを確認できる</strong></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-icon">📊</span>
+          <h3>分析基盤</h3>
+          <span class="cat-count">1件</span>
+        </div>
+        <div class="cat-items">
+          <div class="cat-item">管理担当者は <strong>利用状況・KPIを外部BIツールで分析できる</strong>（管理画面なし）</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="insight-box" style="margin-top: 0; border-left-color: var(--purple);">
+        <p style="font-size:13px;">⚙️ <strong>スプリント別の優先順位（案）</strong><br>
+          Sprint 1–2: 認証 → カード機能 → 閲覧・タイムライン<br>
+          Sprint 3–4: 通知・エンゲージメント<br>
+          Sprint 5–6: AI精度改善・ベータ → MVPリリース
+        </p>
+      </div>
+      <div class="insight-box" style="margin-top: 0; border-left-color: var(--sky);">
+        <p style="font-size:13px;">💡 <strong>今日の確認ポイント</strong><br>
+          「〜できる」の記述は認識と合っているか？<br>
+          カテゴリや機能の漏れはないか？<br>
+          どのユーザーストーリーが「最低ライン」に必要か？
+        </p>
+      </div>
+    </div>
+
+    <a class="ref-link mint" href="../docs/architecture-techselection.html#stack" target="_blank">📐 技術設計ノート（画面・API構成）を見る →</a>
+  </div>
+</section>
+
+
+<!-- ===== 9. DISCUSSION ===== -->
+<section class="dark-section" id="discussion">
+  <div class="section-num">08</div>
+  <div class="section-inner">
+    <span class="section-tag">DISCUSSION</span>
+    <h2>叩き台を確認しよう</h2>
+    <p class="lead">
+      3つの叩き台を見てもらいました。内容について意見をください。<br>
+      「違う」「足りない」「これは外せる」— 何でも聞かせてください。
+    </p>
+    <div class="timer-banner">⏱ 20〜30分</div>
+    <div class="discuss-prompt">
+      <span class="discuss-label">💬 DISCUSSION</span>
+      <h3>この叩き台の内容、どう思いますか？</h3>
+      <p>以下の観点から意見をもらえると助かります。</p>
+      <div class="discuss-questions">
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🎯</span>
+          <span><strong>①目的について：</strong>エレベーターピッチ・プロダクトの目的・学習目的の内容は認識と合っていますか？追加・修正があれば教えてください。</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">✂️</span>
+          <span><strong>②MVP「カットできるもの」はどれ？：</strong>14機能のうち「なくてもリリースできる」ものはありますか？ 例）ゲーミフィケーション・自己分析・アニメーション演出はMVP必須か？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🚫</span>
+          <span><strong>②MVP「やらないことに追加すべきものは？」：</strong>現在の7件で漏れはありますか？「これもやらない方がいい」と思うものがあれば。</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">🖥️</span>
+          <span><strong>③大項目について：</strong>「〜できる」の記述で認識と合っていないものはありますか？また、6カテゴリに入っていない「これができないと困る」という機能はありますか？</span>
+        </div>
+        <div class="discuss-q">
+          <span class="discuss-q-icon">❓</span>
+          <span><strong>全体を通して：</strong>3つの叩き台のどこかで「ここは決める必要があるのでは？」と思う部分はありますか？</span>
+        </div>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>📌 <strong>この会の役割：</strong>今日の議論をもとに、中島さんが要件定義の初稿を完成させます。完了後、メンバー全員で成果物を確認する機会を設けます。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 10. NEXT ACTION ===== -->
+<section class="green-section" id="next-action">
+  <div class="section-num">09</div>
+  <div class="section-inner">
+    <span class="section-tag">NEXT ACTION</span>
+    <h2>ネクストアクション</h2>
+    <p class="lead">今日の議論を受けて、次のステップを確認します。</p>
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-icon">✅</div>
+        <div>
+          <h3>本日の合意事項を記録する</h3>
+          <p>議論で出た「修正・追加・確認事項」をまとめる。（担当: 中島さん）</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">📋</div>
+        <div>
+          <h3>叩き台を修正して要件定義（初稿）を完成させる</h3>
+          <p>今日の議論での指摘を反映し、①目的・②MVP・③大項目の初稿を仕上げる。詳細な機能仕様は各スプリントで追加する。（担当: 中島さん）</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">👥</div>
+        <div>
+          <h3>成果物の共有会を設ける</h3>
+          <p>要件定義初稿が完成したら、メンバー全員で確認する機会を作る。フィードバックを受けて調整する。</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">🚀</div>
+        <div>
+          <h3>Sprint 1 へ移行する</h3>
+          <p>要件定義（骨格）完了後、Sprint 1（カード送受信機能の開発）を開始する。</p>
+        </div>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p>💡 <strong>要件定義は「作って終わり」ではありません。</strong>スプリントが進むにつれ詳細が判明し変更が生まれます。都度見直せる形にしておくことが大切です。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 11. CLOSE ===== -->
+<section class="cta-section" id="close">
+  <div class="section-inner">
+    <h2>叩き台から始めよう</h2>
+    <p class="cta-sub">
+      完璧な要件書は最初からは作れません。<br>
+      今日の議論で「この内容でいい」と言えれば、それが一番の成果です。
+    </p>
+    <div class="next-steps">
+      <div class="next-step">
+        <div class="next-step-icon">💬</div>
+        <div class="next-step-text">叩き台を<br>確認・議論</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-icon">📋</div>
+        <div class="next-step-text">初稿を<br>仕上げる</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-icon">👀</div>
+        <div class="next-step-text">全員で<br>確認・FB</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-icon">🚀</div>
+        <div class="next-step-text">Sprint 1<br>開始</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px 32px; max-width:700px; margin:0 auto 36px; text-align:left;">
+      <p style="font-size:14px; color:rgba(255,255,255,0.6); line-height:2;">
+        📣 <strong style="color:#fff;">参加者のみなさんへ：</strong><br>
+        今日の叩き台はプロジェクト全体をとおして参照される「骨格」になります。<br>
+        「ここは違う」「これも決めたい」という意見があれば、遠慮なく話してください。<br>
+        全員の視点が揃っていることが、この先の開発を支えます。
+      </p>
+    </div>
+    <p style="font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:20px; color:rgba(255,255,255,0.85);">
+      ありがとう 🙏
+    </p>
+  </div>
+</section>
+
+
+<script>
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('nav a');
+  const pageCounter = document.querySelector('.page-counter');
+  const currentPageEl = document.getElementById('currentPage');
+  const darkSections = new Set(['hero', 'discussion', 'close']);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const inner = entry.target.querySelector('.section-inner');
+        if (inner) inner.classList.add('visible');
+        const id = entry.target.id;
+        const index = [...sections].indexOf(entry.target);
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`nav a[href="#${id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+        currentPageEl.textContent = index + 1;
+        pageCounter.classList.toggle('light', darkSections.has(id));
+      }
+    });
+  }, { threshold: 0.45 });
+
+  sections.forEach(section => observer.observe(section));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

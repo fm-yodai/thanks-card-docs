@@ -382,6 +382,20 @@
         "📋 ADR 22件"
       ],
       "order": 10
+    },
+    {
+      "title": "要件定義（骨格） ワーク",
+      "path": "./work/requirements-definition-workshop.html",
+      "group": "sprint0",
+      "icon": "📋",
+      "badges": ["WORK", "REQ"],
+      "color": "mint",
+      "description": "要件定義でやること・やらないことを4名で合意するワーク資料。骨格3項目（目的・MVP・大項目）の確認と進め方を決める。",
+      "meta": [
+        "📄 全11スライド",
+        "⏱ 30〜60分"
+      ],
+      "order": 11
     }
   ]
 }
